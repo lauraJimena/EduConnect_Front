@@ -1,0 +1,125 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@900&family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Quicksand:wght@300..700&display=swap');
+/* Reset general */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+}
+body {
+    background-color: #d3f7f8;
+}
+main {
+    display: flex;
+    height: 100vh; /* ocupa toda la pantalla */
+    margin-bottom: -32px;
+}
+
+.left {
+    flex: 1.2; /* más espacio a la izquierda */
+   
+}
+
+.right {
+    flex: 1; /* menos espacio a la derecha */
+   
+}
+
+.left {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #d3f7f8;
+    height: 95%;
+}
+
+    .left img {
+        margin-top: 15%;
+        max-width: 96%;
+        height: auto;
+    }
+
+.right {
+
+    background: url('../img/FondoInicioSesion.png') repeat ;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 100px;
+    height: 95%;
+    box-sizing: border-box;
+}
+
+    .right h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        margin-top: 15%;
+        font-family: Montserrat, sans-serif;
+        font-size: 2.4em;
+        font-weight: bold;
+        margin-bottom: 18px;
+        text-shadow: 3.5px 2px 2px black, 3.5px 2px 2px black, 3.5px 2px 0 black, 1.5px 0 0 black;
+        color: #fbc959;
+    }
+
+/* Formulario */
+form {
+    font-family: Montserrat, sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding:0 75px;
+}
+
+    form input, form select {
+        font-family: Montserrat, sans-serif;
+        padding: 10px;
+        border: none;
+        border-radius: 35px;
+        outline: none;
+        font-size: 14px;
+        background: white;
+        
+    }
+
+        form input:focus, form select:focus {
+            border: 3px solid #1e2a78; /* morado */
+            box-shadow: 10px 10px 10px rgba(30, 42, 120, 0.99); /* brillo morado */
+        }
+
+.radio-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #333;
+}
+    .radio-opcion {
+        margin-top: -40px;
+    }
+
+/* Botón */
+button {
+    margin-top: 15px;
+    padding: 12px 5px;
+    background-color: #fbc959;
+    color: black;
+    font-size: 16px;
+    font-weight: bold;
+    border: 1px solid white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-bottom: 0px;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    box-shadow: 5px 7px white;
+}
+
+    button:hover {
+        background: rgba(30, 42, 120, 0.7);
+        box-shadow: 7px 7px 13px rgba(30, 42, 120, 0.99); /* glow morado */
+        color: white;
+    }

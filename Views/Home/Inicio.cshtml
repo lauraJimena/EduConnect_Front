@@ -1,0 +1,106 @@
+﻿
+@{
+    ViewData["Title"] = "Home Page";
+    Layout = "_Layout";
+}
+@section Styles {
+    
+    <link rel="stylesheet" href="~/estilos/estilos.css")">
+}
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>Aprendizaje que conecta, conocimiento que crece</h1>
+        <a href="#" class="btn-hero">EMPEZAR AHORA</a>
+    </div>
+</section>
+
+
+<!-- Carrusel -->
+<section class="carrusel">
+    <div class="contenedor-carrusel">
+
+        <!-- Diapositiva 1 -->
+        <div class="diapositiva activa">
+            <!-- Mitad izquierda: imagen -->
+            <div class="mitad izquierda">
+                <img src="~/img/Slide1.png" alt="Tutores ayudando">
+            </div>
+            <!-- Mitad derecha: texto -->
+            <div class="mitad derecha">
+                <p>
+                    Conéctate con una comunidad de tutores dispuestos a compartir su conocimiento y brindarte apoyo en tus materias.
+                   
+                </p>
+            </div>
+        </div>
+
+        <!-- Diapositiva 2 -->
+        <div class="diapositiva">
+            <!-- Mitad izquierda: texto -->
+            <div class="mitad izquierda texto">
+                <p>
+                    Los tutores reciben tus solicitudes y eligen si pueden acompañarte en la materia que necesitas.
+                </p>
+            </div>
+            <!-- Mitad derecha: imagen -->
+            <div class="mitad derecha imagen">
+                <img src="~/img/Slide2.png" alt="Tutores">
+            </div>
+        </div>
+
+        <!-- Diapositiva 3 -->
+        <div class="diapositiva">
+            <!-- Mitad izquierda: imagen -->
+            <div class="mitad izquierda">
+                <img src="~/img/Slide3.png" alt="Clases en línea">
+            </div>
+            <!-- Mitad derecha: texto -->
+            <div class="mitad derecha">
+                <p>
+                    EduConnect fomenta un aprendizaje colaborativo, donde enseñar y aprender son experiencias compartidas.
+                    
+                </p>
+            </div>
+        </div>
+
+    </div>
+    <!-- Botones de control (fuera del contenedor que se mueve) -->
+    <button class="flecha izquierda">←</button>
+    <button class="flecha derecha">→</button>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const contenedor = document.querySelector(".contenedor-carrusel");
+        const diapositivas = document.querySelectorAll(".diapositiva");
+        const btnIzquierda = document.querySelector(".flecha.izquierda");
+        const btnDerecha = document.querySelector(".flecha.derecha");
+
+        let indice = 0; // posición actual del carrusel
+        const total = diapositivas.length;
+
+        function mostrarDiapositiva() {
+            contenedor.style.transform = `translateX(-${indice * 100}%)`;
+        }
+
+        function siguienteDiapositiva() {
+            indice = (indice + 1) % total;
+            mostrarDiapositiva();
+        }
+
+        function anteriorDiapositiva() {
+            indice = (indice - 1 + total) % total;
+            mostrarDiapositiva();
+        }
+
+        btnDerecha.addEventListener("click", siguienteDiapositiva);
+        btnIzquierda.addEventListener("click", anteriorDiapositiva);
+
+        // inicial
+        mostrarDiapositiva();
+
+        // autoplay cada 3 segundos
+        setInterval(siguienteDiapositiva, 3000);
+    });
+</script>

@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\estilos\estilos.css" />
+    <None Include="wwwroot\estilos\inicioSesion.css" />
+    <None Include="wwwroot\estilos\panelTutorado.css" />
+    <None Include="wwwroot\estilos\registro.css" />
+    <None Include="wwwroot\estilos\site.css" />
+    <None Include="wwwroot\img\Baner.png" />
+    <None Include="wwwroot\img\Baner2.png" />
+    <None Include="wwwroot\img\Busqueda.png" />
+    <None Include="wwwroot\img\Editar.png" />
+    <None Include="wwwroot\img\EstudiantesBanner.png" />
+    <None Include="wwwroot\img\FondoCar.png" />
+    <None Include="wwwroot\img\FondoInicioSesion.png" />
+    <None Include="wwwroot\img\FondoPanelT.png" />
+    <None Include="wwwroot\img\FondoRegistro.png" />
+    <None Include="wwwroot\img\FondoTutorado.png" />
+    <None Include="wwwroot\img\Historial.png" />
+    <None Include="wwwroot\img\Inicio.png" />
+    <None Include="wwwroot\img\InicioSesion.png" />
+    <None Include="wwwroot\img\Logo.png" />
+    <None Include="wwwroot\img\Registro.png" />
+    <None Include="wwwroot\img\Slide1.png" />
+    <None Include="wwwroot\img\Slide2.png" />
+    <None Include="wwwroot\img\Slide3.png" />
+    <None Include="wwwroot\img\Solicitud.png" />
+  </ItemGroup>
+
+</Project>

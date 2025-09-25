@@ -1,0 +1,176 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@900&family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Quicksand:wght@300..700&display=swap');
+
+body {
+    background: #fff4d9;
+}
+.perfil-container {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    height: 700px;
+    padding: 20px;
+    gap: 15px;
+    margin-top:5.8%;
+}
+
+/* Panel izquierdo */
+.perfil-left {
+    flex: 1.6;
+    background: url('../img/FondoEditar.png') repeat;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0px 20px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+
+    .perfil-left .avatar {
+        padding: 8px;
+        border-radius: 50%;
+        border: 6px solid white;
+        box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+        margin-top:-40px;
+        
+    }
+
+    .perfil-left .avatar img {
+        width: 230px;
+        height: auto;
+       
+    }
+
+.nombre-tutorado {
+    margin-top: 15px;
+    background: #367172;
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    cursor: default;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.7);
+    box-shadow: 5px 7px white;
+}
+/* Avatares */
+.avatar-selector {
+    margin-top: 20px;
+    text-align: center;
+}
+    .avatar-selector p {
+        font-family: Montserrat, sans-serif;
+        margin-bottom:10px;
+    }
+.avatar-opciones {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+    .avatar-opciones label {
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .avatar-opciones input {
+        display: none;
+    }
+
+    .avatar-opciones img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        transition: border 0.3s ease;
+    }
+
+    /* Cuando el usuario selecciona un avatar */
+    .avatar-opciones input:checked + img {
+        padding: 3px;
+        border: 2.8px solid rgba(30, 42, 120, 0.8);
+        box-shadow: 2px 2px 15px rgba(30, 42, 120, 0.8); /* glow morado */
+    
+    }
+/* Panel derecho */
+.perfil-right {
+    flex: 2;
+    background: #e6e6e6 url('../img/FondoPerfil.png') repeat; /* azul claro */
+    border-radius: 15px;
+    padding: 50px 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+    position: relative;
+    
+}
+
+    /* Título */
+    .perfil-right h1 {
+        font-size: 2.3rem;
+        font-weight: bold;
+        color: #f9bb65;
+        text-shadow: 3px 3px #1e5778;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left:auto;
+        margin-right:auto;
+        font-family: 'League Spartan', sans-serif;
+    }
+
+        .perfil-right h1 img {
+            width: 60px;
+        }
+
+    /* Inputs */
+    .perfil-right form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+        .perfil-right form input,
+        .perfil-right form select {
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            box-shadow: inset 2px 3px 3px rgba(0,0,0,0.25);
+        }
+
+            .perfil-right form input:focus,
+            .perfil-right form select:focus {
+                border: 2px solid rgba(30, 42, 120, 0.8); /* morado */
+                box-shadow: 1.6px 1.6px 15px rgba(30, 42, 120, 0.8); /* glow morado */
+            }
+
+/* Botón */
+.btn-guardar {
+    margin-top: 20px;
+    padding: 12px;
+    background-color: #7ec0e0;
+    color: white;
+    font-weight: bold;
+    border: 1px solid white;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 30%;
+    align-self: center;
+    box-shadow: 5px 7px #367172;
+    transition: background 0.3s ease;
+  
+}
+
+    .btn-guardar:hover {
+        background: rgba(30, 42, 120, 0.7);
+        box-shadow: 7px 7px 13px rgba(30, 42, 120, 0.99); /* glow morado */
+        border: 1px solid white;
+    }

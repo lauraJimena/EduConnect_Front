@@ -1,0 +1,58 @@
+﻿
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EduConnect</title>
+    <link rel="stylesheet" href="~/estilos/estilos.css">
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">                
+                    <img src="~/img/Logo.png" alt="EduConnect Logo">              
+
+            </div>
+            <ul class="menu">
+                
+                <li>@Html.ActionLink("INICIO", "Inicio", "Home", new { area = "" })</li>
+                <li>@Html.ActionLink("ACERCA DE", "Privacy", "Home", new { area = "" })</li>
+                <li>@Html.ActionLink("REGISTRO", "Registro", "Home", new { area = "" })</li>
+                <li>@Html.ActionLink("INICIAR SESIÓN", "IniciarSesion", "Home", new { area = "" }, new { @class = "btn-login" })</li>
+
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer class="pie-pagina">
+        <div class="contenedor-footer">
+            <!-- Frase -->
+            <div class="frase-footer">
+                <span class="icono-comilla">❝</span>
+                <p>Aprendizaje que conecta, conocimiento que crece</p>
+            </div>
+
+            <!-- Correo -->
+            <div class="correo-footer">
+                <span class="icono-correo">✉</span>
+                <p>educonnect@gmail.com</p>
+            </div>
+
+            <!-- Logo y nombre -->
+            <div class="logo-footer">
+                <img src="~/img/Logo.png" alt="Logo EduConnect">
+                
+            </div>
+        </div>
+    </footer>
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

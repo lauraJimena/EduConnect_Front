@@ -1,0 +1,80 @@
+﻿@{
+    ViewData["Title"] = "Editar Perfil";
+    Layout = "_Layout";
+}
+@section Styles {
+
+    <link rel="stylesheet" href="~/estilos/editarTutorado.css" )">
+}
+<main class="perfil-container">
+    <!-- Panel izquierdo -->
+    <section class="perfil-left">
+        <div class="avatar">
+            <img src="~/img/IconoAvatar.png" alt="Avatar Tutorado" id="avatarSeleccionado">
+        </div>
+        <button class="nombre-tutorado">NOMBRE DEL TUTORADO</button>
+        <!-- Selección de avatares -->
+        <div class="avatar-selector">
+            <p>Elige tu avatar:</p>
+            <div class="avatar-opciones">
+                <label>
+                    <input type="radio" name="avatar" value="1" checked>
+                    <img src="~/img/avatars/avatar1.png" alt="Avatar 1">
+                </label>
+                <label>
+                    <input type="radio" name="avatar" value="2">
+                    <img src="~/img/avatars/avatar2.png" alt="Avatar 2">
+                </label>
+                <label>
+                    <input type="radio" name="avatar" value="3">
+                    <img src="~/img/avatars/avatar3.png" alt="Avatar 3">
+                </label>
+                <label>
+                    <input type="radio" name="avatar" value="4">
+                    <img src="~/img/avatars/avatar4.png" alt="Avatar 4">
+                </label>
+                <label>
+                    <input type="radio" name="avatar" value="5">
+                    <img src="~/img/avatars/avatar5.png" alt="Avatar 5">
+                </label>
+                <label>
+                    <input type="radio" name="avatar" value="6">
+                    <img src="~/img/avatars/avatar6.png" alt="Avatar 6">
+                </label>
+            </div>
+        </div>
+    
+    </section>
+
+    <!-- Panel derecho -->
+    <section class="perfil-right">
+        <h1><img src="~/img/IconoEditar.png" alt="icono editar"> EDITAR PERFIL</h1>
+
+        <form>
+            <input type="text" placeholder="NOMBRES" required>
+            <input type="text" placeholder="APELLIDOS" required>
+
+            <select required>
+                <option value="">TIPO DE DOCUMENTO</option>
+                <option value="cc">Cédula</option>
+                <option value="ti">Tarjeta de Identidad</option>
+                <option value="pp">Pasaporte</option>
+            </select>
+
+            <input type="text" placeholder="NUMERO DE DOCUMENTO" required>
+            <input type="tel" placeholder="TELÉFONO" required>
+            <input type="email" placeholder="CORREO" required>
+            <input type="password" placeholder="CONTRASEÑA" required>
+
+            <button type="submit" class="btn-guardar">GUARDAR</button>
+        </form>
+    </section>
+</main>
+<script>
+    document.querySelectorAll("input[name='avatar']").forEach(radio => {
+        radio.addEventListener("change", function () {
+            let imgSrc = this.nextElementSibling.getAttribute("src");
+            document.getElementById("avatarSeleccionado").setAttribute("src", imgSrc);
+        });
+    });
+</script>

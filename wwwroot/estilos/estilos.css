@@ -1,0 +1,323 @@
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@900&family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Quicksand:wght@300..700&display=swap');
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    
+}
+
+/* Hace que el header esté siempre arriba del contenido */
+header {
+    position: absolute; /* o fixed si quieres que siga al hacer scroll */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* asegura que esté encima de todo */
+    padding:10px;
+}
+/* --- NAVBAR --- */
+
+.navbar {
+    background: #7ec0e0; /* azul claro */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px; /* controla la altura total de la barra */
+    padding: 0 20px; /* espacio lateral */
+    z-index: 30;
+    border-radius: 25px;
+    box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.2);
+    font-family: 'League Spartan', sans-serif;
+    color: black;
+    text-shadow: -1.5px -1.5px 0 white, /* arriba izquierda */
+    1.5px -1.5px 0 white, /* arriba derecha */
+    -1.5px 1.5px 0 white, /* abajo izquierda */
+    1.5px 1.5px 0 white, /* abajo derecha */
+    -1.5px 0px 0 white, /* izquierda */
+    1.5px 0px 0 white, /* derecha */
+    0px -1.5px 0 white, /* arriba */
+    0px 1.5px 0 white; /* abajo */
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    height: 100%; /* igual a la altura de la navbar */
+    color: #f4b400;
+}
+
+    .logo img {
+        object-fit: contain; /* mantiene proporción */
+        margin-top:18px;
+        height: 130px;
+        display: block; /* elimina espacio fantasma de inline-img */
+    }
+
+.menu {
+    list-style: none;
+    display: flex;
+    gap: 70px;
+    align-items: center;
+}
+
+    .menu li a {
+        font-size: 1.4em;
+        text-decoration: none;
+        font-weight: 760;
+        color: #323030;
+        font-family: 'League Spartan', sans-serif;
+        padding: 6px 10px;
+    }
+
+        .menu li a:hover {
+            color: white;
+            font-size: 1.5em;
+            text-shadow: -1.5px -1.5px 0 #323030, 1.5px -1.5px 0 #323030, -1.5px 1.5px 0 #323030, 1.5px 1.5px 0 #323030;
+        }
+button {
+    font-family: Montserrat, sans-serif;
+}
+a {
+    font-family: Montserrat, sans-serif;
+}
+p {
+    font-family: Montserrat, sans-serif;
+    
+}
+.btn-login {
+    background: #fbc959;
+    padding: 10px 15px !important;
+    border-radius: 20px;
+    transition: background 0.3s;
+}
+
+    .btn-login:hover {
+        background: #f4b400;
+    }
+/* HERO con imagen de fondo */
+.hero {
+    background: url('../img/Baner.png') no-repeat center center/cover;
+    margin-top:-45px;
+    margin-left:-15px;
+    height: 700px; /* ajusta la altura */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    color: #000; /* color del texto */
+}
+
+    /* Fondo semitransparente para mejorar visibilidad */
+    .hero::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.16); /* capa blanca ligera */
+        z-index: 1;
+    }
+
+/* Contenido encima */
+.hero-content {
+    position: relative;
+    z-index: 2;
+    margin-top:50px;
+    max-width: 800px;
+    padding: 20px;
+    background-color:rgba(255,255,255,0.5);
+    border-radius:25px;
+}
+
+/* Título */
+.hero h1 {
+    font-family: Montserrat, sans-serif;
+    font-size: 2.08rem;
+    font-weight: bold;
+    margin-bottom: 18px;
+    text-shadow: 3.5px 2px 0 #7ec0e0, 3.5px 2px 0 #7ec0e0, 3.5px 2px 0 #7ec0e0, 1.5px 0 0 #7ec0e0;
+}
+
+/* Botón */
+.btn-hero {
+    display: inline-block;
+    background-color: #228f8f;
+    color: white;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 25px;
+    text-decoration: none;
+    transition: background 0.3s;
+    box-shadow: 5px 7px #367172;
+}
+
+    .btn-hero:hover {
+        background-color: #185d59;
+        font-size: 1.15em;
+    }
+
+
+
+/* Contenedor principal */
+.carrusel {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 400px; /* ajusta según tu diseño */
+}
+
+/* Contenedor de las diapositivas */
+.contenedor-carrusel {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    height: 100%;
+}
+
+/* Cada diapositiva */
+.diapositiva {
+    display: flex; /* coloca izquierda y derecha en fila */
+    min-width: 100%; /* ocupa todo el ancho de la pantalla */
+    height: 100%;
+}
+
+/* Mitades */
+.mitad {
+    flex: 1; /* mitad izquierda = 50%, mitad derecha = 50% */
+    display: flex; /* para alinear contenido interno */
+    justify-content: center;
+    align-items: center;
+}
+
+    /* Imagen ocupa toda la mitad */
+    .mitad img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Texto */
+    .mitad h2 {
+        font-size: 2rem;
+        text-align: center;
+        padding: 20px;
+        color: white;
+    }
+
+    /* Personalización de lados */
+    .mitad.izquierda {       
+        background-color: #2a6f97; /* azul */
+        color: white;
+    }
+
+    .mitad.derecha {
+        background: url('../img/FondoCar.png') no-repeat center center/cover;
+        color: white;
+    }
+    .mitad.izquierda.texto {
+        background: url('../img/FondoCar.png') no-repeat center center/cover;
+        color: white;
+        
+    }
+        .mitad.izquierda.texto p {
+            padding: 60px;
+            text-align: center;
+            text-shadow: 0px 0px 8px rgba(0,0,0, 0.8);
+            font-size: 1.46em;
+            line-height: 1.8; /* interlineado, puedes probar valores como 1.5, 1.8 o 2 */
+        }
+    .mitad.derecha p {
+        padding: 60px;
+        font-size: 1.46em;
+        text-align: center;
+        text-shadow: 0px 0px 8px rgba(0,0,0, 0.8);
+        line-height: 1.8; /* interlineado, puedes probar valores como 1.5, 1.8 o 2 */
+    }
+
+/* Flechas */
+.flecha {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.4);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    border-radius: 50%;
+}
+
+    .flecha.izquierda {
+        left: 10px;
+    }
+    .flecha.derecha {
+        right: 10px;
+    }
+    
+        /* Footer */
+.pie-pagina {
+    background-color: #7ec0e0; /* el azul de tu footer */
+    padding: 0px 30px;
+    color: #333;
+    border-radius:0 0 25px 25px;
+
+}
+
+.contenedor-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* se acomoda en pantallas pequeñas */
+}
+
+/* Frase con comilla */
+.frase-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    color: #1c3c50;
+}
+    .frase-footer p {
+        text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
+        font-size: 1.2em;
+    }
+
+.icono-comilla {
+    font-size: 4rem;
+    color: #1c3c50;
+}
+
+/* Correo */
+.correo-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1c3c50;
+    font-weight: bold;
+}
+    .correo-footer p {
+        text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
+        font-size: 1.2em;
+    }
+
+.icono-correo {
+    font-size: 2.5rem;
+}
+
+/* Logo y nombre */
+.logo-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .logo-footer img {
+        height: 170px;
+    }
+
