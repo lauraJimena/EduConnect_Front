@@ -1,0 +1,176 @@
+﻿@{
+    ViewData["Title"] = "Consultar Usuarios";
+    Layout = "_Layout";
+}
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="~/estilos/consultarUsuarios.css">
+
+}
+<main>
+            <!-- ======= TÍTULO ======= -->
+    <h1 class="titulo">🔍CONSULTAR USUARIOS</h1>
+
+            <!-- ======= BARRA DE BÚSQUEDA ======= -->
+            <div class="busqueda">
+                <input type="text" placeholder="NÚMERO DE DOCUMENTO">
+                <button>🔍</button>
+            </div>
+
+            <!-- ======= CONTENIDO PRINCIPAL ======= -->
+            <div class="contenido">
+                <div class="caja-tabla">
+                <!-- ======= TABLA ======= -->
+                <table class="tabla-usuarios">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Apellidos</th>
+                            <th>Tipo documento</th>
+                            <th>N° documento</th>
+                            <th>Teléfono</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Juan</td>
+                            <td>Pérez</td>
+                            <td>CC</td>
+                            <td>123456</td>
+                            <td>320123456</td>
+                            <td>juan@mail.com</td>
+                            <td>Tutorado</td>
+                            <td class="estado">Activo</td>
+                            <td>
+                                <button class="boton-editar"><i class="fas fa-pen"></i></button>
+                                <button class="boton-eliminar"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>María</td>
+                            <td>Gómez</td>
+                            <td>TI</td>
+                            <td>654321</td>
+                            <td>310987654</td>
+                            <td>maria@mail.com</td>
+                            <td>Tutor</td>
+                            <td class="estado">Inactivo</td>
+                            <td>
+                                <button class="boton-editar"><i class="fas fa-pen"></i></button>
+                                <button class="boton-eliminar"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Juan</td>
+                            <td>Pérez</td>
+                            <td>CC</td>
+                            <td>123456</td>
+                            <td>320123456</td>
+                            <td>juan@mail.com</td>
+                            <td>Tutorado</td>
+                            <td class="estado">Activo</td>
+                            <td>
+                                <button class="boton-editar"><i class="fas fa-pen"></i></button>
+                                <button class="boton-eliminar"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            <!-- ===== POPUP ===== -->
+            <div id="popup-confirmacion" class="popup">
+                <div class="popup-contenido">
+                    <p>¿Desea inactivar este usuario?</p>
+                    <button id="btn-si">Sí, confirmar</button>
+                    <button id="btn-no">No, cancelar</button>
+                </div>
+            </div>
+                </div>
+        <!-- ======= FILTROS ======= -->
+        <div class="caja-filtro-img">
+        <div class="imagen-filtros">
+            <img src="~/img/NiñoLupa.png" alt="Niño con lupa">
+        </div>
+        <div class="panel-filtros">
+            
+
+            <h3>FILTRAR POR:</h3>
+
+            <label for="facultad">Facultad</label>
+            <select id="facultad">
+                <option value="">Seleccionar</option>
+                <option>Ingeniería</option>
+                <option>Salud</option>
+                <option>Artes</option>
+            </select>
+
+            <label for="carrera">Carrera</label>
+            <select id="carrera">
+                <option value="">Seleccionar</option>
+                <option>Sistemas</option>
+                <option>Electrónica</option>
+                <option>Psicología</option>
+            </select>
+
+            <label for="semestre">Semestre</label>
+            <select id="semestre">
+                <option value="">Seleccionar</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+            </select>
+
+            <label for="estado">Estado</label>
+            <select id="estado">
+                <option value="">Seleccionar</option>
+                <option>Activo</option>
+                <option>Inactivo</option>
+            </select>
+        </div>
+        </div>
+      </div>
+
+</main>
+<script>
+    let filaSeleccionada = null;
+
+    document.querySelectorAll(".boton-eliminar").forEach((boton) => {
+      boton.addEventListener("click", function () {
+        // Guardamos la fila seleccionada
+        filaSeleccionada = this.closest("tr");
+
+        // Cambiamos el mensaje del popup según el estado
+        const estadoActual = filaSeleccionada.querySelector(".estado").textContent;
+        const mensaje = (estadoActual === "Activo")
+          ? "¿Desea inactivar este usuario?"
+          : "¿Desea activar este usuario?";
+        document.querySelector("#popup-confirmacion p").textContent = mensaje;
+
+        // Mostramos popup
+        document.getElementById("popup-confirmacion").style.display = "flex";
+      });
+    });
+
+    document.getElementById("btn-si").addEventListener("click", function () {
+      if (filaSeleccionada) {
+        const celdaEstado = filaSeleccionada.querySelector(".estado");
+        const estadoActual = celdaEstado.textContent;
+
+        // Cambiar al contrario
+        if (estadoActual === "Activo") {
+          celdaEstado.textContent = "Inactivo";
+        } else {
+          celdaEstado.textContent = "Activo";
+        }
+      }
+      document.getElementById("popup-confirmacion").style.display = "none";
+    });
+
+    document.getElementById("btn-no").addEventListener("click", function () {
+      document.getElementById("popup-confirmacion").style.display = "none";
+    });
+
+</script>

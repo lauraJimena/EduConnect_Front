@@ -1,0 +1,84 @@
+﻿@{
+    ViewData["Title"] = "Búsqueda de Tutores";
+    Layout = "_Layout";
+}
+@section Styles {
+
+    <link rel="stylesheet" href="~/estilos/busquedaTutores.css" )">
+}
+<main class="busqueda-container">
+    <!-- Cabecera -->
+    <section class="intro">
+        <div class="intro-img">
+            <img src="~/img/BusquedaIcono.png" alt="Ilustración búsqueda">
+        </div>
+        <div class="intro-texto">
+            <h1>🔎 BÚSQUEDA DE TUTORES</h1>
+            <p>
+                INICIA TU BÚSQUEDA DE TUTORES, PUEDES FILTRAR POR CARRERA, SEMESTRE Y/O MATERIA
+                EN LA QUE REQUIERES AYUDA.
+            </p>
+        </div>
+       
+    </section>
+
+    <!-- Barra de búsqueda y filtros -->
+    <section class="busqueda-filtros">
+        <div class="barra-busqueda">
+            <input type="text" placeholder="BUSCAR POR NOMBRE DE TUTORES">
+            <button class="btn-buscar">🔍</button>
+        </div>
+
+        <aside class="filtros">
+            <h3>FILTRAR POR:</h3>
+            <select>
+                <option value="">CARRERA</option>
+                <option>Ingeniería</option>
+                <option>Medicina</option>
+            </select>
+            <select>
+                <option value="">SEMESTRE</option>
+                <option>1</option>
+                <option>2</option>
+            </select>
+            <select>
+                <option value="">MATERIA</option>
+                <option>Matemáticas</option>
+                <option>Programación</option>
+            </select>
+
+            <button class="btn-ranking">VER RANKING DE TUTORES</button>
+        </aside>
+    </section>
+
+    <!-- Lista de tutores -->
+    <section class="lista-tutores">
+        <div class="tutor-card">
+            <img src="~/img/avatars/avatar1.png" alt="Avatar tutor">
+            <div class="info-tutor">
+                <p><b>NOMBRE:</b> Juan Pérez</p>
+                <p><b>CARRERA:</b> Ingeniería de Sistemas</p>
+                <p><b>SEMESTRE:</b> 6</p>
+                <p><b>MATERIA QUE DOMINA:</b> Programación I</p>
+                <div class="acciones">
+                    <button class="btn-perfil">VER PERFIL</button>
+                    <button class="btn-solicitar">SOLICITAR TUTORÍA</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tutor-card">
+            <img src="~/img/avatars/avatar2.png" alt="Avatar tutor">
+            <div class="info-tutor">
+                <p><b>NOMBRE:</b> María Gómez</p>
+                <p><b>CARRERA:</b> Psicología</p>
+                <p><b>SEMESTRE:</b> 4</p>
+                <p><b>MATERIA QUE DOMINA:</b> Psicología General</p>
+                <div class="acciones">
+                    <button class="btn-perfil">VER PERFIL</button>
+                    <button class="btn-solicitar">SOLICITAR TUTORÍA</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
