@@ -1,0 +1,201 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@900&family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Quicksand:wght@300..700&display=swap');
+
+
+/* Contenedor principal */
+.busqueda-container {
+    position: relative;
+    padding: 30px;
+    font-family: 'Montserrat', sans-serif;
+    background: #e6e6e6 url('../img/FondoPerfil.png') repeat; /* azul claro */
+    background-size: cover; /* para que la imagen se ajuste */
+    z-index: 0;
+}
+    /* Capa traslúcida */
+    .busqueda-container::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.3); /* blanco traslúcido, cambia el color y opacidad */
+        z-index: -1; /* lo mandamos atrás para no tapar el contenido */
+    }
+
+/* Intro */
+.intro {
+    display: flex;
+    justify-content: space-between;
+    margin-top:3%;
+    align-items: center;
+    margin-bottom: -38px;
+    margin-left:8%;
+
+}
+.intro-texto{
+    width:43%;
+    text-align:center;
+    margin-right:19%;
+    
+}
+.intro-texto h1 {
+    color: #f9bb65;
+    font-size: 2.1rem;
+    font-weight: bold;
+    text-shadow: 3px 3px #1e5778;
+    font-family: 'League Spartan', sans-serif;
+    margin-right:15px;
+    margin-bottom:25px;
+    
+}
+
+.intro-texto p {
+    margin-top: 10px;
+    font-size: 15px;
+    color: #333;
+    text-align:center;
+}
+
+.intro-img img {
+    width: 400px;
+    margin-left:22%;
+}
+
+/* Barra búsqueda */
+.busqueda-filtros {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: -175px;
+}
+
+.barra-busqueda {
+    display: flex;
+    flex: 0.99;
+    margin-right: 20px;
+    background: white;
+    border-radius: 30px;
+    padding: 5px 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    height: 55px;
+    border: 1px solid #c0c0c0;
+}
+
+    .barra-busqueda input {
+        border: none;
+        outline: none;
+        flex: 1;
+        font-size: 14px;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .barra-busqueda .btn-buscar {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+/* Filtros */
+.filtros {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    width: 320px;
+    border: 1px solid #c0c0c0;
+}
+
+    .filtros h3 {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .filtros select {
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 8px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+    }
+
+.btn-ranking {
+    background-color: #228f8f;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    box-shadow: 5px 7px #367172;
+}
+.btn-ranking:hover {
+    background: rgba(30, 42, 120, 0.7);
+    box-shadow: 3px 3px 10px rgba(30, 42, 120, 0.8); /* glow morado */
+    border:none;
+}
+
+/* Tarjetas tutores */
+.lista-tutores {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding-left:60px;
+}
+
+.tutor-card {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    width: 66%;
+    border: 1px solid #c0c0c0;
+}
+
+    .tutor-card img {
+        width: 110px;
+        border-radius: 50%;
+        margin-right: 15px;
+    }
+
+.info-tutor {
+    flex: 1;
+    font-size: 14.8px;
+    font-family: 'Montserrat', sans-serif;
+    color:rgba(0,0,0,0.88);
+}
+    .info-tutor p {
+        line-height: 1.6em;
+    }
+
+.acciones {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-perfil {
+    background: #ffd95a;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+    .btn-perfil:hover {
+        background: #f9bb65;
+    }
+.btn-solicitar {
+    background: #228f8f;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+    .btn-solicitar:hover {
+        background: rgba(30, 42, 120, 0.7);
+    }
+
+      

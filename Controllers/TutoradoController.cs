@@ -14,6 +14,14 @@ namespace EduConnect_Front.Controllers
         {
             return View();
         }
+        public ActionResult BusquedaTutores()
+        {
+            return View();
+        }
+        public ActionResult RankingTutores()
+        {
+            return View();
+        }
 
     }
 }
