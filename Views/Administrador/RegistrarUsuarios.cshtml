@@ -1,0 +1,58 @@
+﻿@{
+    ViewData["Title"] = "Registrar usuario";
+    Layout = "_Layout";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/registroUsuarios.css" />
+}
+
+<main>
+    <!-- Izquierda: contenido (título + formulario) sobre el fondo -->
+    <section class="left">
+        <div class="panel">
+            <h1 class="page-title">REGISTRAR USUARIO</h1>
+
+            <form method="post">
+                <input type="text" placeholder="NOMBRES" required />
+                <input type="text" placeholder="APELLIDOS" required />
+
+                <select required>
+                    <option value="">TIPO DE DOCUMENTO</option>
+                    <option value="cc">Cédula</option>
+                    <option value="ti">Tarjeta de Identidad</option>
+                    <option value="pp">Pasaporte</option>
+                </select>
+
+                <input type="text" placeholder="NÚMERO DE DOCUMENTO" required />
+                <input type="tel" placeholder="TELÉFONO" required />
+                <input type="email" placeholder="CORREO" required />
+                <input type="text" placeholder="CARRERA" required />
+
+                <select required>
+                    <option value="">SEMESTRE</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+                </select>
+
+                <input type="password" placeholder="CONTRASEÑA" required />
+
+                <p class="radio-label">Elije el rol del usuario</p>
+                <label><input type="radio" name="rol" required /> Tutor</label>
+                <label><input type="radio" name="rol" /> Tutorado</label>
+                <label><input type="radio" name="rol" /> Coordinador</label>
+
+                <button type="submit">GUARDAR</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Derecha: fondo amarillo + ilustración via ::after en CSS -->
+    <section class="right" aria-label="Decoración de registro"></section>
+</main>
