@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Administrador";
+    Layout = "_Layout";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/panelAdministrador.css" />
+}
+<main class="administrador-container">
+
+    <!-- CONTENIDO -->
+    <section class="contenido">
+        <h1>BIENVENIDO ADMINISTRADOR</h1>
+
+        <div class="opciones">
+            <button>
+                <img src="~/img/RegistrarUsu.png" alt="icono registrarUsu">
+                REGISTRAR USUARIO
+            </button>
+
+            <button>
+                <img src="~/img/ConsultarUsu.png" alt="icono consultarUsu">
+                CONSULTAR USUARIO
+            </button>
+            <button>
+                <img src="~/img/RegistrarMat.png" alt="icono registrarMat">
+                REGISTRAR MATERIAS
+            </button>
+            <button>
+                <img src="~/img/ConsultarMat.png" alt="icono consultraMat">
+                CONSULTAR MATERIAS
+            </button>
+            <button>
+                <img src="~/img/GenerarReporte.png" alt="icono generarRepo">
+                GENERAR REPORTES
+            </button>
+        </div>
+
+        <div class="imagen-personaje">
+            <img src="~/img/FondoAdmin.png" alt="Ilustración administrador">
+        </div>
+    </section>
+</main>

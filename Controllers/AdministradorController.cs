@@ -10,6 +10,20 @@ namespace EduConnect_Front.Controllers
         {
             return View();
         }
+        public ActionResult RegistrarUsuarios()
+        {
+            return View();
+        }
+
+        public ActionResult PanelAdministrador()
+        {
+            return View();
+        }
+        public ActionResult EditarUsuarios()
+        {
+            return View();
+        }
+
 
     }
 }
