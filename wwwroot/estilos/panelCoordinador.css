@@ -6,7 +6,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: Montserrat, sans-serif;
-    background: url('../img/FondoAdmin2.png');
+    background: #e6e6e6 url('../img/FondoPerfil.png') repeat; /* azul claro */
     background-size: cover;
 }
 
@@ -84,7 +84,7 @@ body {
 
 /* Imagen personaje */
 .imagen-personaje img {
-    width: 500px;
+    width: 490px;
     margin-top: 20%;
     height: auto;
 }

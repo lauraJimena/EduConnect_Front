@@ -17,49 +17,51 @@ main {
     width: 100vw;
     margin-left: calc(50% - 50vw); 
     margin-right: calc(50% - 50vw);
-    margin-bottom: 0%;
+    margin-bottom: 0;
 }
 
 .left {
-    flex: 1; 
+    flex: 0.8; 
 }
-
-
 
 
 .left {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 13%;
+    margin-top: 5%;
     background-color: #fff4dd;
 }
 
     .left img {
-        max-width: 100%;
+        max-width: 73%;
         height: auto;
     }
 
 .right {
-    flex: 0 0 50%; 
+    flex: 0.9;
+}
+
+.right {
     background: url('../img/FondoEditarUsuario.png') repeat;
     display: flex;
     flex-direction: column;
-    justify-content: center; 
-    align-items: flex-end; 
-    padding: 50px 100px;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 40px;
     box-sizing: border-box;
 }
 
 
     .right h1 {
         align-self: center;
-        text-align: center; 
-        margin: 0 0 20px; 
+        text-align: center;
+        margin-top: 68px;
+        margin-bottom:8px;
         font-family: Montserrat, sans-serif;
         font-size: 2.4em;
         font-weight: bold;
-        text-shadow: 3.5px 2px 0 black;
+        text-shadow: 3.5px 2px 0 #133d6b;
         color: #fbc959;
     }
 
@@ -116,7 +118,7 @@ button {
     border-radius: 25px;
     cursor: pointer;
     transition: 0.3s;
-    margin-bottom: 30px;
+    margin-bottom: -10px;
     width: 50%;
     margin-left: auto;
     margin-right: auto;
