@@ -35,8 +35,8 @@ main {
 }
 
     .left img {
-        margin-top: 15%;
-        max-width: 96%;
+        margin-top: 12%;
+        max-width: 92%;
         height: auto;
     }
 
@@ -78,16 +78,23 @@ form {
         border: none;
         border-radius: 35px;
         outline: none;
-        font-size: 14px;
-        background: white;
-        
+        font-size: 17px; /* puntos más grandes */
+        letter-spacing: 1px; /* opcional: separación */
+       
     }
-
-        form input:focus, form select:focus {
-            border: 3px solid #1e2a78; /* morado */
-            box-shadow: 10px 10px 10px rgba(30, 42, 120, 0.99); /* brillo morado */
-        }
-
+            form input:focus, form select:focus {
+                border: 3px solid #1e2a78; /* morado */
+                box-shadow: 10px 10px 10px rgba(30, 42, 120, 0.99); /* brillo morado */
+            }
+.nombre {
+    font-size: 17px; /* puntos más grandes */
+    letter-spacing: 1px; /* opcional: separación */
+}
+    .nombre::placeholder {
+        font-size: 14px; /* placeholder más pequeño */
+        letter-spacing: normal;
+    }
+                
 .radio-label {
     font-size: 14px;
     font-weight: bold;
@@ -122,4 +129,34 @@ button {
         background: rgba(30, 42, 120, 0.7);
         box-shadow: 7px 7px 13px rgba(30, 42, 120, 0.99); /* glow morado */
         color: white;
+    }
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+    .password-container input {
+        width: 100%;
+        padding-right: 35px; /* espacio para el ojo */
+        font-size: 17px; /* puntos más grandes */
+        letter-spacing: 1px; /* opcional: separación */
+    }
+        .password-container input::placeholder {
+            font-size: 14px; /* placeholder más pequeño */
+            letter-spacing: normal;
+            
+        }
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 1.6rem; /* tamaño del icono */
+    color: #666;
+}
+
+    .toggle-password:hover {
+        color: #000; /* más oscuro al pasar el mouse */
     }

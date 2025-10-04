@@ -1,4 +1,7 @@
-﻿@{
+﻿
+@model List<EduConnect_Front.Dtos.ObtenerTutorDto>
+
+@{
     ViewData["Title"] = "Búsqueda de Tutores";
     Layout = "_Layout";
 }
@@ -19,66 +22,87 @@
                 EN LA QUE REQUIERES AYUDA.
             </p>
         </div>
-       
     </section>
 
     <!-- Barra de búsqueda y filtros -->
     <section class="busqueda-filtros">
-        <div class="barra-busqueda">
-            <input type="text" placeholder="BUSCAR POR NOMBRE DE TUTORES">
-            <button class="btn-buscar">🔍</button>
-        </div>
+        <form asp-controller="Tutorado" asp-action="BusquedaTutores" method="post" class="filtros-form">
+            @Html.AntiForgeryToken()
 
-        <aside class="filtros">
-            <h3>FILTRAR POR:</h3>
-            <select>
-                <option value="">CARRERA</option>
-                <option>Ingeniería</option>
-                <option>Medicina</option>
-            </select>
-            <select>
-                <option value="">SEMESTRE</option>
-                <option>1</option>
-                <option>2</option>
-            </select>
-            <select>
-                <option value="">MATERIA</option>
-                <option>Matemáticas</option>
-                <option>Programación</option>
-            </select>
+            <div class="barra-busqueda">
+                <input name="Nombre" type="text" placeholder="BUSCAR POR NOMBRE DE TUTORES" />
+                <button class="btn-buscar" type="submit">🔍</button>
+            </div>
 
-            <button class="btn-ranking">VER RANKING DE TUTORES</button>
-        </aside>
+            <aside class="filtros">
+                <h3>FILTRAR POR:</h3>
+
+                <input name="CarreraNombre" type="text" placeholder="CARRERA (ej: Psicología)" />
+
+                <select name="Semestre">
+                    <option value="">SEMESTRE</option>
+                    <option value="1">Activo</option>
+                    <option value="2">Inactivo</option>
+                </select>
+                <input name="MateriaNombre" type="text" placeholder="MATERIA (ej: Programación)" />
+
+                <select name="IdEstado">
+                    <option value="">ESTADO</option>
+                    <option value="1">Activo</option>
+                    <option value="2">Inactivo</option>
+                </select>
+                <button class="btn-ranking btn-aplicar" type="submit">APLICAR FILTRO</button>
+                <button class="btn-ranking" type="button">VER RANKING DE TUTORES</button>
+                
+            </aside>
+        </form>
     </section>
 
     <!-- Lista de tutores -->
     <section class="lista-tutores">
-        <div class="tutor-card">
-            <img src="~/img/avatars/avatar1.png" alt="Avatar tutor">
-            <div class="info-tutor">
-                <p><b>NOMBRE:</b> Juan Pérez</p>
-                <p><b>CARRERA:</b> Ingeniería de Sistemas</p>
-                <p><b>SEMESTRE:</b> 6</p>
-                <p><b>MATERIA QUE DOMINA:</b> Programación I</p>
-                <div class="acciones">
-                    <button class="btn-perfil">VER PERFIL</button>
-                    <button class="btn-solicitar">SOLICITAR TUTORÍA</button>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var t in Model)
+            {
+                <div class="tutor-card">
+                    <img src="~/img/avatars/avatar1.png" alt="Avatar tutor">
+                    <div class="info-tutor">
+                        <p><b>NOMBRE:</b> @t.TutorNombreCompleto</p>
+                        <p><b>CARRERA:</b> @t.CarreraNombre</p>
+                        <p><b>SEMESTRE:</b> @t.Semestre</p>
+                        <p><b>MATERIA QUE DOMINA:</b> @t.MateriaNombre</p>
+                        <p><b>ESTADO:</b> @(t.IdEstado == 1 ? "Activo" : "Inactivo")</p>
+                        <div class="acciones">
+                            <a asp-controller="Tutor" asp-action="Perfil" asp-route-id="@t.IdUsuario" class="btn-perfil">VER PERFIL</a>
+                            <a asp-controller="Tutorias" asp-action="Solicitar" asp-route-idTutor="@t.IdUsuario" class="btn-solicitar">SOLICITAR TUTORÍA</a>
+                        </div>
+                    </div>
                 </div>
+            }
+        }else
+        {
+            <div class="sin-resultados">
+                <p>No hay tutores para mostrar. Ajusta tus filtros y vuelve a intentar.</p>
+                <img src="~/img/PensarSolicitud.png" alt="Avatar tutor">
+                <!-- Botón para volver a cargar todos -->
+                <form asp-controller="Tutorado" asp-action="BusquedaTutores" method="get">
+                    <button type="submit" class="btn-volver-todos">🔄 Ver todos los tutores</button>
+                </form>
             </div>
-        </div>
-
-        <div class="tutor-card">
-            <img src="~/img/avatars/avatar2.png" alt="Avatar tutor">
-            <div class="info-tutor">
-                <p><b>NOMBRE:</b> María Gómez</p>
-                <p><b>CARRERA:</b> Psicología</p>
-                <p><b>SEMESTRE:</b> 4</p>
-                <p><b>MATERIA QUE DOMINA:</b> Psicología General</p>
-                <div class="acciones">
-                    <button class="btn-perfil">VER PERFIL</button>
-                    <button class="btn-solicitar">SOLICITAR TUTORÍA</button>
-                </div>
-            </div>
-        </div>
+        }
+       
     </section>
+
+    @* Popup de error si la API falló *@
+    @{
+        var error = ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage;
+    }
+    @await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto {
+    Tipo = "error",
+        Titulo = "No se pudo obtener los tutores",
+        Mensaje = error
+        })
 </main>
+
+
+

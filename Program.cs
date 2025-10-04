@@ -3,6 +3,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Cache para Session (requerido)
+builder.Services.AddDistributedMemoryCache();
+
+// 3) Configurar Session
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(60); // tiempo de inactividad
+    options.Cookie.HttpOnly = true;                 // por seguridad
+    options.Cookie.IsEssential = true;              // requerido si usas GDPR/cookie consent
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -17,6 +28,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+//Habilitar Session 
+app.UseSession();
 
 app.UseAuthorization();
 
