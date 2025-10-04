@@ -8,12 +8,12 @@
 
 <main>
     <section class="left">
-        <img src="~/img/Registro2.png" alt="Estudiante">
+        <img src="~/img/RegistroNiña.png" alt="Estudiante">
     </section>
 
     <section class="right">
         <h1 class="visually-hidden">@ViewData["Title"]</h1>
-        <form>
+        <form asp-action="Registro" asp-controller="General" method="post">
             <input type="text" placeholder="NOMBRES" required>
             <input type="text" placeholder="APELLIDOS" required>
 

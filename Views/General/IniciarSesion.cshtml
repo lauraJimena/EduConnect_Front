@@ -1,0 +1,59 @@
+﻿@model EduConnect_Front.Dtos.IniciarSesionDto
+@{
+    ViewData["Title"] = "Iniciar Sesión";
+    Layout = "_Layout";
+}
+@section Styles {
+   
+     <link rel="stylesheet" href="~/estilos/inicioSesion.css">
+}
+<main>
+    <section class="left">
+        <img src="~/img/InicioSesion.png" alt="Estudiante">
+    </section>
+
+    <section class="right">
+        <h1 class="visually-hidden">@ViewData["Title"]</h1>
+        <form asp-action="IniciarSesion" asp-controller="General" method="post">
+            @Html.AntiForgeryToken()
+
+            <input asp-for="NumIdent" type="text" placeholder="NÚMERO DE DOCUMENTO" required class="nombre" />
+            <div class="password-container">
+                <input asp-for="ContrasUsu" id="passwordInput" type="password" placeholder="CONTRASEÑA" required />
+                <span id="togglePassword" class="toggle-password">
+                    👁️
+                </span>
+            </div>
+
+            <button type="submit">INICIAR SESIÓN</button>
+        </form>
+    </section>
+</main>
+
+@await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto {
+Tipo = "exito",
+    Titulo = "Registro exitoso",
+    Mensaje = TempData["RegisterSuccess"] as string
+})
+
+@{
+    var errorGeneral = ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage;
+}
+@await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto {
+Tipo = "error",
+    Titulo = "Error de inicio de sesión",
+    Mensaje = errorGeneral
+})
+
+<script>
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        const pwdInput = document.getElementById("passwordInput");
+        if (pwdInput.type === "password") {
+            pwdInput.type = "text";
+            this.textContent = "🙈"; // cambia el icono
+        } else {
+            pwdInput.type = "password";
+            this.textContent = "👁️"; // vuelve al ojo
+        }
+    });
+</script>

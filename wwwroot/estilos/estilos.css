@@ -16,7 +16,8 @@ header {
     left: 0;
     width: 100%;
     z-index: 1000; /* asegura que esté encima de todo */
-    padding:10px;
+    padding: 10px;
+    color: #333;
 }
 /* --- NAVBAR --- */
 
@@ -31,7 +32,7 @@ header {
     border-radius: 25px;
     box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.2);
     font-family: 'League Spartan', sans-serif;
-    color: black;
+    color: #333;
     text-shadow: -1.5px -1.5px 0 white, /* arriba izquierda */
     1.5px -1.5px 0 white, /* arriba derecha */
     -1.5px 1.5px 0 white, /* abajo izquierda */
@@ -67,7 +68,7 @@ header {
         font-size: 1.4em;
         text-decoration: none;
         font-weight: 760;
-        color: #323030;
+        color: #333;
         font-family: 'League Spartan', sans-serif;
         padding: 6px 10px;
     }
@@ -102,7 +103,7 @@ p {
     background: url('../img/Baner.png') no-repeat center center/cover;
     margin-top:-45px;
     margin-left:-15px;
-    height: 700px; /* ajusta la altura */
+    height: 750px; /* ajusta la altura */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -127,8 +128,8 @@ p {
 .hero-content {
     position: relative;
     z-index: 2;
-    margin-top:50px;
-    max-width: 800px;
+    margin-top:55px;
+    max-width: 830px;
     padding: 20px;
     background-color:rgba(255,255,255,0.5);
     border-radius:25px;
@@ -154,11 +155,13 @@ p {
     text-decoration: none;
     transition: background 0.3s;
     box-shadow: 5px 7px #367172;
+    margin-bottom:15px;
 }
 
     .btn-hero:hover {
         background-color: #185d59;
-        font-size: 1.15em;
+        font-size: 1.10em;
+    
     }
 
 
@@ -304,6 +307,7 @@ p {
     .correo-footer p {
         text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
         font-size: 1.2em;
+         color: #1c3c50;
     }
 
 .icono-correo {

@@ -1,4 +1,5 @@
-﻿@{
+﻿@model EduConnect_Front.Dtos.ObtenerUsuarioDto
+@{
     ViewData["Title"] = "Tutorado";
     Layout = "_Layout";
 }
@@ -9,7 +10,7 @@
 
     <!-- CONTENIDO -->
     <section class="contenido">
-        <h1>BIENVENIDO TUTOR</h1>
+        <h1>BIENVENIDO @Model.Nombre.ToUpper()</h1>
 
         <div class="opciones">
             <button>

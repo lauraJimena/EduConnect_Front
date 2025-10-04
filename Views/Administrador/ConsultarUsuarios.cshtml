@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<EduConnect_Front.Dtos.ListadoUsuariosDto>
+@{
     ViewData["Title"] = "Consultar Usuarios";
     Layout = "_Layout";
 }
@@ -36,50 +37,39 @@
                         </tr>
                     </thead>
                     <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var u in Model)
+                        {
+                            <tr>
+                                <td>@u.Nombre</td>
+                                <td>@u.Apellido</td>
+                                <td>@u.IdTipoIdent</td>
+                                <td>@u.NumIdent</td>
+                                <td>@u.TelUsu</td>
+                                <td>@u.Correo</td>
+                                <td>@u.IdRol</td>
+                                <td>@u.IdEstado</td>
+                                
+                                <td>
+                                    <button type="button" class="boton-editar" title="Editar" data-id="@u.IdUsu">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    <button type="button" class="boton-eliminar" title="Inactivar" data-id="@u.IdUsu" data-nombre="@($"{u.Nombre} {u.Apellido}")" onclick="abrirPopup(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
                         <tr>
-                            <td>Juan</td>
-                            <td>Pérez</td>
-                            <td>CC</td>
-                            <td>123456</td>
-                            <td>320123456</td>
-                            <td>juan@mail.com</td>
-                            <td>Tutorado</td>
-                            <td class="estado">Activo</td>
-                            <td>
-                                <button class="boton-editar"><i class="fas fa-pen"></i></button>
-                                <button class="boton-eliminar"><i class="fas fa-trash"></i></button>
-                            </td>
+                            <td colspan="9" style="text-align:center; padding:14px;">No hay usuarios para mostrar.</td>
                         </tr>
-                        <tr>
-                            <td>María</td>
-                            <td>Gómez</td>
-                            <td>TI</td>
-                            <td>654321</td>
-                            <td>310987654</td>
-                            <td>maria@mail.com</td>
-                            <td>Tutor</td>
-                            <td class="estado">Inactivo</td>
-                            <td>
-                                <button class="boton-editar"><i class="fas fa-pen"></i></button>
-                                <button class="boton-eliminar"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Juan</td>
-                            <td>Pérez</td>
-                            <td>CC</td>
-                            <td>123456</td>
-                            <td>320123456</td>
-                            <td>juan@mail.com</td>
-                            <td>Tutorado</td>
-                            <td class="estado">Activo</td>
-                            <td>
-                                <button class="boton-editar"><i class="fas fa-pen"></i></button>
-                                <button class="boton-eliminar"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                    }
+                </tbody>
+            </table>
             <!-- ===== POPUP ===== -->
             <div id="popup-confirmacion" class="popup">
                 <div class="popup-contenido">

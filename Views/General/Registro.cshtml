@@ -1,0 +1,80 @@
+﻿@model EduConnect_Front.Dtos.CrearUsuarioDto
+@{
+    ViewData["Title"] = "Registro";
+    Layout = "_Layout";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/registro.css" />
+}
+
+<main>
+    <section class="left">
+        <img src="~/img/Registro.png" alt="Estudiante">
+    </section>
+
+    <section class="right">
+        <h1 class="visually-hidden">@ViewData["Title"]</h1>
+
+        <form asp-action="Registro" asp-controller="General" method="post">
+            @Html.AntiForgeryToken()
+            
+
+            <input asp-for="Nombre" type="text" placeholder="NOMBRES" required />
+            <input asp-for="Apellido" type="text" placeholder="APELLIDOS" required />
+
+            @* TIPOS DE DOCUMENTO -> Usa IDs numéricos que entienda tu API *@
+            <select asp-for="IdTipoIdent" required>
+                <option value="">TIPO DE DOCUMENTO</option>
+                <option value="1">Cédula</option>              @* CC *@
+                <option value="2">Tarjeta de Identidad</option> @* TI *@
+                <option value="3">Pasaporte</option>            @* PP *@
+            </select>
+
+            <input asp-for="NumIdent" type="text" placeholder="NÚMERO DE DOCUMENTO" required />
+            <input asp-for="TelUsu" type="tel" placeholder="TELÉFONO" required />
+            <input asp-for="Correo" type="email" placeholder="CORREO" required />
+
+            @* CARRERA: si es ID, usa number o un <select> si ya tienes catálogo *@
+            <select asp-for="IdCarrera" required>
+                <option value="">CARRERA</option>
+                <option value="1">Ingeniería de Sistemas</option>
+                <option value="2">Administración</option>
+                <option value="3">Derecho</option>
+                <option value="4">Contaduría</option>
+                <option value="5">Psicología</option>
+            </select>
+
+            <select asp-for="IdSemestre" required>
+                <option value="">SEMESTRE</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+            </select>
+
+            <input asp-for="ContrasUsu" type="password" placeholder="CONTRASEÑA" required />
+
+            <p class="radio-label">¿CÓMO QUIERES PARTICIPAR CON NOSOTROS?</p>
+            @* Mapea a IdRol (número). Ajusta valores según tu BD *@
+            <label>
+                <input type="radio" name="IdRol" value="2" required />
+                Quiero Enseñar (Tutor)
+            </label>
+            <label>
+                <input type="radio" name="IdRol" value="1" class="radio-opcion" />
+                Quiero Aprender (Tutorado)
+            </label>
+
+            <input type="hidden" asp-for="IdEstado" value="1" />
+
+            <button type="submit">GUARDAR</button>
+        </form>
+    </section>
+</main>
+@await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto {
+Tipo = "error",
+    Titulo = "No se pudo registrar",
+    Mensaje = ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage
+})

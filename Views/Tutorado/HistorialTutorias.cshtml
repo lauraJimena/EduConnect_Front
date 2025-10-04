@@ -1,0 +1,109 @@
+﻿@model List<EduConnect_Front.Dtos.HistorialTutoriaDto>
+@using EduConnect_Front.Dtos
+@{
+    ViewData["Title"] = "Historial de Tutorías";
+    Layout = "_Layout";
+    var usuario = ViewBag.Usuario as ObtenerUsuarioDto;
+}
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/HistorialTutorias.css" />
+}
+
+<main class="historial">
+    <div class="cabecera">
+        <h1>HISTORIAL DE TUTORÍAS</h1>
+    </div>
+
+    <section class="contenido">
+        <div class="tabla-wrapper">
+            <table class="tabla">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Materia</th>
+                        <th>Tutor</th>
+                        <th>Tema</th>
+                        <th>Modalidad</th>                       
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var r in Model)
+                        {
+                            <tr>
+                                <td>@r.Fecha</td>
+                                <td>@r.Hora</td>
+                                <td>@r.MateriaNombre</td>
+                                <td>@r.TutorNombreCompleto</td>
+                                <td>@r.Tema</td>
+                                <td>@r.ModalidadNombre</td>
+                                <td>@r.EstadoNombre</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:18px;">
+                                No hay tutorías en tu historial.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <a asp-controller="Tutorado" asp-action="PanelTutorado" class="btn-volver">
+               VOLVER
+            </a>
+        </div>
+
+        <aside class="lateral">
+            <div class="ilustracion">
+                <img src="~/img/PensarHistorial.png" alt="Usuario">
+            </div>
+
+            <div class="filtros tarjeta">
+                <h3>FILTRAR POR ESTADO:</h3>
+
+                <label class="chk">
+                    <input type="checkbox" value="aceptada" checked />
+                    <span class="tick"></span>
+                    ACEPTADA
+                </label>
+
+                <label class="chk">
+                    <input type="checkbox" value="finalizada" checked />
+                    <span class="tick"></span>
+                    FINALIZADA
+                </label>
+
+                <label class="chk">
+                    <input type="checkbox" value="cancelada" />
+                    <span class="tick"></span>
+                    CANCELADA
+                </label>
+
+                <button type="button" class="btn-aplicar">APLICAR</button>
+            </div>
+        </aside>
+       
+    </section>
+
+    <button class="btn-flotante" title="Soporte">
+        <img src="~/img/chat-bubble.png" alt="Chat">
+    </button>
+    
+
+    @* Popup de error si algo falló *@
+    @{
+        var error = ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage;
+    }
+    @await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto {
+    Tipo = "error",
+        Titulo = "No se pudo cargar el historial",
+        Mensaje = error
+        })
+</main> 
+
