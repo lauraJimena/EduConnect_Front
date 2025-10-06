@@ -12,27 +12,30 @@
         <h1>BIENVENIDO ADMINISTRADOR</h1>
 
         <div class="opciones">
-            <button>
+            <a asp-controller="Administrador" asp-action="RegistrarUsuarios" class="btn-opcion">
                 <img src="~/img/RegistrarUsu.png" alt="icono registrarUsu">
                 REGISTRAR USUARIO
-            </button>
+            </a>
 
-            <button>
+            <a asp-controller="Administrador" asp-action="ConsultarUsuarios" class="btn-opcion">
                 <img src="~/img/ConsultarUsu.png" alt="icono consultarUsu">
                 CONSULTAR USUARIO
-            </button>
-            <button>
+            </a>
+
+            <a asp-controller="Administrador" asp-action="RegistrarMaterias" class="btn-opcion">
                 <img src="~/img/RegistrarMat.png" alt="icono registrarMat">
                 REGISTRAR MATERIAS
-            </button>
-            <button>
-                <img src="~/img/ConsultarMat.png" alt="icono consultraMat">
+            </a>
+
+            <a asp-controller="Administrador" asp-action="ConsultarMaterias" class="btn-opcion">
+                <img src="~/img/ConsultarMat.png" alt="icono consultarMat">
                 CONSULTAR MATERIAS
-            </button>
-            <button>
+            </a>
+
+            <a asp-controller="Administrador" asp-action="GenerarReportes" class="btn-opcion">
                 <img src="~/img/GenerarReporte.png" alt="icono generarRepo">
                 GENERAR REPORTES
-            </button>
+            </a>
         </div>
 
        

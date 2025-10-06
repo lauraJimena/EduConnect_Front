@@ -13,6 +13,9 @@ body {
     gap: 15px;
     margin-top:5.8%;
 }
+.perfil-container2{
+    height:810px;
+}
 
 /* Panel izquierdo */
 .perfil-left {
@@ -181,8 +184,13 @@ body {
     text-align: center;
     color: white;
     font-weight: 700;
-    text-shadow: 2px 3px 5px rgba(0,0,0,.5);
+    text-shadow: 3px 3px 2.5px rgba(0,0,0,.7);
 }
     .btn-volver:hover {
         color: #367172;
+        text-shadow:none
     }
+.botones-acciones{
+    margin-top:-15px;
+    text-align:center;
+}

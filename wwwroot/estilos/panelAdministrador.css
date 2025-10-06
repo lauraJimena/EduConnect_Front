@@ -47,46 +47,54 @@ body {
 /* Menú */
 .opciones {
     background: rgba(192, 192, 192, 0.7);
-    padding: 30px 48px;
+    padding: 30px 58px;
     border-radius: 20px;
     box-shadow: 0px 0px 15px rgba(0,0,0,0.7);
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
     width: 540px;
     margin-top: 28%;
     margin-left:15%;
     margin-right:-60px;
   
 }
+.btn-opcion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #3f7594;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 8px 25px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-align: left;
+    border: 2px solid rgba(12, 55, 105, 0.3);
+    box-shadow: 8px 10px white;
+    text-decoration:none;
+}
 
-    .opciones button {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        background: #228f8f;
-        color: white;
-        font-size: 18px;
-        font-weight: bold;
-        padding: 5px 10px;
-        border: none;
-        border-radius: 50px;
-        cursor: pointer;
-        transition: background 0.3s ease;
-        text-align: left;
-        border: 2px solid #1e7b76; /* Borde azul oscuro */
-        box-shadow: 8px 10px white;
+    .btn-opcion:hover {
+        background: rgba(12, 55, 105, 0.8);
+        width: 435px;
     }
+
+    .btn-opcion img {
+        width: 40px;
+        height: 40px;
+    }
+
 
         .opciones button img {
             width: 52px;
             height: auto;
+           
         }
 
-        .opciones button:hover {
-            background: #185d59;
-            width: 455px;
-        }
 
 /* Imagen personaje */
 .imagen-personaje img {

@@ -1,4 +1,5 @@
-﻿@{
+﻿@model EduConnect_Front.Dtos.CrearUsuarioDto
+@{
     ViewData["Title"] = "Registrar Usuario";
     Layout = "_Layout";
 }
@@ -13,23 +14,38 @@
 
     <section class="right">
         <h1 class="visually-hidden">@ViewData["Title"]</h1>
-        <form asp-action="Registro" asp-controller="General" method="post">
-            <input type="text" placeholder="NOMBRES" required>
-            <input type="text" placeholder="APELLIDOS" required>
 
-            <select required>
+        <form asp-action="RegistrarUsuarios" asp-controller="Administrador" method="post" class="form-registro">
+            @Html.AntiForgeryToken()
+
+            <!-- Errores del back (validaciones del Service de la API) -->
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <input asp-for="Nombre" type="text" placeholder="NOMBRES" required />
+            <input asp-for="Apellido" type="text" placeholder="APELLIDOS" required />
+
+            <select asp-for="IdTipoIdent" required>
                 <option value="">TIPO DE DOCUMENTO</option>
-                <option value="cc">Cédula</option>
-                <option value="ti">Tarjeta de Identidad</option>
-                <option value="pp">Pasaporte</option>
+                <option value="1">Cédula</option>
+                <option value="2">Tarjeta de Identidad</option>
+                <option value="3">Pasaporte</option>
             </select>
 
-            <input type="text" placeholder="NÚMERO DE DOCUMENTO" required>
-            <input type="tel" placeholder="TELÉFONO" required>
-            <input type="email" placeholder="CORREO" required>
-            <input type="text" placeholder="CARRERA" required>
+            <input asp-for="NumIdent" type="text" placeholder="NÚMERO DE DOCUMENTO" required />
+            <input asp-for="TelUsu" type="tel" placeholder="TELÉFONO (10 dígitos)" required />
+            <input asp-for="Correo" type="email" placeholder="CORREO" required />
 
-            <select required>
+            <!-- Si aún no cargas catálogos desde la BD, deja opciones fijas -->
+            <select asp-for="IdCarrera" required>
+                <option value="">CARRERA</option>
+                <option value="1">Administración</option>
+                <option value="2">Contaduría</option>
+                <option value="3">Ingeniería Agronímica</option>
+                <option value="4">Ingeniería Ambiental</option>               
+                <option value="5">Psicología</option>
+            </select>
+
+            <select asp-for="IdSemestre" required>
                 <option value="">SEMESTRE</option>
                 <option>1</option>
                 <option>2</option>
@@ -37,15 +53,37 @@
                 <option>4</option>
                 <option>5</option>
                 <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+                <option>10</option>
             </select>
 
-            <input type="password" placeholder="CONTRASEÑA" required>
+            <input asp-for="ContrasUsu" type="password" placeholder="CONTRASEÑA" required />
 
-            <p class="radio-label">Elije el rol del usuario</p>
-            <label><input type="radio" name="rol" required>Tutor</label>
-            <label><input type="radio" name="rol" class="radio-opcion">Tutorado</label>
-            <label><input type="radio" name="rol" class="radio-opcion">Coordinador</label>
-            <button type="submit">GUARDAR</button>
+            <p class="radio-label">Elige el rol del usuario</p>
+            <label><input type="radio" asp-for="IdRol" value="1" required /> Tutor</label>
+            <label><input type="radio" asp-for="IdRol" value="2" /> Tutorado</label>
+            <label><input type="radio" asp-for="IdRol" value="4" /> Coordinador</label>
+
+            <!-- Estado por defecto activo (como en tu back) -->
+            <input asp-for="IdEstado" type="hidden" value="1" />
+
+            <div class="acciones">
+                
+                <button type="submit" class="btn-principal">GUARDAR</button>
+                <a asp-controller="Administrador" asp-action="PanelAdministrador" class="btn-secundario">CANCELAR</a>
+            </div>
         </form>
+
+        @* Popup de error si la API respondió con fallo *@
+        @{
+            var error = ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage;
+        }
+        @await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto {
+        Tipo = "error",
+                Titulo = "No se pudo registrar",
+                Mensaje = error
+                })
     </section>
 </main>

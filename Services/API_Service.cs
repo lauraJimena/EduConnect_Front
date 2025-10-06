@@ -147,5 +147,135 @@ namespace EduConnect_Front.Services
                 return (false, $"No se pudo conectar con la API: {ex.Message}", null);
             }
         }
+        //Registro que hace el administrador
+        public async Task<(bool Ok, string Msg)> RegistrarUsuarioAdminAsync(CrearUsuarioDto dto, CancellationToken ct = default)
+        {
+            try
+            {
+                using var resp = await _httpClient.PostAsJsonAsync("Administrador/RegistrarUsuario", dto, ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.IsSuccessStatusCode)
+                {
+                    //API devuelve "Usuario registrado con éxito" o texto similar
+                    var msgOk = string.IsNullOrWhiteSpace(body) ? "Usuario registrado con éxito" : body;
+                    return (true, msgOk);
+                }
+
+                var msgErr = string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body;
+                return (false, msgErr);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"No se pudo conectar con la API: {ex.Message}");
+            }
+            catch (TaskCanceledException)
+            {
+                return (false, "La solicitud a la API expiró (timeout).");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}");
+            }
+        }
+        // OBTENER USUARIO POR ID
+        public async Task<(bool Ok, string Msg, ActualizarUsuarioDto? Usuario)> ObtenerUsuarioPorIdAsync(int idUsuario, CancellationToken ct = default)
+        {
+            try
+            {
+                using var resp = await _httpClient.GetAsync($"Administrador/ObtenerUsuarioPorId/{idUsuario}", ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.IsSuccessStatusCode)
+                {
+                    var usuario = JsonSerializer.Deserialize<ActualizarUsuarioDto>(
+                        body,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    );
+                    return (true, "Usuario obtenido correctamente", usuario);
+                }
+
+                var msgErr = string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body;
+                return (false, msgErr, null);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"No se pudo conectar con la API: {ex.Message}", null);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}", null);
+            }
+        }
+        //ACTUALIZAR USUARIO
+
+        public async Task<(bool Ok, string Msg)> ActualizarUsuarioAsync(ActualizarUsuarioDto dto, CancellationToken ct = default)
+        {
+            try
+            {
+                using var resp = await _httpClient.PutAsJsonAsync("Administrador/ActualizarUsuario", dto, ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.IsSuccessStatusCode)
+                {
+                    var msgOk = string.IsNullOrWhiteSpace(body) ? "Usuario actualizado con éxito" : body;
+                    return (true, msgOk);
+                }
+
+                var msgErr = string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body;
+                return (false, msgErr);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"No se pudo conectar con la API: {ex.Message}");
+            }
+            catch (TaskCanceledException)
+            {
+                return (false, "La solicitud a la API expiró (timeout).");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}");
+            }
+        }
+        //INACTIVAR USUARIO
+        public async Task<(bool Ok, string Msg)> EliminarUsuarioAsync(int idUsuario, CancellationToken ct = default)
+        {
+            try
+            {
+                using var resp = await _httpClient.DeleteAsync($"Administrador/EliminarUsuario/{idUsuario}", ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.IsSuccessStatusCode)
+                {
+                    // Mensaje correcto si la API no devuelve cuerpo
+                    var msgOk = string.IsNullOrWhiteSpace(body)
+                        ? "Usuario eliminado (inactivado) correctamente."
+                        : body;
+                    return (true, msgOk);
+                }
+
+                // Si hubo error
+                var msgErr = string.IsNullOrWhiteSpace(body)
+                    ? $"Error {(int)resp.StatusCode}"
+                    : body;
+                return (false, msgErr);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"Error al conectar con la API: {ex.Message}");
+            }
+            catch (TaskCanceledException)
+            {
+                return (false, "La solicitud a la API expiró (timeout).");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}");
+            }
+        }
+
+
+
     }
 }
