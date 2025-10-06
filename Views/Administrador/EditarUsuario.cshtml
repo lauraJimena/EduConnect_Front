@@ -1,0 +1,104 @@
+﻿@model EduConnect_Front.Dtos.ActualizarUsuarioDto
+@{
+    ViewData["Title"] = "Editar Perfil";
+    Layout = "_Layout";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/editarTutorado.css">
+}
+
+<main class="perfil-container perfil-container2">
+    <!-- Panel izquierdo -->
+    <section class="perfil-left">
+        <div class="avatar">
+            <img src="~/img/IconoAvatar.png" alt="Avatar Tutorado" id="avatarSeleccionado">
+        </div>
+
+        <!-- 🔹 Muestra el nombre del usuario -->
+        <button class="nombre-tutorado">@Model.Nombre.ToUpper() @Model.Apellido.ToUpper()</button>
+
+        <!-- Selección de avatares -->
+        <div class="avatar-selector">
+            <p>Elige tu avatar:</p>
+            <div class="avatar-opciones">
+                @for (int i = 1; i <= 6; i++)
+                {
+                    <label>
+                        <input type="radio" name="avatar" value="@i" @(i == 1 ? "checked" : "") />
+                        <img src="@Url.Content($"~/img/avatars/avatar{i}.png")" alt="Avatar @i" />
+                    </label>
+                }
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Panel derecho -->
+    <section class="perfil-right">
+        <h1><img src="~/img/IconoEditar.png" alt="icono editar"> EDITAR PERFIL</h1>
+
+        <form asp-action="EditarUsuario" asp-controller="Administrador" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="IdUsu" />
+
+            <input asp-for="Nombre" type="text" placeholder="NOMBRES" required />
+            <input asp-for="Apellido" type="text" placeholder="APELLIDOS" required />
+
+            <select asp-for="IdTipoIdent" required>
+                <option value="">TIPO DE DOCUMENTO</option>
+                <option value="1">Cédula</option>
+                <option value="2">Tarjeta de Identidad</option>
+                <option value="3">Pasaporte</option>
+            </select>
+
+            <input asp-for="NumIdent" type="text" placeholder="NÚMERO DE DOCUMENTO" required />
+            <input asp-for="TelUsu" type="tel" placeholder="TELÉFONO" required />
+            <input asp-for="Correo" type="email" placeholder="CORREO" required />
+           
+
+            <select asp-for="IdCarrera" required>
+                <option value="">CARRERA</option>
+                <option value="1">Ingeniería Agronómica</option>
+                <option value="2">Ingeniería Ambiental</option>
+                <option value="3">Ingeniería Topográfica y Geomática</option>
+                <option value="4">Medicina Veterinaria</option>
+                <option value="5">Zootecnia</option>
+                <option value="5">Profesional en Ciencias del Deporte</option>
+
+            </select>
+
+            <select asp-for="IdSemestre" class="form-select" required>
+                <option value="">SEMESTRE</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+            </select>
+
+            <select asp-for="IdRol" required>
+                <option value="">ROL</option>
+                <option value="1">Tutor</option>
+                <option value="2">Tutorado</option>
+                <option value="3">Administrador</option>
+                <option value="4">Coordinador</option>
+            </select>
+
+            <div class="botones-acciones">
+                <button type="submit" class="btn-guardar">GUARDAR</button><br /><br />
+                <a asp-controller="Administrador" asp-action="ConsultarUsuarios" class="btn-volver">VOLVER</a>
+            </div>
+        </form>
+    </section>
+</main>
+
+<script>
+    // 🔹 Script para cambiar el avatar seleccionado
+    document.querySelectorAll("input[name='avatar']").forEach(radio => {
+        radio.addEventListener("change", function () {
+            let imgSrc = this.nextElementSibling.getAttribute("src");
+            document.getElementById("avatarSeleccionado").setAttribute("src", imgSrc);
+        });
+    });
+</script>

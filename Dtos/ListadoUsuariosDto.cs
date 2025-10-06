@@ -10,9 +10,10 @@
         public string NumIdent { get; set; } = "";
         public string TelUsu { get; set; } = "";
         public string ContrasUsu { get; set; } = ""; // viene vacío en tu API
-        public int IdCarrera { get; set; }
         public int IdSemestre { get; set; }
-        public int IdRol { get; set; }
-        public int IdEstado { get; set; }
+        public string Estado { get; set; } = string.Empty;
+        public string Carrera { get; set; } = string.Empty;
+        public string Rol { get; set; } = string.Empty;
+        public string TipoIdent { get; set; } = string.Empty;
     }
 }
