@@ -33,4 +33,8 @@
     <None Include="wwwroot\img\Solicitud.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,4 @@
-﻿@model List<EduConnect_Front.Dtos.HistorialTutoriaDto>
+﻿@model List<EduConnect_Front.Dtos.SolicitudTutoriaDto>
 @using EduConnect_Front.Dtos
 @{
     ViewData["Title"] = "Solicitudes de Tutorías";
@@ -35,12 +35,12 @@
                         foreach (var r in Model)
                         {
                             <tr>
-                                <td>@r.TutorNombreCompleto</td>
-                                <td>@r.MateriaNombre</td>
-                                <td>@r.Fecha</td>
-                                <td>@r.Hora</td>
-                                <td>@r.Tema</td>
-                                <td>@r.EstadoNombre</td>
+                                <td>@r.NombreTutor</td>
+                                <td>@r.MateriaSolicitada</td>
+                                <td>@r.FechaPropuesta.ToShortDateString()</td>
+                                <td>@r.HoraPropuesta</td>
+                                <td>@r.TemaRequerido</td>
+                                <td>@r.Estado</td>
                             </tr>
                         }
                     }
@@ -64,30 +64,35 @@
             <div class="ilustracion">
                 <img src="~/img/PensarSolicitud.png" alt="Usuario">
             </div>
-            <div class="filtros tarjeta">
-                <h3>FILTRAR POR:</h3>
 
-                <label class="chk">
-                    <input type="checkbox" value="pendiente" checked />
-                    <span class="tick"></span>
-                    PENDIENTE DE RESPUESTA
-                </label>
+            <!-- 🔹 Formulario que envía el filtro -->
+            <form asp-action="SolicitudesTutorias" method="post">
+                <div class="filtros tarjeta">
+                    <h3>FILTRAR POR:</h3>
 
-                <label class="chk">
-                    <input type="checkbox" value="aceptada" checked />
-                    <span class="tick"></span>
-                    ACEPTADA
-                </label>
+                    <label class="chk">
+                        <input type="checkbox" name="Estados" value="4"/>
+                        <span class="tick"></span>
+                        PENDIENTE DE RESPUESTA
+                    </label>
 
-                <label class="chk">
-                    <input type="checkbox" value="rechazada" />
-                    <span class="tick"></span>
-                    RECHAZADA
-                </label>
+                    <label class="chk">
+                        <input type="checkbox" name="Estados" value="3" />
+                        <span class="tick"></span>
+                        ACEPTADA
+                    </label>
 
-                <button type="button" class="btn-aplicar btn-aplicar2">APLICAR FILTRO</button>
-            </div>
+                    <label class="chk">
+                        <input type="checkbox" name="Estados" value="5" />
+                        <span class="tick"></span>
+                        RECHAZADA
+                    </label>
+
+                    <button type="submit" class="btn-aplicar btn-aplicar2">APLICAR FILTRO</button>
+                </div>
+            </form>
         </aside>
+
     </section>
 
     <button class="btn-flotante" title="Soporte">
@@ -104,3 +109,4 @@
         Mensaje = error
         })
 </main>
+

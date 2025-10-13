@@ -1,0 +1,186 @@
+﻿/* ---------- CONTENEDOR GENERAL ---------- */
+.historial-container {
+    background: url('../img/FondoZigAzul.png') repeat;
+    min-height: calc(100vh - 100px);
+    font-family: Montserrat, sans-serif;
+    padding: 2rem 1rem;
+    position: relative;
+}
+
+/* ---------- TÍTULO ---------- */
+.encabezado h1 {
+    text-align: center;
+    color: #fbc959;
+    font-weight: 800;
+    font-family: 'League Spartan', sans-serif;
+    text-shadow: 3px 3px #0e2b5b;
+    margin-bottom: 10px;
+    margin-top: 78px;
+    font-size: 2.4em;
+}
+
+/* ---------- ESTRUCTURA ---------- */
+.contenido {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+}
+
+/* ---------- TABLA ---------- */
+.tabla-contenedor {
+    flex: 2.5;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  
+}
+
+.tabla-historial {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing:2px;
+    text-align: center;
+   
+}
+
+    .tabla-historial th {
+        background-color: #90b5e8;
+        color: #fff;
+        padding: 0.8rem;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .tabla-historial td {
+        background-color: #fffef6;
+        padding: 0.7rem;
+        font-size: 0.95rem;
+        color: #444;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .tabla-historial tr:hover td {
+        background-color: #f5faff;
+    }
+
+.sin-registros {
+    text-align: center;
+    color: #555;
+    font-style: italic;
+    padding: 1.5rem;
+}
+
+/* ---------- FILTROS ---------- */
+.panel-filtros {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    width: 230px;
+    height: fit-content;
+    margin-left:-20px;
+}
+
+    .panel-filtros h3 {
+        color: #3a3a3a;
+        font-weight: 700;
+        margin-bottom: 1.3rem;       
+        font-size:0.95em;
+    }
+
+/* ---------- GRUPO DE CHECKBOX ---------- */
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+    /* ---------- CHECKBOX PERSONALIZADO ---------- */
+    .checkbox-group input[type="checkbox"] {
+        /* Tamaño más grande */
+        width: 22px;
+        height: 22px;
+        /* Apariencia base */
+        appearance: none; /* Quita el estilo del navegador */
+        border: 2px solid #4a90e2;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+        background-color: #fff;
+    }
+
+        /* Al pasar el mouse */
+        .checkbox-group input[type="checkbox"]:hover {
+            border-color: #2a78c0;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.4);
+        }
+
+        /* Estado activo (marcado) */
+        .checkbox-group input[type="checkbox"]:checked {
+            background-color: #4a90e2;
+            border-color: #4a90e2;
+        }
+
+            /* Agrega el ícono ✓ cuando esté seleccionado */
+            .checkbox-group input[type="checkbox"]:checked::after {
+                content: "✔";
+                color: white;
+                font-size: 14px;
+                position: absolute;
+                top: 1px;
+                left: 4px;
+            }
+
+    /* ---------- Texto de los labels ---------- */
+    .checkbox-group label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #444;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        user-select: none;
+    }
+
+
+    .checkbox-group label {
+        color: #444;
+        font-weight: 500;
+        font-size: 0.85em;
+    }
+
+.btn-filtrar {
+    background-color: #78c0e0;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    transition: 0.3s ease;
+    text-shadow: 1px 1px #00000030;
+}
+
+    .btn-filtrar:hover {
+        background-color: #5aa9d6;
+        transform: scale(1.05);
+    }
+
+/* ---------- RESPONSIVO ---------- */
+@media (max-width: 768px) {
+    .contenido {
+        flex-direction: column;
+    }
+
+    .panel-filtros {
+        width: 100%;
+        order: -1;
+    }
+}

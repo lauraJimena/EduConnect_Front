@@ -5,7 +5,7 @@
 /* Contenedor principal */
 .busqueda-container {
     position: relative;
-    padding: 30px;
+    padding: 30px 0px;
     font-family: 'Montserrat', sans-serif;
     background: #e6e6e6 url('../img/FondoPerfil.png') repeat; /* azul claro */
     background-size: cover; /* para que la imagen se ajuste */
@@ -27,7 +27,7 @@
     margin-top:3%;
     align-items: center;
     margin-bottom: -38px;
-    margin-left:8%;
+    margin-left:7%;
 
 }
 .intro-texto{
@@ -38,12 +38,13 @@
 }
 .intro-texto h1 {
     color: #f9bb65;
-    font-size: 2.1rem;
-    font-weight: bold;
-    text-shadow: 3px 3px #1e5778;
+    font-size: 2.45rem;
+    font-weight: 730;
+    text-shadow: 3.8px 3.2px #1e5778;
     font-family: 'League Spartan', sans-serif;
-    margin-right:15px;
-    margin-bottom:25px;
+    margin-left:-30px;
+    margin-bottom:20px;
+    
     
 }
 
@@ -64,7 +65,7 @@
 .busqueda-filtros {
     width: 100%;
     margin-bottom: 5px;
-    padding:10px;
+    padding:0px;
     border-radius:30px;
 }
 a{
@@ -90,9 +91,10 @@ a{
     background: #fff;
     border: 1px solid #c0c0c0;
     border-radius: 30px;
-    padding: 6px 14px;
+    padding: 6px 10px;
     height: 56px;
     box-shadow: 0 4px 6px rgba(0,0,0,.2);
+    margin-left:-40px;
 }
 
     .barra-busqueda input {
@@ -111,8 +113,8 @@ a{
 
 /* Panel de filtros FIJO a la DERECHA */
 .filtros {
-    width: 300px; /* ancho fijo */
-    margin-left: auto; /* se pega a la derecha */
+    width: 260px; /* ancho fijo */
+    margin-right:-40px; /* se pega a la derecha */
     background: #fff;
     border: 1px solid #c0c0c0;
     border-radius: 15px;
@@ -156,25 +158,30 @@ a{
 /* Tarjetas tutores */
 .lista-tutores {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
-    padding-left:60px;
-    margin-top:-270px;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    max-width: 1000px; /* ✅ limita cuántas caben por fila */
+    margin-top:-259px;
+    margin-left:30px;
 }
 
+/* Cada tarjeta ocupará la mitad del ancho del contenedor menos el gap */
 .tutor-card {
+    flex: 0 0 48%; /* ✅ cada tarjeta ocupa el 44% fijo del contenedor */
+    max-width: 48%;
     display: flex;
     align-items: center;
     background: white;
     border-radius: 15px;
-    padding: 15px;
+    padding: 20px 15px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    width: 66%;
     border: 1px solid #c0c0c0;
+    box-sizing: border-box;
 }
 
     .tutor-card img {
-        width: 110px;
+        width: 105px;
         border-radius: 50%;
         margin-right: 15px;
     }
@@ -223,7 +230,7 @@ a{
     margin-top: 0px;
     box-shadow: 2px 4px 3px gray;
     padding: 10px 0px;
-    width: 50%;
+    width: 60%;
     background: #7ec0e0;
     margin-left:25%;
     margin-bottom:10px;

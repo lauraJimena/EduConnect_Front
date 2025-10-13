@@ -1,4 +1,5 @@
 ﻿using EduConnect_Front.Dtos;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using static System.Net.WebRequestMethods;
 
@@ -21,7 +22,7 @@ namespace EduConnect_Front.Services
         {
             try
             {
-                
+
                 using var resp = await _httpClient.PostAsJsonAsync("General/RegistrarUsuario", usuario, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
@@ -45,29 +46,127 @@ namespace EduConnect_Front.Services
                 return (false, $"Error inesperado: {ex.Message}");
             }
         }
-        public async Task<(bool Ok, string Msg, ObtenerUsuarioDto? Usuario)> IniciarSesionAsync(IniciarSesionDto dto, CancellationToken ct = default)
+        public async Task<(bool Ok, string Msg, List<SolicitudTutorDto>? Solicitudes)>
+    ObtenerSolicitudesTutoriasAsync(FiltroSolicitudesTutorDto filtro, string token, CancellationToken ct = default)
         {
             try
             {
-                using var resp = await _httpClient.PostAsJsonAsync("General/IniciarSesi%C3%B3n", dto, ct);
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                using var resp = await _httpClient.PostAsJsonAsync("Tutor/SolicitudesTutorias", filtro, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
                 if (resp.IsSuccessStatusCode)
                 {
-                    var usuario = JsonSerializer.Deserialize<ObtenerUsuarioDto>(
-                        body,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                    );
-                    return (true, "Inicio de sesión correcto", usuario);
+                    var lista = JsonSerializer.Deserialize<List<SolicitudTutorDto>>(body,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    return (true, "Solicitudes obtenidas correctamente", lista);
                 }
 
-                return (false, string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body, null);
+                var msgErr = string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body;
+                return (false, msgErr, null);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"No se pudo conectar con la API: {ex.Message}", null);
             }
             catch (Exception ex)
             {
-                return (false, $"Error al conectar con la API: {ex.Message}", null);
+                return (false, $"Error inesperado: {ex.Message}", null);
             }
         }
+
+        //public async Task<(bool Ok, string Msg, ObtenerUsuarioDto? Usuario)> IniciarSesionAsync(IniciarSesionDto dto, CancellationToken ct = default)
+        //{
+        //    try
+        //    {
+        //        using var resp = await _httpClient.PostAsJsonAsync("General/IniciarSesi%C3%B3n", dto, ct);
+        //        var body = await resp.Content.ReadAsStringAsync(ct);
+
+        //        if (resp.IsSuccessStatusCode)
+        //        {
+        //            var usuario = JsonSerializer.Deserialize<ObtenerUsuarioDto>(
+        //                body,
+        //                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        //            );
+        //            return (true, "Inicio de sesión correcto", usuario);
+        //        }
+
+        //        return (false, string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body, null);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return (false, $"Error al conectar con la API: {ex.Message}", null);
+        //    }
+        //}
+
+        public async Task<(bool Ok, string Msg, RespuestaInicioSesionDto? Usuario)> IniciarSesionAsync(
+      IniciarSesionDto dto,
+      CancellationToken ct = default)
+        {
+            try
+            {
+                using var resp = await _httpClient.PostAsJsonAsync("General/IniciarSesión", dto, ct);
+
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                // 🔹 Si el cuerpo está vacío
+                if (string.IsNullOrWhiteSpace(body))
+                    return (false, $"Error {(int)resp.StatusCode}: Respuesta vacía del servidor.", null);
+
+                // 🔹 Intentar parsear JSON solo si parece JSON
+                RespuestaInicioSesionDto? usuario = null;
+                if (body.TrimStart().StartsWith("{") || body.TrimStart().StartsWith("["))
+                {
+                    try
+                    {
+                        usuario = JsonSerializer.Deserialize<RespuestaInicioSesionDto>(
+                            body,
+                            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                        );
+                    }
+                    catch
+                    {
+                        // Si el contenido no es JSON válido, lo tratamos como texto
+                    }
+                }
+
+                // ✅ Si la respuesta fue exitosa (HTTP 200) y se pudo deserializar
+                if (resp.IsSuccessStatusCode && usuario != null)
+                {
+                    return (true, usuario.Mensaje ?? "Inicio de sesión exitoso", usuario);
+                }
+
+                // 🔹 Si hubo error (texto plano o mensaje en JSON)
+                string msgError;
+                if (usuario != null && !string.IsNullOrWhiteSpace(usuario.Mensaje))
+                {
+                    msgError = usuario.Mensaje!;
+                }
+                else
+                {
+                    msgError = body.Trim('"', '\n', '\r'); // limpiar comillas o saltos
+                }
+
+                return (false, msgError, null);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"Error al conectar con la API: {ex.Message}", null);
+            }
+            catch (TaskCanceledException)
+            {
+                return (false, "La solicitud de inicio de sesión expiró (timeout).", null);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}", null);
+            }
+        }
+
+
         // GET /Tutorado/{idTutorado}/historial
         public async Task<(bool Ok, string Msg, List<HistorialTutoriaDto>? Items)>
             ObtenerHistorialTutoradoAsync(int idTutorado, CancellationToken ct = default)
@@ -93,33 +192,55 @@ namespace EduConnect_Front.Services
                 return (false, $"No se pudo conectar con la API: {ex.Message}", null);
             }
         }
-        // GET /Administrador/ConsultarUsuarios
-        public async Task<(bool Ok, string Msg, List<ListadoUsuariosDto>? Items)>
-            ConsultarUsuariosAsync(CancellationToken ct = default)
+        // CONSULTAR USUARIOS ADMIN
+        public async Task<List<ListadoUsuariosDto>> ObtenerUsuariosAsync(int? idRol = null, int? idEstado = null, string? numIdent = null)
         {
-            try
+            // Construimos la URL con los filtros dinámicos
+            var queryParams = new List<string>();
+            if (idRol.HasValue) queryParams.Add($"idRol={idRol.Value}");
+            if (idEstado.HasValue) queryParams.Add($"idEstado={idEstado.Value}");
+            if (!string.IsNullOrWhiteSpace(numIdent)) queryParams.Add($"numIdent={numIdent}");
+
+            var url = "Administrador/ConsultarUsuarios";
+            if (queryParams.Any())
+                url += "?" + string.Join("&", queryParams);
+
+            var response = await _httpClient.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
             {
-                using var resp = await _httpClient.GetAsync("Administrador/ConsultarUsuarios", ct);
-                var body = await resp.Content.ReadAsStringAsync(ct);
-
-                if (resp.IsSuccessStatusCode)
-                {
-                    var items = JsonSerializer.Deserialize<List<ListadoUsuariosDto>>(
-                        body,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                    ) ?? new List<ListadoUsuariosDto>();
-
-                    return (true, "OK", items);
-                }
-
-                var msg = string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body;
-                return (false, msg, null);
+                var usuarios = await response.Content.ReadFromJsonAsync<List<ListadoUsuariosDto>>();
+                return usuarios ?? new List<ListadoUsuariosDto>();
             }
-            catch (Exception ex)
-            {
-                return (false, $"No se pudo conectar con la API: {ex.Message}", null);
-            }
+
+            throw new Exception("Error al obtener usuarios desde el API.");
         }
+        //public async Task<(bool Ok, string Msg, List<ListadoUsuariosDto>? Items)>
+        //    ConsultarUsuariosAsync(CancellationToken ct = default)
+        //{
+        //    try
+        //    {
+        //        using var resp = await _httpClient.GetAsync("Administrador/ConsultarUsuarios", ct);
+        //        var body = await resp.Content.ReadAsStringAsync(ct);
+
+        //        if (resp.IsSuccessStatusCode)
+        //        {
+        //            var items = JsonSerializer.Deserialize<List<ListadoUsuariosDto>>(
+        //                body,
+        //                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        //            ) ?? new List<ListadoUsuariosDto>();
+
+        //            return (true, "OK", items);
+        //        }
+
+        //        var msg = string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body;
+        //        return (false, msg, null);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return (false, $"No se pudo conectar con la API: {ex.Message}", null);
+        //    }
+        //}
         // POST /Tutor/obtener
         public async Task<(bool Ok, string Msg, List<ObtenerTutorDto>? Items)>
             BuscarTutoresAsync(BuscarTutorDto filtros, CancellationToken ct = default)
@@ -147,7 +268,7 @@ namespace EduConnect_Front.Services
                 return (false, $"No se pudo conectar con la API: {ex.Message}", null);
             }
         }
-        //Registro que hace el administrador
+        //REGISTRAR USUARIO ADMIN
         public async Task<(bool Ok, string Msg)> RegistrarUsuarioAdminAsync(CrearUsuarioDto dto, CancellationToken ct = default)
         {
             try
@@ -179,10 +300,13 @@ namespace EduConnect_Front.Services
             }
         }
         // OBTENER USUARIO POR ID
-        public async Task<(bool Ok, string Msg, ActualizarUsuarioDto? Usuario)> ObtenerUsuarioPorIdAsync(int idUsuario, CancellationToken ct = default)
+        public async Task<(bool Ok, string Msg, ActualizarUsuarioDto? Usuario)> ObtenerUsuarioPorIdPerfil(int idUsuario, string token, CancellationToken ct = default)
         {
             try
             {
+                // 🔹 Agregar encabezado de autorización con el token JWT
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 using var resp = await _httpClient.GetAsync($"Administrador/ObtenerUsuarioPorId/{idUsuario}", ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
@@ -207,6 +331,40 @@ namespace EduConnect_Front.Services
                 return (false, $"Error inesperado: {ex.Message}", null);
             }
         }
+        public async Task<(bool Ok, string Msg, ObtenerUsuarioDto? Usuario)> ObtenerUsuarioPorIdAsync(
+    int idUsuario,
+    string token,
+    CancellationToken ct = default)
+        {
+            try
+            {
+                // Agregar token en el encabezado de la solicitud
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                using var resp = await _httpClient.GetAsync($"Administrador/ObtenerUsuarioPorId/{idUsuario}", ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.IsSuccessStatusCode)
+                {
+                    var usuario = JsonSerializer.Deserialize<ObtenerUsuarioDto>(
+                        body,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    return (true, "Usuario obtenido correctamente", usuario);
+                }
+
+                return (false, $"Error {(int)resp.StatusCode}: {body}", null);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"Error de conexión: {ex.Message}", null);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}", null);
+            }
+        }
+
         //ACTUALIZAR USUARIO
 
         public async Task<(bool Ok, string Msg)> ActualizarUsuarioAsync(ActualizarUsuarioDto dto, CancellationToken ct = default)
@@ -238,6 +396,118 @@ namespace EduConnect_Front.Services
                 return (false, $"Error inesperado: {ex.Message}");
             }
         }
+        //public async Task<(bool Ok, string Msg)> EditarPerfilAsync(ActualizarUsuarioDto dto, string token, CancellationToken ct = default)
+        //{
+        //    try
+        //    {
+        //        // 🔹 Agregar encabezado de autorización con el token JWT
+        //        _httpClient.DefaultRequestHeaders.Authorization =
+        //            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        //        // Crear la solicitud con el header de autorización
+        //        using var request = new HttpRequestMessage(HttpMethod.Put, "Tutorado/ActualizarPerfil")
+        //        {
+        //            Content = JsonContent.Create(dto)
+        //        };
+
+        //        // Agregar el token al encabezado
+        //        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        //        using var resp = await _httpClient.SendAsync(request, ct);
+        //        var body = await resp.Content.ReadAsStringAsync(ct);
+
+        //        if (resp.IsSuccessStatusCode)
+        //        {
+        //            var msgOk = string.IsNullOrWhiteSpace(body)
+        //                ? "Perfil actualizado con éxito"
+        //                : body;
+
+        //            return (true, msgOk);
+        //        }
+
+        //        // Mensaje de error devuelto por la API
+        //        var msgErr = string.IsNullOrWhiteSpace(body)
+        //            ? $"Error {(int)resp.StatusCode}"
+        //            : body;
+
+        //        return (false, msgErr);
+        //    }
+        //    catch (HttpRequestException ex)
+        //    {
+        //        return (false, $"No se pudo conectar con la API: {ex.Message}");
+        //    }
+        //    catch (TaskCanceledException)
+        //    {
+        //        return (false, "La solicitud a la API expiró (timeout).");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return (false, $"Error inesperado: {ex.Message}");
+        //    }
+        //}
+        // 🔹 Método para actualizar perfil
+        public async Task<string> ActualizarPerfilAsync(EditarPerfilDto perfil, string token)
+        {
+            // Agregar encabezado de autorización Bearer
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            // Hacer la llamada PUT
+            var response = await _httpClient.PutAsJsonAsync("Tutorado/ActualizarPerfil", perfil);
+
+            // Manejo de respuesta
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync(); // devuelve "Perfil actualizado con éxito"
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Error al actualizar perfil: {error}");
+            }
+        }
+
+        public async Task<(bool Ok, string Msg)> EditarPerfilAsync(
+    EditarPerfilDto dto,
+
+    CancellationToken ct = default)
+        {
+            try
+            {
+
+
+                // Enviar la solicitud PUT al endpoint
+                using var resp = await _httpClient.PutAsJsonAsync("Tutorado/ActualizarPerfil", dto, ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.IsSuccessStatusCode)
+                {
+                    // Mensaje exitoso, el backend devuelve texto plano ("Perfil actualizado con éxito")
+                    var msgOk = string.IsNullOrWhiteSpace(body)
+                        ? "Perfil actualizado correctamente."
+                        : body;
+                    return (true, msgOk);
+                }
+
+                // 🔸 Si hubo error en la respuesta
+                var msgErr = string.IsNullOrWhiteSpace(body)
+                    ? $"Error {(int)resp.StatusCode}"
+                    : body;
+                return (false, msgErr);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"Error al conectar con la API: {ex.Message}");
+            }
+            catch (TaskCanceledException)
+            {
+                return (false, "La solicitud a la API expiró (timeout).");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}");
+            }
+        }
+
         //INACTIVAR USUARIO
         public async Task<(bool Ok, string Msg)> EliminarUsuarioAsync(int idUsuario, CancellationToken ct = default)
         {
@@ -272,6 +542,309 @@ namespace EduConnect_Front.Services
             catch (Exception ex)
             {
                 return (false, $"Error inesperado: {ex.Message}");
+            }
+        }
+
+
+        // OBTENER HISTORIAL DE TUTORÍAS PARA EL TUTORADO
+        public async Task<(bool Ok, string Msg, List<HistorialTutoriaDto>? Datos)> ObtenerHistorialTutoradoAsync(
+            int idTutorado,
+            string token,                        // 🔹 Mover el token antes del parámetro opcional
+            List<int>? idsEstado = null,
+            CancellationToken ct = default)
+        {
+            try
+            {
+                // Validar token antes de usarlo
+                if (string.IsNullOrWhiteSpace(token))
+                    return (false, "Token de autenticación inválido o no encontrado.", null);
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                // 🔹 Construir la URL con parámetros opcionales
+                var url = $"Tutorado/{idTutorado}/historial";
+
+                if (idsEstado != null && idsEstado.Any())
+                {
+                    var query = string.Join("&", idsEstado.Select(e => $"idsEstado={e}"));
+                    url += $"?{query}";
+                }
+
+                using var resp = await _httpClient.GetAsync(url, ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                // ✅ Caso de éxito
+                if (resp.IsSuccessStatusCode)
+                {
+                    var datos = JsonSerializer.Deserialize<List<HistorialTutoriaDto>>(
+                        body,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    );
+
+                    return (true, "Historial obtenido correctamente", datos ?? new());
+                }
+
+                // ❌ Caso de error con detalle del body
+                var msgErr = string.IsNullOrWhiteSpace(body)
+                    ? $"Error {(int)resp.StatusCode}: {resp.ReasonPhrase}"
+                    : body;
+
+                return (false, msgErr, null);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"Error al conectar con la API: {ex.Message}", null);
+            }
+            catch (TaskCanceledException)
+            {
+                return (false, "La solicitud de historial expiró (timeout).", null);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}", null);
+            }
+        }
+
+        //OBTENER CARRERAS
+        public async Task<List<CarreraDto>> ObtenerCarrerasAsync()
+        {
+            var response = await _httpClient.GetAsync("General/ObtenerCarreras");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var carreras = await response.Content.ReadFromJsonAsync<List<CarreraDto>>();
+                return carreras ?? new List<CarreraDto>();
+            }
+
+            throw new Exception("Error al obtener las carreras del API");
+        }
+        public async Task<List<TipoIdentDto>> ObtenerTipoIdentAsync()
+        {
+            var response = await _httpClient.GetAsync("General/ObtenerTiposIdent");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var tipoIdent = await response.Content.ReadFromJsonAsync<List<TipoIdentDto>>();
+                return tipoIdent ?? new List<TipoIdentDto>();
+            }
+
+            throw new Exception("Error al obtener las carreras del API");
+        }
+
+        //OBETENER USUARIO POR ID
+        public async Task<ObtenerUsuarioDto?> ObtenerUsuarioPorIdAsync(int idUsuario, string token)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.GetAsync($"Administrador/ObtenerUsuarioPorId/{idUsuario}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<ObtenerUsuarioDto>();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Error al obtener usuario: {error}");
+            }
+        }
+        //SOLICITUDES TUTORIAS TUTORADO
+        public async Task<List<SolicitudTutoriaDto>> ObtenerSolicitudesTutoriasAsync(
+    FiltroSolicitudesDto filtro, string token, CancellationToken ct = default)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                using var resp = await _httpClient.PostAsJsonAsync("Tutorado/SolicitudesTutorias", filtro, ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.IsSuccessStatusCode)
+                {
+                    var solicitudes = JsonSerializer.Deserialize<List<SolicitudTutoriaDto>>(
+                        body,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    );
+                    return solicitudes ?? new List<SolicitudTutoriaDto>();
+                }
+
+                // Si hubo error
+                var msgError = string.IsNullOrWhiteSpace(body)
+                    ? $"Error {(int)resp.StatusCode}"
+                    : body;
+                throw new Exception(msgError);
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new Exception($"Error de conexión con la API: {ex.Message}");
+            }
+            catch (TaskCanceledException)
+            {
+                throw new Exception("La solicitud de tutorías tardó demasiado (timeout).");
+            }
+        }
+
+        //CREAR SOLICITUD TUTORIA
+        public async Task<(bool Success, string Message)> CrearSolicitudTutoriaAsync(
+    SolicitudTutoriaRespuestaDto solicitud,
+    string token,
+    CancellationToken ct = default)
+        {
+            try
+            {
+                // 🔹 Agregar encabezado de autorización
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                // 🔹 Llamada POST a la API
+                using var resp = await _httpClient.PostAsJsonAsync("Tutorado/CrearSolicitudTutoria", solicitud, ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.IsSuccessStatusCode)
+                {
+                    // Si la API devuelve un mensaje (string), lo usamos directamente
+                    return (true, string.IsNullOrWhiteSpace(body)
+                        ? "Solicitud de tutoría creada con éxito."
+                        : body);
+                }
+
+                // 🔹 Manejo de errores devueltos por la API (400, 401, 500, etc.)
+                var msg = string.IsNullOrWhiteSpace(body)
+                    ? $"Error {(int)resp.StatusCode}"
+                    : body;
+
+                // Si el token expiró o no es válido
+                if (resp.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    msg = "Tu sesión ha expirado o el token no es válido. Por favor, inicia sesión nuevamente.";
+
+                return (false, msg);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"❌ No se pudo conectar con la API: {ex.Message}");
+            }
+            catch (TaskCanceledException)
+            {
+                return (false, "⏰ La solicitud a la API expiró (timeout).");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"⚠️ Error inesperado: {ex.Message}");
+
+
+            }
+
+        }
+        //ACEPTAR SOLICITUD DE TUTORÍA
+        public async Task<(bool Ok, string Msg)> AceptarSolicitudTutoriaAsync(int idTutoria, string token, CancellationToken ct = default)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var request = new ActualizarEstadoSolicitudDto { IdTutoria = idTutoria };
+
+                using var resp = await _httpClient.PutAsJsonAsync("Tutor/AceptarSolicitudTutoria", request, ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.IsSuccessStatusCode)
+                    return (true, string.IsNullOrWhiteSpace(body) ? "Solicitud aceptada correctamente" : body);
+
+                var msgErr = string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body;
+                return (false, msgErr);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"No se pudo conectar con la API: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}");
+            }
+        }
+        //RECHAZAR SOLICITUD DE TUTORÍA
+        public async Task<(bool Ok, string Msg)> RechazarSolicitudTutoriaAsync(int idTutoria, string token, CancellationToken ct = default)
+        {
+            try
+            {
+                // 🔹 Agregar encabezado con el token JWT
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var request = new ActualizarEstadoSolicitudDto { IdTutoria = idTutoria };
+
+                // 🔹 Enviar solicitud PUT al endpoint del back
+                using var resp = await _httpClient.PutAsJsonAsync("Tutor/RechazarSolicitudTutoria", request, ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.IsSuccessStatusCode)
+                    return (true, string.IsNullOrWhiteSpace(body) ? "Solicitud rechazada correctamente" : body);
+
+                var msgErr = string.IsNullOrWhiteSpace(body)
+                    ? $"Error {(int)resp.StatusCode}"
+                    : body;
+
+                return (false, msgErr);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"No se pudo conectar con la API: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}");
+            }
+        }
+        //HISTORIAL DE TUTORÍAS PARA EL TUTOR
+        public async Task<(bool Ok, string Msg, List<HistorialTutoriaDto>? Data)> ObtenerHistorialTutorAsync(
+    int idTutor,
+    List<int>? estados,
+    string token,
+    CancellationToken ct = default)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                // 🔹 Construir query string dinámico si hay estados
+                string url = $"Tutor/{idTutor}/historial/";
+                if (estados != null && estados.Any())
+                {
+                    string query = string.Join("&", estados.Select(e => $"idEstados={e}"));
+                    url += $"?{query}";
+                }
+
+                using var resp = await _httpClient.GetAsync(url, ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (!resp.IsSuccessStatusCode)
+                {
+                    return (false, $"Error al obtener historial: {body}", null);
+                }
+
+                var datos = JsonSerializer.Deserialize<List<HistorialTutoriaDto>>(
+                    body,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                return (true, "Historial obtenido correctamente", datos ?? new List<HistorialTutoriaDto>());
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"No se pudo conectar con la API: {ex.Message}", null);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}", null);
             }
         }
 

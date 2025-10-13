@@ -4,6 +4,8 @@
     ViewData["Title"] = "Historial de Tutorías";
     Layout = "_Layout";
     var usuario = ViewBag.Usuario as ObtenerUsuarioDto;
+    var estadosSeleccionados = Context.Request.Query["idsEstado"].ToList();
+
 }
 @section Styles {
     <link rel="stylesheet" href="~/estilos/HistorialTutorias.css" />
@@ -47,7 +49,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="6" style="text-align:center; padding:18px;">
+                            <td colspan="7" style="text-align:center; padding:18px;">
                                 No hay tutorías en tu historial.
                             </td>
                         </tr>
@@ -59,44 +61,46 @@
             </a>
         </div>
 
+        <!-- 🔹 FILTROS DE ESTADO -->
         <aside class="lateral">
             <div class="ilustracion">
                 <img src="~/img/PensarHistorial.png" alt="Usuario">
             </div>
 
-            <div class="filtros tarjeta">
+            <form method="get" asp-action="HistorialTutorias" asp-controller="Tutorado" class="filtros tarjeta">
                 <h3>FILTRAR POR ESTADO:</h3>
 
+                <input type="hidden" name="idTutorado" value="@Context.Session.GetInt32("IdUsuario")" />
+
                 <label class="chk">
-                    <input type="checkbox" value="aceptada" checked />
+                    <input type="checkbox" name="idsEstado" value="3" @(estadosSeleccionados.Contains("3") ? "checked" : "") />
                     <span class="tick"></span>
-                    ACEPTADA
+                    <span class="texto">ACEPTADA</span>
                 </label>
 
                 <label class="chk">
-                    <input type="checkbox" value="finalizada" checked />
+                    <input type="checkbox" name="idsEstado" value="7" @(estadosSeleccionados.Contains("7") ? "checked" : "") />
                     <span class="tick"></span>
-                    FINALIZADA
+                    <span class="texto">CANCELADA</span>
                 </label>
 
                 <label class="chk">
-                    <input type="checkbox" value="cancelada" />
+                    <input type="checkbox" name="idsEstado" value="6" @(estadosSeleccionados.Contains("6") ? "checked" : "") />
                     <span class="tick"></span>
-                    CANCELADA
+                    <span class="texto">FINALIZADA</span>
                 </label>
 
-                <button type="button" class="btn-aplicar">APLICAR</button>
-            </div>
+
+                <button type="submit" class="btn-aplicar">APLICAR</button>
+            </form>
         </aside>
-       
     </section>
 
     <button class="btn-flotante" title="Soporte">
         <img src="~/img/chat-bubble.png" alt="Chat">
     </button>
-    
 
-    @* Popup de error si algo falló *@
+    <!-- 🔹 Popup de error -->
     @{
         var error = ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage;
     }
@@ -105,5 +109,16 @@
         Titulo = "No se pudo cargar el historial",
         Mensaje = error
         })
-</main> 
+
+    <script>
+        document.querySelector(".filtros").addEventListener("submit", function (e) {
+            // Asegurar que solo se envíen los checkboxes marcados
+            document.querySelectorAll("input[name='idsEstado']").forEach(chk => {
+                if (!chk.checked) chk.disabled = true;
+            });
+        });
+    </script>
+
+</main>
+
 

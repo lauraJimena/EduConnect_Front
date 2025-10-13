@@ -14,7 +14,7 @@ body {
     margin-top:5.8%;
 }
 .perfil-container2{
-    height:810px;
+    height:730px;
 }
 
 /* Panel izquierdo */
@@ -130,17 +130,60 @@ body {
         .perfil-right h1 img {
             width: 60px;
         }
+/* Nueva grilla de dos columnas */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* columnas idénticas */
+    gap: 20px 40px; /* espacio entre filas y columnas */
+    width: 110%;
+    align-items: start; /* alinea los elementos arriba */
+    margin-bottom:20px;
+    margin-left:-20px;
+}
+
+    .form-grid div {
+        display: flex;
+        flex-direction: column;
+        width: 110%;
+    }
+
+    .form-grid label {
+        font-family: Montserrat, sans-serif;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+
+    }
+    .form-grid input, .form-grid select {
+        padding: 11px;
+        border: none;
+        border-radius: 25px;
+        font-size: 14px;
+        outline: none;
+        box-shadow: inset 2px 3px 3px rgba(0,0,0,0.25);
+        font-family: Montserrat, sans-serif;
+        color: gray;
+        width: 100%;
+        box-sizing: border-box;
+       
+    }
+
+
+
 
     /* Inputs */
-    .perfil-right form {
+    /*.perfil-right form {
         display: flex;
         flex-direction: column;
         gap: 15px;
     }
-
+        .perfil-right form label {
+            font-family: Montserrat, sans-serif;
+            margin-bottom:-10px;
+        }
         .perfil-right form input,
         .perfil-right form select {
-            padding: 12px;
+            padding: 11px;
             border: none;
             border-radius: 25px;
             font-size: 14px;
@@ -148,13 +191,14 @@ body {
             box-shadow: inset 2px 3px 3px rgba(0,0,0,0.25);
             font-family: Montserrat, sans-serif;
             color: gray;
+            
         }
 
             .perfil-right form input:focus,
             .perfil-right form select:focus {
-                border: 2px solid rgba(30, 42, 120, 0.8); /* morado */
-                box-shadow: 1.6px 1.6px 15px rgba(30, 42, 120, 0.8); /* glow morado */
-            }
+                border: 2px solid rgba(30, 42, 120, 0.8);*/ /* morado */
+                /*box-shadow: 1.6px 1.6px 15px rgba(30, 42, 120, 0.8);*/ /* glow morado */
+            /*}*/
 
 /* Botón */
 .btn-guardar {

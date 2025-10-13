@@ -68,7 +68,8 @@ form {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    padding:0 70px;
+    padding: 0 70px;
+    color: rgba(0,0,0,0.8);
 }
 
     form input, form select {
@@ -79,6 +80,7 @@ form {
         outline: none;
         font-size: 14px;
         background: white;
+        color: rgba(0,0,0,0.8);
         
     }
 
@@ -86,6 +88,10 @@ form {
             border: 3px solid #1e2a78; /* morado */
             box-shadow: 7px 7px 13px rgba(30, 42, 120, 0.99); /* glow morado */
         }
+        form input::placeholder, form select::placeholder {
+            color: rgba(0,0,0,0.7); /* color gris suave */
+        }
+
 
 .radio-label {
     font-size: 15px;

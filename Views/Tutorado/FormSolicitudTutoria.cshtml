@@ -1,0 +1,80 @@
+﻿@using EduConnect_Front.Dtos
+@model EduConnect_Front.Dtos.SolicitudTutoriaRespuestaDto
+
+@{
+    ViewData["Title"] = "Solicitud de Tutoría";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/formSolicitudTutoria.css" />
+}
+
+<main class="solicitud-container">
+    <section class="form-section">
+        <h1>SOLICITUD DE TUTORÍA</h1>
+
+        <form asp-controller="Tutorado" asp-action="FormSolicitudTutoria" method="post" class="formulario-tutoria">
+            @Html.AntiForgeryToken()
+
+            <!-- 🔹 Campo oculto para el IdTutor -->
+            <input type="hidden" asp-for="IdTutor" />
+            <input type="hidden" asp-for="IdTutorado" />
+            <input type="hidden" asp-for="IdMateria" />
+
+            <label for="fecha">Fecha sugerida</label>
+            <input type="date" name="Fecha" required />
+
+
+            <label for="hora">Hora sugerida</label>
+            <input type="time" asp-for="Hora" id="hora" required />
+
+            <label for="modalidad">Modalidad preferida</label>
+            <select asp-for="IdModalidad" required>
+                <option value="">MODALIDAD PREFERIDA</option>
+                <option value="1">Presencial</option>
+                <option value="2">Virtual</option>
+            </select>
+
+            <label for="tema">Tema que requieres</label>
+            <input type="text" asp-for="Tema" placeholder="TEMA QUE REQUIERO" required />
+
+            <label for="comentario">Comentario adicional (opcional)</label>
+            <textarea asp-for="ComentarioAdicional" placeholder="COMENTARIO ADICIONAL"></textarea>
+
+            <button type="submit" class="btn-enviar">ENVIAR</button>
+        </form>
+    </section>
+
+   
+
+</main>
+
+<!-- 🔹 Popup de ÉXITO -->
+@if (TempData["Success"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "exito",
+        Titulo = "Solicitud enviada con éxito",
+        Mensaje = TempData["Success"] as string
+        })
+
+<script>
+    // Espera 2 segundos y redirige
+    setTimeout(() => {
+        window.location.href = '@Url.Action("BusquedaTutores", "Tutorado")';
+    }, 7000);
+</script>
+        }
+
+<!-- 🔹 Popup de ERROR -->
+@if (TempData["Error"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "error",
+        Titulo = "Error al enviar la solicitud",
+        Mensaje = TempData["Error"] as string
+        })
+        }

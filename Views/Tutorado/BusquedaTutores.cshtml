@@ -74,7 +74,13 @@
                         <p><b>ESTADO:</b> @(t.IdEstado == 1 ? "Activo" : "Inactivo")</p>
                         <div class="acciones">
                             <a asp-controller="Tutor" asp-action="Perfil" asp-route-id="@t.IdUsuario" class="btn-perfil">VER PERFIL</a>
-                            <a asp-controller="Tutorias" asp-action="Solicitar" asp-route-idTutor="@t.IdUsuario" class="btn-solicitar">SOLICITAR TUTORÍA</a>
+                            <a asp-controller="Tutorado"
+                               asp-action="FormSolicitudTutoria"
+                               asp-route-idTutor="@t.IdUsuario"
+                               asp-route-idMateria="@t.IdMateria"
+                               class="btn-solicitar">
+                                SOLICITAR TUTORÍA
+                            </a>
                         </div>
                     </div>
                 </div>
