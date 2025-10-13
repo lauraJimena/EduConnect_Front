@@ -89,14 +89,14 @@ p {
     
 }
 .btn-login {
-    background: #fbc959;
+    background: #f9bb65;
     padding: 10px 15px !important;
     border-radius: 20px;
     transition: background 0.3s;
 }
 
     .btn-login:hover {
-        background: #f4b400;
+        background: #f4b155;
     }
 /* HERO con imagen de fondo */
 .hero {

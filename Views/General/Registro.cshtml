@@ -1,10 +1,14 @@
-﻿@model EduConnect_Front.Dtos.CrearUsuarioDto
+﻿@using EduConnect_Front.Dtos
+@model EduConnect_Front.Dtos.CrearUsuarioDto
 @{
     ViewData["Title"] = "Registro";
     Layout = "_Layout";
+    var carreras = ViewBag.Carreras as List<CarreraDto>;
+    var tipoIdent = ViewBag.TipoIdent as List<TipoIdentDto>;
 }
 @section Styles {
     <link rel="stylesheet" href="~/estilos/registro.css" />
+
 }
 
 <main>
@@ -23,25 +27,34 @@
             <input asp-for="Apellido" type="text" placeholder="APELLIDOS" required />
 
             @* TIPOS DE DOCUMENTO -> Usa IDs numéricos que entienda tu API *@
-            <select asp-for="IdTipoIdent" required>
-                <option value="">TIPO DE DOCUMENTO</option>
-                <option value="1">Cédula</option>              @* CC *@
-                <option value="2">Tarjeta de Identidad</option> @* TI *@
-                <option value="3">Pasaporte</option>            @* PP *@
-            </select>
+            
+                <select asp-for="IdTipoIdent" required>
+
+                    <option value="">TIPO DE DOCUMENTO</option>
+                    @if (tipoIdent != null)
+                    {
+                        foreach (var t in tipoIdent)
+                        {
+                            <option value="@t.IdTipoIdent">@t.Nombre</option>
+                        }
+                    }
+                </select>
+            
 
             <input asp-for="NumIdent" type="text" placeholder="NÚMERO DE DOCUMENTO" required />
             <input asp-for="TelUsu" type="tel" placeholder="TELÉFONO" required />
             <input asp-for="Correo" type="email" placeholder="CORREO" required />
 
             @* CARRERA: si es ID, usa number o un <select> si ya tienes catálogo *@
-            <select asp-for="IdCarrera" required>
+            <select asp-for="IdCarrera" class="form-control" required>
                 <option value="">CARRERA</option>
-                <option value="1">Ingeniería de Sistemas</option>
-                <option value="2">Administración</option>
-                <option value="3">Derecho</option>
-                <option value="4">Contaduría</option>
-                <option value="5">Psicología</option>
+                @if (carreras != null)
+                {
+                    foreach (var c in carreras)
+                    {
+                        <option value="@c.IdCarrera">@c.NombreCarrera</option>
+                    }
+                }
             </select>
 
             <select asp-for="IdSemestre" required>

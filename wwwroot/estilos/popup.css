@@ -62,7 +62,7 @@
 }
 
 .modal-acciones {
-    text-align: right;
+    text-align: center;
 }
 
 .btn {
@@ -71,7 +71,9 @@
     border-radius: 30px;
     cursor: pointer;
     width:150px;
-    margin-top:20px;
+    margin-top:10px;
+    text-align:center;
+    font-weight:700;
 }
 
 .btn-principal {
@@ -79,6 +81,11 @@
     color: #fff;
     box-shadow: 5px 7px gray;
     margin-bottom: 28px;
+    text-align: center;
+    margin-left:auto;
+    font-size:0.99em;
+    
+
 }
     .btn-principal:hover {
         background: #fbc959;
@@ -94,3 +101,21 @@
     margin-bottom: 18px;
 }
 
+/* --- Animación fade-out --- */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+        visibility: hidden;
+    }
+}
+
+/* Clase que activa el efecto */
+.modal-fondo.fade-out {
+    animation: fadeOut 1s ease forwards;
+}

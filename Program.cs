@@ -1,10 +1,17 @@
+using EduConnect_Front.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+// ?? Registro de servicios personalizados
+builder.Services.AddScoped<API_Service>();
+builder.Services.AddScoped<TutorService>();
+
 
 // Cache para Session (requerido)
 builder.Services.AddDistributedMemoryCache();
+
 
 // 3) Configurar Session
 builder.Services.AddSession(options =>

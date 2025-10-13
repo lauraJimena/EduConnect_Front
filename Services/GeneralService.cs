@@ -16,10 +16,18 @@ namespace EduConnect_Front.Services
             // aquí validaciones
             return await _apiService.RegistrarUsuarioAsync(usuario, ct);
         }
-        public async Task<(bool Ok, string Msg, ObtenerUsuarioDto? Usuario)> IniciarSesion(IniciarSesionDto dto, CancellationToken ct = default)
+        public async Task<(bool Ok, string Msg, RespuestaInicioSesionDto? Usuario)> IniciarSesion(IniciarSesionDto dto, CancellationToken ct = default)
         {
             
             return await _apiService.IniciarSesionAsync(dto, ct);
+        }
+        public async Task<List<TipoIdentDto>> ObtenerTipoIdentAsync()
+        {
+            return await _apiService.ObtenerTipoIdentAsync();
+        }
+        public async Task<List<CarreraDto>> ObtenerCarrerasAsync()
+        {
+            return await _apiService.ObtenerCarrerasAsync();
         }
     }
 }
