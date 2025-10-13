@@ -11,8 +11,8 @@
         public int IdEstado { get; set; }
         public int IdTipoIdent { get; set; }
         public string Rol { get; set; } = string.Empty;
-        public int IdCarrera { get; set; }
-        public int IdSemestre { get; set; }
+        public int? IdCarrera { get; set; }
+        public int? IdSemestre { get; set; }
         public string NumIdent { get; set; } = string.Empty;
     }
 }
