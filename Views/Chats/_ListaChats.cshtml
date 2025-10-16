@@ -1,0 +1,15 @@
+@model List<(string Nombre, string Materia)>
+
+<div class="popup-chat-header">CHATS</div>
+<div class="popup-chat-list">
+    @foreach (var chat in Model)
+    {
+        <div class="popup-chat-item">
+            <img src="~/img/chat.png" alt="Chat Bot" />
+            <div class="popup-chat-item-info">
+                <span class="popup-chat-item-nombre">@chat.Nombre</span>
+                <span class="popup-chat-item-materia">@chat.Materia</span>
+            </div>
+        </div>
+    }
+</div>

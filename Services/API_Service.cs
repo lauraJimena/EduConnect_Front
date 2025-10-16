@@ -848,6 +848,41 @@ namespace EduConnect_Front.Services
             }
         }
 
+    
+    
+
+    public async Task<List<ObtenerChatDto>> ObtenerChatsAsync(int idUsuario, string token, CancellationToken ct = default)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                using var resp = await _httpClient.GetAsync($"Chat/ObtenerChatsPorUsuario?idUsuario={idUsuario}", ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+                if (resp.IsSuccessStatusCode)
+                {
+                    var chats = JsonSerializer.Deserialize<List<ObtenerChatDto>>(
+                        body,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    );
+                    return chats ?? new List<ObtenerChatDto>();
+                }
+                // Si hubo error
+                var msgError = string.IsNullOrWhiteSpace(body)
+                    ? $"Error {(int)resp.StatusCode}"
+                    : body;
+                throw new Exception(msgError);
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new Exception($"Error de conexión con la API: {ex.Message}");
+            }
+            catch (TaskCanceledException)
+            {
+                throw new Exception("La solicitud de chats tardó demasiado (timeout).");
+            }
+        }
 
 
     }
