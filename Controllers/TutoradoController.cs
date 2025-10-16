@@ -14,7 +14,7 @@ namespace EduConnect_Front.Controllers
 
         // GET: TutoradoController
         [HttpGet]
-        public async Task<IActionResult> PanelTutoradoAsync()
+        public async Task<IActionResult> PanelTutorado()
         {
             
             try
@@ -54,8 +54,6 @@ namespace EduConnect_Front.Controllers
             }
 
         }
-
-
         public ActionResult RankingTutores()
         {
             return View();

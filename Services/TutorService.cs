@@ -37,6 +37,10 @@ namespace EduConnect_Front.Services
         {
             return await _apiService.ObtenerHistorialTutorAsync(idTutor, estados, token);
         }
+        public async Task<(bool Ok, string Msg)> ActualizarPerfilTutorAsync(EditarPerfilDto perfil, string token)
+        {
+            return await _apiService.ActualizarPerfilTutorAsync(perfil, token);
+        }
 
 
     }

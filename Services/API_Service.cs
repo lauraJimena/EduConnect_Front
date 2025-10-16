@@ -78,29 +78,7 @@ namespace EduConnect_Front.Services
             }
         }
 
-        //public async Task<(bool Ok, string Msg, ObtenerUsuarioDto? Usuario)> IniciarSesionAsync(IniciarSesionDto dto, CancellationToken ct = default)
-        //{
-        //    try
-        //    {
-        //        using var resp = await _httpClient.PostAsJsonAsync("General/IniciarSesi%C3%B3n", dto, ct);
-        //        var body = await resp.Content.ReadAsStringAsync(ct);
 
-        //        if (resp.IsSuccessStatusCode)
-        //        {
-        //            var usuario = JsonSerializer.Deserialize<ObtenerUsuarioDto>(
-        //                body,
-        //                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-        //            );
-        //            return (true, "Inicio de sesión correcto", usuario);
-        //        }
-
-        //        return (false, string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body, null);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return (false, $"Error al conectar con la API: {ex.Message}", null);
-        //    }
-        //}
 
         public async Task<(bool Ok, string Msg, RespuestaInicioSesionDto? Usuario)> IniciarSesionAsync(
       IniciarSesionDto dto,
@@ -192,55 +170,64 @@ namespace EduConnect_Front.Services
                 return (false, $"No se pudo conectar con la API: {ex.Message}", null);
             }
         }
-        // CONSULTAR USUARIOS ADMIN
-        public async Task<List<ListadoUsuariosDto>> ObtenerUsuariosAsync(int? idRol = null, int? idEstado = null, string? numIdent = null)
+        // CONSULTAR USUARIOS ADMIN 
+        public async Task<(bool Ok, string Msg, List<ListadoUsuariosDto>? Usuarios)> ObtenerUsuariosAsync(
+            string token,
+            int? idRol = null,
+            int? idEstado = null,
+            string? numIdent = null,
+            CancellationToken ct = default)
         {
-            // Construimos la URL con los filtros dinámicos
-            var queryParams = new List<string>();
-            if (idRol.HasValue) queryParams.Add($"idRol={idRol.Value}");
-            if (idEstado.HasValue) queryParams.Add($"idEstado={idEstado.Value}");
-            if (!string.IsNullOrWhiteSpace(numIdent)) queryParams.Add($"numIdent={numIdent}");
-
-            var url = "Administrador/ConsultarUsuarios";
-            if (queryParams.Any())
-                url += "?" + string.Join("&", queryParams);
-
-            var response = await _httpClient.GetAsync(url);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var usuarios = await response.Content.ReadFromJsonAsync<List<ListadoUsuariosDto>>();
-                return usuarios ?? new List<ListadoUsuariosDto>();
+                // 🔹 Agregar encabezado de autorización con el token JWT
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                // 🔹 Construimos la URL con los filtros dinámicos
+                var queryParams = new List<string>();
+                if (idRol.HasValue) queryParams.Add($"idRol={idRol.Value}");
+                if (idEstado.HasValue) queryParams.Add($"idEstado={idEstado.Value}");
+                if (!string.IsNullOrWhiteSpace(numIdent)) queryParams.Add($"numIdent={numIdent}");
+
+                var url = "Administrador/ConsultarUsuarios";
+                if (queryParams.Any())
+                    url += "?" + string.Join("&", queryParams);
+
+                // 🔹 Hacemos la petición
+                using var resp = await _httpClient.GetAsync(url, ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                // ✅ Éxito
+                if (resp.IsSuccessStatusCode)
+                {
+                    var usuarios = System.Text.Json.JsonSerializer.Deserialize<List<ListadoUsuariosDto>>(
+                        body,
+                        new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    );
+                    return (true, "Usuarios obtenidos correctamente", usuarios);
+                }
+
+                // ❌ Error controlado
+                var msgErr = string.IsNullOrWhiteSpace(body)
+                    ? $"Error {(int)resp.StatusCode}"
+                    : body;
+                return (false, msgErr, null);
             }
-
-            throw new Exception("Error al obtener usuarios desde el API.");
+            catch (HttpRequestException ex)
+            {
+                return (false, $"No se pudo conectar con la API: {ex.Message}", null);
+            }
+            catch (TaskCanceledException)
+            {
+                return (false, "La solicitud a la API expiró (timeout).", null);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}", null);
+            }
         }
-        //public async Task<(bool Ok, string Msg, List<ListadoUsuariosDto>? Items)>
-        //    ConsultarUsuariosAsync(CancellationToken ct = default)
-        //{
-        //    try
-        //    {
-        //        using var resp = await _httpClient.GetAsync("Administrador/ConsultarUsuarios", ct);
-        //        var body = await resp.Content.ReadAsStringAsync(ct);
 
-        //        if (resp.IsSuccessStatusCode)
-        //        {
-        //            var items = JsonSerializer.Deserialize<List<ListadoUsuariosDto>>(
-        //                body,
-        //                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-        //            ) ?? new List<ListadoUsuariosDto>();
-
-        //            return (true, "OK", items);
-        //        }
-
-        //        var msg = string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body;
-        //        return (false, msg, null);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return (false, $"No se pudo conectar con la API: {ex.Message}", null);
-        //    }
-        //}
         // POST /Tutor/obtener
         public async Task<(bool Ok, string Msg, List<ObtenerTutorDto>? Items)>
             BuscarTutoresAsync(BuscarTutorDto filtros, CancellationToken ct = default)
@@ -300,37 +287,35 @@ namespace EduConnect_Front.Services
             }
         }
         // OBTENER USUARIO POR ID
-        public async Task<(bool Ok, string Msg, ActualizarUsuarioDto? Usuario)> ObtenerUsuarioPorIdPerfil(int idUsuario, string token, CancellationToken ct = default)
+        public async Task<(bool Ok, string? Msg, ActualizarUsuarioDto? Usuario)> ObtenerUsuarioPorIdPerfil(int id, string token, CancellationToken ct)
         {
             try
             {
-                // 🔹 Agregar encabezado de autorización con el token JWT
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                using var resp = await _httpClient.GetAsync($"Administrador/ObtenerUsuarioPorId/{idUsuario}", ct);
-                var body = await resp.Content.ReadAsStringAsync(ct);
+                    new AuthenticationHeaderValue("Bearer", token);
 
-                if (resp.IsSuccessStatusCode)
+                var response = await _httpClient.GetAsync($"Administrador/ObtenerUsuarioPorId/{id}", ct);
+                var body = await response.Content.ReadAsStringAsync(ct);
+
+                if (response.IsSuccessStatusCode)
                 {
-                    var usuario = JsonSerializer.Deserialize<ActualizarUsuarioDto>(
-                        body,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                    );
-                    return (true, "Usuario obtenido correctamente", usuario);
+                    var usuario = JsonSerializer.Deserialize<ActualizarUsuarioDto>(body, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    // ✅ No devolvemos mensaje de éxito aquí
+                    return (true, null, usuario);
                 }
 
-                var msgErr = string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body;
-                return (false, msgErr, null);
-            }
-            catch (HttpRequestException ex)
-            {
-                return (false, $"No se pudo conectar con la API: {ex.Message}", null);
+                return (false, body, null);
             }
             catch (Exception ex)
             {
-                return (false, $"Error inesperado: {ex.Message}", null);
+                return (false, $"Error al obtener usuario: {ex.Message}", null);
             }
         }
+
         public async Task<(bool Ok, string Msg, ObtenerUsuarioDto? Usuario)> ObtenerUsuarioPorIdAsync(
     int idUsuario,
     string token,
@@ -365,22 +350,37 @@ namespace EduConnect_Front.Services
             }
         }
 
-        //ACTUALIZAR USUARIO
-
-        public async Task<(bool Ok, string Msg)> ActualizarUsuarioAsync(ActualizarUsuarioDto dto, CancellationToken ct = default)
+        // ACTUALIZAR USUARIO
+        public async Task<(bool Ok, string Msg)> ActualizarUsuarioAsync(
+            ActualizarUsuarioDto dto,
+            string token,
+            CancellationToken ct = default)
         {
             try
             {
+                // 🔹 Agregar encabezado de autorización con el token JWT
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                // 🔹 Enviar la solicitud PUT
                 using var resp = await _httpClient.PutAsJsonAsync("Administrador/ActualizarUsuario", dto, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
+                // ✅ Si la API responde correctamente
                 if (resp.IsSuccessStatusCode)
                 {
-                    var msgOk = string.IsNullOrWhiteSpace(body) ? "Usuario actualizado con éxito" : body;
+                    var msgOk = string.IsNullOrWhiteSpace(body)
+                        ? "Usuario actualizado con éxito"
+                        : body;
+
                     return (true, msgOk);
                 }
 
-                var msgErr = string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body;
+                // ❌ Si la API devuelve error controlado
+                var msgErr = string.IsNullOrWhiteSpace(body)
+                    ? $"Error {(int)resp.StatusCode}"
+                    : body;
+
                 return (false, msgErr);
             }
             catch (HttpRequestException ex)
@@ -396,6 +396,7 @@ namespace EduConnect_Front.Services
                 return (false, $"Error inesperado: {ex.Message}");
             }
         }
+
         //public async Task<(bool Ok, string Msg)> EditarPerfilAsync(ActualizarUsuarioDto dto, string token, CancellationToken ct = default)
         //{
         //    try
@@ -847,6 +848,94 @@ namespace EduConnect_Front.Services
                 return (false, $"Error inesperado: {ex.Message}", null);
             }
         }
+        public async Task<(bool Ok, string Msg)> ActualizarPerfilTutorAsync(EditarPerfilDto perfil, string token, CancellationToken ct = default)
+        {
+            try
+            {
+                // ✅ Token JWT en encabezado
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                using var response = await _httpClient.PutAsJsonAsync("Tutor/ActualizarPerfil", perfil, ct);
+                var body = await response.Content.ReadAsStringAsync(ct);
+
+                if (response.IsSuccessStatusCode)
+                    return (true, string.IsNullOrWhiteSpace(body) ? "Perfil actualizado con éxito" : body);
+
+                var msgError = string.IsNullOrWhiteSpace(body)
+                    ? $"Error {(int)response.StatusCode}"
+                    : body;
+
+                return (false, msgError);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"No se pudo conectar con la API: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}");
+            }
+        }
+        // CONSULTAR USUARIOS ADMIN 
+        public async Task<(bool Ok, string Msg, List<ListadoUsuariosDto>? Usuarios)> ObtenerUsuariosAdmin(
+            string token,
+            int? idRol = null,
+            int? idEstado = null,
+            string? numIdent = null,
+            CancellationToken ct = default)
+        {
+            try
+            {
+                // 🔹 Agregar encabezado de autorización con el token JWT
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                // 🔹 Construimos la URL con los filtros dinámicos
+                var queryParams = new List<string>();
+                if (idRol.HasValue) queryParams.Add($"idRol={idRol.Value}");
+                if (idEstado.HasValue) queryParams.Add($"idEstado={idEstado.Value}");
+                if (!string.IsNullOrWhiteSpace(numIdent)) queryParams.Add($"numIdent={numIdent}");
+
+                var url = "Administrador/ConsultarUsuarios";
+                if (queryParams.Any())
+                    url += "?" + string.Join("&", queryParams);
+
+                // 🔹 Hacemos la petición
+                using var resp = await _httpClient.GetAsync(url, ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                // ✅ Éxito
+                if (resp.IsSuccessStatusCode)
+                {
+                    var usuarios = System.Text.Json.JsonSerializer.Deserialize<List<ListadoUsuariosDto>>(
+                        body,
+                        new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    );
+                    return (true, "Usuarios obtenidos correctamente", usuarios);
+                }
+
+                // ❌ Error controlado
+                var msgErr = string.IsNullOrWhiteSpace(body)
+                    ? $"Error {(int)resp.StatusCode}"
+                    : body;
+                return (false, msgErr, null);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"No se pudo conectar con la API: {ex.Message}", null);
+            }
+            catch (TaskCanceledException)
+            {
+                return (false, "La solicitud a la API expiró (timeout).", null);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}", null);
+            }
+        }
+
+
 
 
 

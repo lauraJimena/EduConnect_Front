@@ -10,9 +10,10 @@
 
     <link rel="stylesheet" href="~/estilos/editarTutorado.css" )">
 }
+<!-- 🔹 Popup de ÉXITO -->
 @if (TempData["Success"] != null)
 {
-    @await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto
+    @await Html.PartialAsync("_Popup", new PopupDto
     {
         Tipo = "exito",
         Titulo = "Perfil actualizado con éxito",
@@ -20,28 +21,30 @@
     })
 
 <script>
-    // 🔹 Oculta el popup y redirige automáticamente al panel del tutorado
+    // 🔹 Oculta el popup y redirige al Panel del Tutor
     setTimeout(() => {
         const popup = document.querySelector('.modal-fondo');
         if (popup) popup.style.display = 'none';
 
-        @if (TempData["RedirectToPanel"] != null && (bool)TempData["RedirectToPanel"])
+        @if (TempData["RedirectToPanelTutor"] != null && (bool)TempData["RedirectToPanelTutor"])
             {
-                    @:window.location.href = '/Tutorado/PanelTutorado';
+                    @:window.location.href = '/Tutor/PanelTutor';
             }
         }, 3000);
     </script>
 }
 
+<!-- 🔹 Popup de ERROR -->
 @if (TempData["Error"] != null)
 {
-    @await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto
+    @await Html.PartialAsync("_Popup", new PopupDto
     {
         Tipo = "error",
         Titulo = "Error al actualizar el perfil",
         Mensaje = TempData["Error"] as string
     })
 }
+
 
 <main class="perfil-container">
     <!-- Panel izquierdo -->
@@ -80,13 +83,13 @@
                 </label>
             </div>
         </div>
-    
+
     </section>
 
     <!-- Panel derecho -->
     <section class="perfil-right">
         <h1><img src="~/img/IconoEditar.png" alt="icono editar"> EDITAR PERFIL</h1>
-        <form asp-action="EditarTutorado" asp-controller="Tutorado" method="post">
+        <form asp-action="EditarTutor" asp-controller="Tutor" method="post">
 
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="IdUsu" />
@@ -105,7 +108,7 @@
                 <div>
                     <label>Tipo de documento</label>
                     <select asp-for="IdTipoIdent" required>
-                        
+
                         <option value="">TIPO DE DOCUMENTO</option>
                         @if (tipoIdent != null)
                         {
@@ -160,7 +163,7 @@
                     </select>
                 </div>
 
-              
+
             </div>
 
             <div class="botones-acciones">
@@ -168,9 +171,10 @@
                 <a asp-controller="Tutorado" asp-action="PanelTutorado" class="btn-volver">VOLVER</a>
             </div>
         </form>
-        
+
     </section>
 
-    
+
 </main>
+
 

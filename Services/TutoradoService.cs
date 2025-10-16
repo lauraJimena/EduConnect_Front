@@ -1,4 +1,5 @@
 ﻿using EduConnect_Front.Dtos;
+using System.Reflection;
 using System.Text.Json;
 
 namespace EduConnect_Front.Services
@@ -52,8 +53,9 @@ namespace EduConnect_Front.Services
                 Apellido = usuario.Apellido,
                 Correo = usuario.Correo,
                 TelUsu = usuario.TelUsu,
-                IdCarrera = usuario.IdCarrera,
-                IdSemestre = usuario.IdSemestre,
+                IdCarrera = usuario.IdCarrera > 0 ? usuario.IdCarrera : null,
+                IdSemestre = usuario.IdSemestre > 0 ? usuario.IdSemestre : null,
+
                 NumIdent = usuario.NumIdent,
                 IdTipoIdent = usuario.IdTipoIdent
                 // agrega aquí otros campos que uses en la vista de edición

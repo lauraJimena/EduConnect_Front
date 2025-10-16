@@ -37,11 +37,14 @@
                         onclick="
                 const popup = this.closest('.modal-fondo');
                 popup.style.display='none';
-                @if (TempData["RedirectToPanel"] != null && (bool)TempData["RedirectToPanel"])
-                {
-                        @:window.location.href = '/Tutorado/PanelTutorado';
-                }
-            ">
+                    @if (TempData["RedirectToPanelTutor"] != null && (bool)TempData["RedirectToPanelTutor"])
+                    {
+                            @:window.location.href = '/Tutor/PanelTutor';
+                    }
+                    else if (TempData["RedirectToPanel"] != null && (bool)TempData["RedirectToPanel"])
+                    {
+                            @:window.location.href = '/Tutorado/PanelTutorado';
+                    } ">
                     Cerrar
                 </button>
             </div>
