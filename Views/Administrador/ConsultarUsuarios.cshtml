@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Consultar Usuarios";
-    Layout = "_Layout";
+    Layout = "_LayoutUsuario";
 
     // 🔹 Valores manuales para los filtros
     var roles = new List<(int IdRol, string Nombre)>
@@ -123,14 +123,16 @@
                                         <i class="fas fa-eye"></i>
                                     </button>
 
-                                    <!-- Botón Editar --> 
-                                    <button class="boton-editar"> 
-                                        <a asp-controller="Administrador" 
-                                        asp-action="EditarUsuario" 
-                                        asp-route-id="@u.IdUsu" 
-                                        class="boton-editar"> 
-                                        <i class="fas fa-pen"></i> </a> 
+                                    <!-- Botón Editar -->
+                                    <button class="boton-editar">
+                                        <a asp-controller="Administrador"
+                                           asp-action="EditarUsuario"
+                                           asp-route-id="@u.IdUsu"
+                                           class="boton-editar">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
                                     </button>
+
 
                                     <!-- Botón Eliminar -->
                                     <button type="button"

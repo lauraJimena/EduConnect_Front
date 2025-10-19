@@ -14,7 +14,7 @@ namespace EduConnect_Front.Controllers
 
         // GET: TutoradoController
         [HttpGet]
-        public async Task<IActionResult> PanelTutoradoAsync()
+        public async Task<IActionResult> PanelTutorado()
         {
             
             try
@@ -26,8 +26,7 @@ namespace EduConnect_Front.Controllers
                     TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
                     return RedirectToAction("IniciarSesion", "General");
                 }
-
-                // ✅ Obtener el ID del usuario actual desde la sesión o el token
+           
                 var idUsuario = HttpContext.Session.GetInt32("IdUsu");
 
                 if (idUsuario == null)
@@ -53,12 +52,6 @@ namespace EduConnect_Front.Controllers
                 return RedirectToAction("IniciarSesion", "General");
             }
 
-        }
-
-
-        public ActionResult RankingTutores()
-        {
-            return View();
         }
 
 
@@ -91,66 +84,131 @@ namespace EduConnect_Front.Controllers
             return View(datos ?? new List<HistorialTutoriaDto>());
         }
 
-        // Muestra formulario vacío y tabla sin resultados
+        // GET: /Tutorado/BusquedaTutores
+        // Carga inicial y paginación SIEMPRE con filtros desde querystring.
         [HttpGet]
-        public async Task<IActionResult> BusquedaTutores(CancellationToken ct)
+        public async Task<IActionResult> BusquedaTutores(
+            int page = 1,
+            string Nombre = "",
+            string CarreraNombre = "",
+            string MateriaNombre = "",
+            string Semestre = "",
+            int? IdEstado = null)
         {
-            var filtrosVacios = new BuscarTutorDto
-            {
-                // todo null/"" -> el back debe devolver todos
-                Nombre = null,
-                MateriaNombre = null,
-                Semestre = null,
-                CarreraNombre = null,
-                IdEstado = null
-            };
-
-            var (ok, msg, items) = await _tutoradoService.BuscarTutoresAsync(filtrosVacios, ct);
-            if (!ok) ModelState.AddModelError(string.Empty, msg);
-
-            return View(items); // tu vista ya recibe List<ObtenerTutorDto>
-        }
-
-        // Envía filtros al back (POST /Tutor/obtener) y muestra resultados
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> BusquedaTutores(BuscarTutorDto filtros, CancellationToken ct)
-        {
-            var (ok, msg, items) = await _tutoradoService.BuscarTutoresAsync(filtros, ct);
-            if (!ok) ModelState.AddModelError(string.Empty, msg);
-            return View(items);
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditarTutorado(EditarPerfilDto perfil)
-        {
-            try { 
             var token = HttpContext.Session.GetString("Token");
             if (string.IsNullOrEmpty(token))
             {
-                TempData["Error"] = "No se encontró el token de autenticación. Inicia sesión nuevamente.";
+                TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
                 return RedirectToAction("IniciarSesion", "General");
             }
 
-            var mensaje = await _tutoradoService.ActualizarPerfilAsync(perfil, token);
-            TempData["Success"] = mensaje;
-                TempData["RedirectToPanel"] = true;
-
-                var tipoIdent = await _generalService.ObtenerTipoIdentAsync();
-                var carreras = await _administradorService.ObtenerCarrerasAsync();
-                ViewBag.TipoIdent = tipoIdent;
-                ViewBag.Carreras = carreras;
-                return View(perfil);
-            }
-            catch (Exception ex)
+            var filtros = new BuscarTutorDto
             {
-                TempData["Error"] = ex.Message;
-                ViewBag.Carreras = await _generalService.ObtenerCarrerasAsync();
-                ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
-                return View(perfil);
+                Page = page < 1 ? 1 : page,
+                PageSize = 4, // mostramos 4
+                Nombre = (Nombre ?? "").Trim(),
+                CarreraNombre = (CarreraNombre ?? "").Trim(),
+                MateriaNombre = (MateriaNombre ?? "").Trim(),
+                Semestre = (Semestre ?? "").Trim(),
+                IdEstado = IdEstado
+               
+            };
+
+            // Ideal: el backend devuelve PageSize+1 (5) para detectar "siguiente"
+            var (ok, msg, tutores) = await _tutoradoService.BuscarTutoresAsync(filtros, token);
+            if (!ok)
+            {
+                ModelState.AddModelError(string.Empty, msg ?? "No se pudieron obtener tutores.");
+                tutores = new List<ObtenerTutorDto>();
             }
+
+            bool hasMore = tutores.Count > filtros.PageSize;     // >4
+            var tutoresMostrados = tutores.Take(filtros.PageSize).ToList(); // 4
+
+            ViewBag.Page = filtros.Page;
+            ViewBag.HasMore = hasMore;
+            ViewBag.Filtros = filtros; // para repintar inputs y construir paginación
+
+            return View(tutoresMostrados);
         }
-       
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult BusquedaTutores(BuscarTutorDto filtros)
+        {
+            var token = HttpContext.Session.GetString("Token");
+            if (string.IsNullOrEmpty(token))
+            {
+                TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                return RedirectToAction("IniciarSesion", "General");
+            }
+
+            // Normaliza y fuerza la página 1 al aplicar filtros
+            return RedirectToAction(nameof(BusquedaTutores), new
+            {
+                page = 1,
+                Nombre = filtros?.Nombre?.Trim() ?? "",
+                CarreraNombre = filtros?.CarreraNombre?.Trim() ?? "",
+                MateriaNombre = filtros?.MateriaNombre?.Trim() ?? "",
+                Semestre = filtros?.Semestre?.Trim() ?? "",
+                IdEstado = filtros?.IdEstado
+            });
+        }
+
+
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> EditarTutorado(EditarPerfilDto perfil)
+        //{
+        //    try { 
+        //    var token = HttpContext.Session.GetString("Token");
+        //    if (string.IsNullOrEmpty(token))
+        //    {
+        //        TempData["Error"] = "No se encontró el token de autenticación. Inicia sesión nuevamente.";
+        //        return RedirectToAction("IniciarSesion", "General");
+        //    }
+
+        //    var mensaje = await _tutoradoService.ActualizarPerfilAsync(perfil, token);
+        //    TempData["Success"] = mensaje;
+        //        TempData["RedirectToPanel"] = true;
+
+        //        var tipoIdent = await _generalService.ObtenerTipoIdentAsync();
+        //        var carreras = await _administradorService.ObtenerCarrerasAsync();
+        //        ViewBag.TipoIdent = tipoIdent;
+        //        ViewBag.Carreras = carreras;
+        //        return View(perfil);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["Error"] = ex.Message;
+        //        ViewBag.Carreras = await _generalService.ObtenerCarrerasAsync();
+        //        ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
+        //        return View(perfil);
+        //    }
+        //}
+
+        //[HttpGet]
+        //public async Task<IActionResult> EditarTutorado(CancellationToken ct)
+        //{
+        //    var token = HttpContext.Session.GetString("Token");
+        //    var idUsu = HttpContext.Session.GetInt32("IdUsu");
+
+        //    if (string.IsNullOrEmpty(token) || !idUsu.HasValue)
+        //        return RedirectToAction("IniciarSesion", "General");
+
+        //    var modelo = await _tutoradoService.ObtenerUsuarioParaEditarAsync(idUsu.Value, token, ct);
+        //    if (modelo == null)
+        //    {
+        //        TempData["Error"] = "Usuario no encontrado.";
+        //        return RedirectToAction("PanelTutorado");
+        //    }
+
+        //    ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
+        //    ViewBag.Carreras = await _administradorService.ObtenerCarrerasAsync();
+        //    return View(modelo);
+        //}
+        // 🔹 GET: Mostrar el perfil con datos actuales (incluido avatar)
         [HttpGet]
         public async Task<IActionResult> EditarTutorado()
         {
@@ -158,34 +216,71 @@ namespace EduConnect_Front.Controllers
             {
                 var token = HttpContext.Session.GetString("Token");
                 var idUsu = HttpContext.Session.GetInt32("IdUsu");
-                
+
+                if (string.IsNullOrEmpty(token) || idUsu == null)
+                {
+                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                // 🔸 Obtener datos del tutorado (incluye avatar)
+                var modelo = await _tutoradoService.ObtenerTutoradoParaEditarAsync(idUsu.Value, token);
+
+                if (modelo == null)
+                {
+                    TempData["Error"] = "No se encontró la información del tutorado.";
+                    return RedirectToAction("PanelTutorado");
+                }
+
+                // 🔸 Combos de apoyo
+                ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
+                ViewBag.Carreras = await _administradorService.ObtenerCarrerasAsync();
+
+                return View(modelo);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("PanelTutorado");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditarTutorado(EditarPerfilDto perfil)
+        {
+            try
+            {
+                var token = HttpContext.Session.GetString("Token");
 
                 if (string.IsNullOrEmpty(token))
                 {
                     TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
                     return RedirectToAction("IniciarSesion", "General");
                 }
+                var mensaje = await _tutoradoService.ActualizarPerfilAsync(perfil, token);
 
-                // 🔹 Llama al service que ya devuelve EditarPerfilDto
-                var modelo = await _tutoradoService.ObtenerUsuarioParaEditarAsync(idUsu.Value, token);
+                TempData["Success"] = mensaje;
+                TempData["RedirectToPanel"] = true;
 
-                if (modelo == null)
-                {
-                    TempData["Error"] = "Usuario no encontrado.";
-                    return RedirectToAction("ConsultarUsuarios");
-                }
-                var tipoIdent = await _generalService.ObtenerTipoIdentAsync();
-                var carreras = await _administradorService.ObtenerCarrerasAsync();
-                ViewBag.TipoIdent = tipoIdent;
-                ViewBag.Carreras = carreras;
-                return View(modelo);
+                // Vuelve a obtener los datos actualizados del backend
+                var modeloActualizado = await _tutoradoService.ObtenerTutoradoParaEditarAsync(perfil.IdUsu, token);
+
+                ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
+                ViewBag.Carreras = await _administradorService.ObtenerCarrerasAsync();
+
+                return View(modeloActualizado);
             }
             catch (Exception ex)
             {
                 TempData["Error"] = ex.Message;
-                return RedirectToAction("ConsultarUsuarios");
+                ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
+                ViewBag.Carreras = await _administradorService.ObtenerCarrerasAsync();
+
+                return View(perfil);
             }
         }
+
         [HttpGet]
         public async Task<ActionResult> SolicitudesTutoriasAsync()
         {
@@ -220,7 +315,7 @@ namespace EduConnect_Front.Controllers
                     return RedirectToAction("IniciarSesion", "General");
                 }
 
-                // 🔹 Asignar el IdTutorado que pide el backend
+                
                 filtro.IdTutorado = idTutorado.Value;
 
                 // Si no marcó ningún estado, usar 3, 4, 5 por defecto
@@ -276,6 +371,100 @@ namespace EduConnect_Front.Controllers
 
             return View("FormSolicitudTutoria", modelo);
         }
+
+        //RANKING DE TUTORES
+        [HttpGet]
+        public async Task<IActionResult> RankingTutores()
+        {
+            try
+            {
+                var token = HttpContext.Session.GetString("Token");
+                if (string.IsNullOrEmpty(token))
+                {
+                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                var (ok, msg, ranking) = await _tutoradoService.ObtenerRankingTutoresAsync(token);
+
+                if (!ok)
+                {
+                    TempData["Error"] = msg;
+                    return View(new List<RankingTutorDto>());
+                }
+
+               
+                return View(ranking);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error inesperado: " + ex.Message;
+                return View(new List<RankingTutorDto>());
+            }
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> PerfilTutor(int idTutor)
+        {
+            try
+            {
+                var token = HttpContext.Session.GetString("Token");
+                if (string.IsNullOrEmpty(token))
+                {
+                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                var modelo = await _tutoradoService.ObtenerPerfilConComentariosAsync(idTutor, token);
+
+                return View(modelo);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al cargar el perfil del tutor: " + ex.Message;
+                return RedirectToAction("BusquedaTutores");
+            }
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AgregarValoracion(CrearComentarioDto dto)
+        {
+            try
+            {
+                var token = HttpContext.Session.GetString("Token");
+                var idTutorado = HttpContext.Session.GetInt32("IdUsu");
+
+                if (string.IsNullOrEmpty(token) || idTutorado == null)
+                {
+                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                // Completa el DTO
+                dto.IdTutorado = idTutorado.Value;
+                dto.IdEstado = 1; // activo
+
+                var mensaje = await _tutoradoService.CrearComentarioAsync(dto, token);
+                TempData["Success"] = mensaje;
+
+                // Redirige al perfil del tutor valorado
+                return RedirectToAction("PerfilTutor", new { id = dto.IdTutor });
+            }
+            catch (ArgumentException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("PerfilTutor", new { id = dto.IdTutor });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al crear el comentario: " + ex.Message;
+                return RedirectToAction("PerfilTutor", new { id = dto.IdTutor });
+            }
+        }
+
+
+
+
 
 
 

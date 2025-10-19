@@ -8,25 +8,68 @@ namespace EduConnect_Front.Controllers
     public class TutorController : Controller
     {
 
-
+        private readonly TutoradoService _tutoradoService = new TutoradoService();
+        private readonly GeneralService _generalService = new GeneralService();
         private readonly TutorService _tutorService;
+        private readonly AdministradorService _administradorService = new AdministradorService();
 
         public TutorController(TutorService tutorService)
         {
             _tutorService = tutorService;
         }
+        //[HttpGet]
+        //public IActionResult PanelTutor()
+        //{
+        //    var usuario = HttpContext.Session.GetObject<ObtenerUsuarioDto>("Usuario");
+        //    if (usuario == null)
+        //    {
+        //        // No hay sesión -> volver a iniciar sesión
+        //        return RedirectToAction("IniciarSesion", "General");
+        //    }
+
+        //    return View(usuario); // Pasa el DTO completo a la vista
+        //}
         [HttpGet]
-        public IActionResult PanelTutor()
+        public async Task<IActionResult> PanelTutor()
         {
-            var usuario = HttpContext.Session.GetObject<ObtenerUsuarioDto>("Usuario");
-            if (usuario == null)
+
+            try
             {
-                // No hay sesión -> volver a iniciar sesión
+                var token = HttpContext.Session.GetString("Token");
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }              
+                var idUsuario = HttpContext.Session.GetInt32("IdUsu");
+
+                if (idUsuario == null)
+                {
+                    TempData["Error"] = "No se encontró información del usuario actual.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                //Volver a consultar al backend por los datos actualizados
+                var usuario = await _tutoradoService.ObtenerUsuarioParaEditarAsync(idUsuario.Value, token);
+
+                if (usuario == null)
+                {
+                    TempData["Error"] = "No se pudo cargar el perfil del tutorado.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                return View(usuario);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
                 return RedirectToAction("IniciarSesion", "General");
             }
 
-            return View(usuario); // Pasa el DTO completo a la vista
         }
+
+
+
         [HttpGet]
         public async Task<IActionResult> SolicitudesTutorias()
         {
@@ -115,6 +158,145 @@ namespace EduConnect_Front.Controllers
             TempData["Success"] = msg;
             return View(historial);
         }
+        [HttpGet]
+        public async Task<IActionResult> EditarTutor()
+        {
+            try
+            {
+                var token = HttpContext.Session.GetString("Token");
+                var idUsu = HttpContext.Session.GetInt32("IdUsu");
+
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                // 🔹 Llama al service que ya devuelve EditarPerfilDto
+                var modelo = await _tutoradoService.ObtenerUsuarioParaEditarAsync(idUsu.Value, token);
+
+                if (modelo == null)
+                {
+                    TempData["Error"] = "Usuario no encontrado.";
+                    return RedirectToAction("ConsultarUsuarios");
+                }
+                var tipoIdent = await _generalService.ObtenerTipoIdentAsync();
+                var carreras = await _generalService.ObtenerCarrerasAsync();
+                ViewBag.TipoIdent = tipoIdent;
+                ViewBag.Carreras = carreras;
+                return View(modelo);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("ConsultarUsuarios");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditarTutor(EditarPerfilDto perfil)
+        {
+            try
+            {
+                var token = HttpContext.Session.GetString("Token");
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                var mensaje = await _tutorService.ActualizarPerfilTutorAsync(perfil, token);
+
+                TempData["Success"] = mensaje;
+                // 🔹 Redirige al GET de esta acción (para evitar reenvío del formulario)
+                return RedirectToAction("EditarTutor");
+
+               
+
+               
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("EditarTutor");
+            }
+        }
+
+        //[HttpGet]
+        //public async Task<IActionResult> RegistrarMaterias()
+        //{
+        //    var token = HttpContext.Session.GetString("Token");
+        //    var idTutor = HttpContext.Session.GetInt32("IdUsu");
+
+        //    if (string.IsNullOrEmpty(token) || idTutor == null)
+        //    {
+        //        TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+        //        return RedirectToAction("IniciarSesion", "General");
+        //    }
+
+        //    var (ok, msg, materias) = await _tutorService.ObtenerMateriasPorTutorAsync(idTutor.Value, token);
+
+        //    if (!ok)
+        //    {
+        //        TempData["Error"] = msg;
+        //        return RedirectToAction("PanelTutor", "Tutor");
+        //    }
+
+        //    return View(materias);
+        //}
+        [HttpGet]
+        public async Task<IActionResult> RegistrarMaterias()
+        {
+            var token = HttpContext.Session.GetString("Token");
+            var idTutor = HttpContext.Session.GetInt32("IdUsu");
+
+            if (string.IsNullOrEmpty(token) || idTutor == null)
+            {
+                TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                return RedirectToAction("IniciarSesion", "General");
+            }
+
+            var (ok, msg, materias) = await _tutorService.ObtenerMateriasPorTutorAsync(idTutor.Value, token);
+
+            if (!ok)
+            {
+                TempData["Error"] = msg;
+                return RedirectToAction("PanelTutor", "Tutor");
+            }
+
+            return View(materias);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GuardarMaterias(int[] MateriasSeleccionadas)
+        {
+            var token = HttpContext.Session.GetString("Token");
+            var idTutor = HttpContext.Session.GetInt32("IdUsu");
+
+            if (string.IsNullOrEmpty(token) || idTutor == null)
+            {
+                TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                return RedirectToAction("IniciarSesion", "General");
+            }
+
+            if (MateriasSeleccionadas == null || MateriasSeleccionadas.Length == 0)
+            {
+                TempData["Error"] = "Debes seleccionar al menos una materia.";
+                return RedirectToAction("RegistrarMaterias");
+            }
+
+            var (ok, msg) = await _tutorService.RegistrarMateriasAsync(idTutor.Value, MateriasSeleccionadas, token);
+
+            TempData[ok ? "Success" : "Error"] = msg;
+            return RedirectToAction("PanelTutor");
+        }
+
+
+
 
 
 

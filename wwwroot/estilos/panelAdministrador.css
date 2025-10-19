@@ -6,7 +6,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: Montserrat, sans-serif;
-    background: url('../img/FondoAdmin2.png');
+    background: url('../img/FondoPerfil.png');
     background-size: cover;
 }
 
@@ -42,21 +42,23 @@ body {
         font-weight: bold;
         color: #f9bb65;
         text-shadow: 3.5px 2px 2px #1e5778, 3.5px 2px 2px #1e5778, 3.5px 2px 0 #1e5778, 1.5px 0 0 #1e5778;
+
     }
 
 /* Menú */
 .opciones {
-    background: rgba(192, 192, 192, 0.7);
-    padding: 30px 58px;
+    background: rgba(192, 192, 192, 0.5);
+    padding: 30px;
     border-radius: 20px;
     box-shadow: 0px 0px 15px rgba(0,0,0,0.7);
     display: flex;
     flex-direction: column;
     gap: 15px;
-    width: 540px;
-    margin-top: 28%;
-    margin-left:15%;
+    width: 520px;
+    margin-top: 25%;
+    margin-left:20%;
     margin-right:-60px;
+    align-items:center;
   
 }
 .btn-opcion {
@@ -67,7 +69,7 @@ body {
     color: white;
     font-size: 18px;
     font-weight: bold;
-    padding: 8px 25px;
+    padding: 8px 10px;
     border: none;
     border-radius: 50px;
     cursor: pointer;
@@ -76,11 +78,12 @@ body {
     border: 2px solid rgba(12, 55, 105, 0.3);
     box-shadow: 8px 10px white;
     text-decoration:none;
+    width:380px;
 }
 
     .btn-opcion:hover {
         background: rgba(12, 55, 105, 0.8);
-        width: 435px;
+        width: 400px;
     }
 
     .btn-opcion img {
@@ -101,4 +104,7 @@ body {
     width: 700px;
     margin-top: 30%;
     height: auto;
+    
+    padding-left:0px;
+    margin-left:-8%;
 }

@@ -7,6 +7,7 @@ namespace EduConnect_Front.Controllers
 {
     public class AdministradorController : Controller
     {
+        private readonly TutoradoService _tutoradoService = new TutoradoService();
         private readonly AdministradorService _administradorService = new AdministradorService();
         // GET: TutoradoController
         [HttpGet]
@@ -35,50 +36,116 @@ namespace EduConnect_Front.Controllers
             return View(dto);
         }
 
-        public ActionResult PanelAdministrador()
+        public async Task<IActionResult> PanelAdministrador()
         {
-            return View();
+            {
+                var token = HttpContext.Session.GetString("Token");
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                var idUsuario = HttpContext.Session.GetInt32("IdUsu");
+
+                if (idUsuario == null)
+                {
+                    TempData["Error"] = "No se encontró información del usuario actual.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                //Volver a consultar al backend por los datos actualizados
+                var usuario = await _tutoradoService.ObtenerUsuarioParaEditarAsync(idUsuario.Value, token);
+
+                if (usuario == null)
+                {
+                    TempData["Error"] = "No se pudo cargar el perfil del tutorado.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                return View(usuario);
+
+
+
+
+            }
         }
+
 
         [HttpGet]
-        public async Task<IActionResult> EditarUsuario(int id, string token, CancellationToken ct)
+        public async Task<IActionResult> EditarUsuario(int id, CancellationToken ct)
         {
-
-            var (ok, msg, usuario) = await _administradorService.ObtenerUsuarioPorIdPerfil(id, token, ct);
-            
-
-            if (!ok || usuario == null)
+            try
             {
-                ModelState.AddModelError(string.Empty, msg ?? "No se pudo obtener el usuario");
+                var token = HttpContext.Session.GetString("Token");
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                var (ok, msg, usuario) = await _administradorService.ObtenerUsuarioPorIdPerfil(id, token, ct);
+
+                if (!ok || usuario == null)
+                {
+                    TempData["Error"] = msg ?? "Usuario no encontrado.";
+                    return RedirectToAction("ConsultarUsuarios");
+                }
+
+                var tipoIdent = await new GeneralService().ObtenerTipoIdentAsync();
+                var carreras = await _administradorService.ObtenerCarrerasAsync();
+
+                ViewBag.TipoIdent = tipoIdent;
+                ViewBag.Carreras = carreras;
+
+                // ✅ No tocar TempData aquí
+                return View(usuario);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
                 return RedirectToAction("ConsultarUsuarios");
             }
-            GeneralService _generalService = new GeneralService();
-            var tipoIdent = await _generalService.ObtenerTipoIdentAsync();
-            ViewBag.TipoIdent = tipoIdent;
-            // Cargar carreras para el dropdown
-            var carreras = await _administradorService.ObtenerCarrerasAsync();
-            ViewBag.Carreras = carreras;
-
-            return View(usuario);
         }
+
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditarUsuario(ActualizarUsuarioDto dto, CancellationToken ct)
+        public async Task<IActionResult> EditarUsuario(ActualizarUsuarioDto dto)
         {
-            var (ok, msg) = await _administradorService.ActualizarUsuarioAsync(dto, ct);
-            var carreras = await _administradorService.ObtenerCarrerasAsync();
-
-            ViewBag.Carreras = carreras;
-            if (ok)
+            try
             {
-                TempData["UpdateSuccess"] = msg;
-                return RedirectToAction("ConsultarUsuarios");
-            }
+                var token = HttpContext.Session.GetString("Token");
+                if (string.IsNullOrEmpty(token))
+                {
+                    TempData["Error"] = "No se encontró el token de autenticación. Inicia sesión nuevamente.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
 
-            ModelState.AddModelError(string.Empty, msg);
-            return View(dto);
+                // ✅ Desempaquetamos la tupla correctamente
+                var (ok, msg) = await _administradorService.ActualizarUsuarioAsync(dto, token);
+
+                if (ok)
+                {
+                    // Solo guardamos el mensaje de texto
+                    TempData["Success"] = msg;
+                }
+                else
+                {
+                    TempData["Error"] = msg;
+                }
+
+                // ✅ Redirigimos al GET (para mostrar el popup si aplica)
+                return RedirectToAction("EditarUsuario", new { id = dto.IdUsu });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("EditarUsuario", new { id = dto.IdUsu });
+            }
         }
+
 
         //[HttpGet]
         //public async Task<IActionResult> ConsultarUsuarios(CancellationToken ct)
@@ -94,30 +161,44 @@ namespace EduConnect_Front.Controllers
         //    return View(items);
         //}
         [HttpPost]
-        public async Task<IActionResult> EliminarUsuario(int idUsuario, CancellationToken ct)
-        {
-            var (ok, msg) = await _administradorService.EliminarUsuarioAsync(idUsuario, ct);
+        public async Task<IActionResult> EliminarUsuario(int idUsuario,CancellationToken ct) { 
+
+
+              var token = HttpContext.Session.GetString("Token");
+        if (string.IsNullOrEmpty(token))
+            {
+                TempData["Error"] = "No se encontró token de sesión. Inicia sesión nuevamente.";
+                return RedirectToAction("IniciarSesion", "General");
+            }
+            var(ok, msg) = await _administradorService.EliminarUsuarioAsync(idUsuario, token, ct);
+
 
             if (ok)
                 return Ok(msg);
             else
                 return BadRequest(msg);
         }
+
         [HttpGet]
+
         public async Task<IActionResult> ConsultarUsuarios(int? idRol, int? idEstado, string? numIdent)
         {
-            // Llamar al servicio para traer usuarios con filtros
-            var usuarios = await _administradorService.ObtenerUsuariosAsync(idRol, idEstado, numIdent);
+            var token = HttpContext.Session.GetString("Token");
+            if (string.IsNullOrEmpty(token))
+            {
+                TempData["Error"] = "No se encontró token de sesión. Inicia sesión nuevamente.";
+                return RedirectToAction("IniciarSesion", "General");
+            }
 
-            //// Traer roles y estados para llenar dropdowns
-            //ViewBag.Roles = await _administradorService.ObtenerRolesAsync();
-            //ViewBag.Estados = await _administradorService.ObtenerEstadosAsync();
+            var (ok, msg, usuarios) = await _administradorService.ObtenerUsuariosAsync(token, idRol, idEstado, numIdent);
 
-            //// Mantener valores seleccionados en los filtros
-            //ViewBag.FiltroRol = idRol;
-            //ViewBag.FiltroEstado = idEstado;
-            //ViewBag.FiltroNumIdent = numIdent;
+            if (!ok)
+            {
+                TempData["Error"] = msg;
+                return View(new List<ListadoUsuariosDto>());
+            }
 
+           
             return View(usuarios);
         }
 

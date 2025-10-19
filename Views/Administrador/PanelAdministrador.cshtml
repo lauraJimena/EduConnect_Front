@@ -1,6 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Administrador";
-    Layout = "_Layout";
+    Layout = "_LayoutUsuario";
 }
 @section Styles {
     <link rel="stylesheet" href="~/estilos/panelAdministrador.css" />
@@ -9,7 +9,7 @@
 
     <!-- CONTENIDO -->
     <section class="contenido">
-        <h1>BIENVENIDO ADMINISTRADOR</h1>
+        <h1>BIENVENIDO @Model.Nombre.ToUpper()</h1>
 
         <div class="opciones">
             <a asp-controller="Administrador" asp-action="RegistrarUsuarios" class="btn-opcion">

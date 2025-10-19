@@ -1,6 +1,44 @@
 ﻿@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@900&family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Quicksand:wght@300..700&display=swap');
+.paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    
+    font-size: 1.1em;
+    margin-top: auto;
+    padding-bottom: 2rem;
+    position: relative;
+}
 
+.btn-paginacion {
+    background-color: #ffd966;
+    color: white;
+    text-shadow: 1px 1px 2px gray;
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    transition: 0.3s ease;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+}
+
+    .btn-paginacion:hover {
+        background-color: #fbc959;
+        transform: scale(1.05);
+    }
+
+    .btn-paginacion.deshabilitado {
+        background-color: #ccc;
+        color: #666;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+       
+    }
 
 /* Contenedor principal */
 .busqueda-container {
@@ -137,7 +175,11 @@ a{
         border-radius: 10px;
         border: 1px solid #ccc;
     }
-
+.caja-botones{
+    align-items:center;
+    text-align:center;
+    margin-bottom:20px;
+}
 .btn-ranking {
     background-color: #228f8f;
     color: white;
@@ -148,6 +190,7 @@ a{
     cursor: pointer;
     width: 100%;
     box-shadow: 5px 7px #367172;
+    font-size: 0.8em;
 }
 .btn-ranking:hover {
     background: rgba(30, 42, 120, 0.7);
@@ -161,9 +204,11 @@ a{
     flex-wrap: wrap;
     gap: 20px;
     justify-content: center;
-    max-width: 1000px; /* ✅ limita cuántas caben por fila */
-    margin-top:-259px;
-    margin-left:30px;
+    max-width: 1000px; 
+    margin-top: -270px;
+    margin-left: 30px;
+    min-height: 60vh; 
+    padding-bottom: 1.8rem; 
 }
 
 /* Cada tarjeta ocupará la mitad del ancho del contenedor menos el gap */
@@ -232,8 +277,9 @@ a{
     padding: 10px 0px;
     width: 60%;
     background: #7ec0e0;
-    margin-left:25%;
-    margin-bottom:10px;
+    margin-left:9%;
+    margin-right:20px;
+    margin-bottom:20px;
 
 }
 .sin-resultados {
@@ -248,6 +294,7 @@ a{
     border-radius:30px; 
     box-shadow: 2px 3px 19px gray;
     margin-bottom:-10px;
+    margin-top:5px;
 }
 .sin-resultados img{
     width:200px;
@@ -269,3 +316,4 @@ a{
         cursor: pointer;
         background-color: #228f8f;
     }
+

@@ -10,7 +10,10 @@
         public string ContrasUsu { get; set; } = string.Empty;
         public int IdTipoIdent { get; set; }
         public string NumIdent { get; set; } = string.Empty;
-        public int IdCarrera { get; set; }
-        public int IdSemestre { get; set; }
+        public int? IdCarrera { get; set; }
+        public int? IdSemestre { get; set; }
+        public string? Avatar { get; set; }
+        public string? AvatarRadio{ get; set; }
+
     }
 }

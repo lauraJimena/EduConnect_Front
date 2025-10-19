@@ -101,15 +101,15 @@ p {
 /* HERO con imagen de fondo */
 .hero {
     background: url('../img/Baner.png') no-repeat center center/cover;
-    margin-top:-45px;
-    margin-left:-15px;
+    margin-top: -45px;
+    margin-left: -15px;
     height: 750px; /* ajusta la altura */
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
     position: relative;
-    color: #000; /* color del texto */
+    color: #333; /* color del texto */
 }
 
     /* Fondo semitransparente para mejorar visibilidad */
@@ -128,20 +128,21 @@ p {
 .hero-content {
     position: relative;
     z-index: 2;
-    margin-top:55px;
-    max-width: 830px;
-    padding: 20px;
-    background-color:rgba(255,255,255,0.5);
-    border-radius:25px;
+    margin-top:90px;
+    max-width: 900px;
+    padding: 20px 40px;
+    background-color:rgba(255,255,255,0.45);
+    border-radius:45px;
 }
 
 /* Título */
 .hero h1 {
     font-family: Montserrat, sans-serif;
-    font-size: 2.08rem;
+    font-size: 1.9rem;
     font-weight: bold;
     margin-bottom: 18px;
-    text-shadow: 3.5px 2px 0 #7ec0e0, 3.5px 2px 0 #7ec0e0, 3.5px 2px 0 #7ec0e0, 1.5px 0 0 #7ec0e0;
+    text-shadow: 3.5px 2px 0 white, 3.5px 2px 0 white, 3.5px 2px 0 white, 1.5px 0 0 white;
+    line-height:1.5em;
 }
 
 /* Botón */
