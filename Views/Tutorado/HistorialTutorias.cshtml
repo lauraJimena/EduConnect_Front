@@ -2,7 +2,7 @@
 @using EduConnect_Front.Dtos
 @{
     ViewData["Title"] = "Historial de Tutorías";
-    Layout = "_Layout";
+    Layout = "_LayoutUsuario";
     var usuario = ViewBag.Usuario as ObtenerUsuarioDto;
     var estadosSeleccionados = Context.Request.Query["idsEstado"].ToList();
 

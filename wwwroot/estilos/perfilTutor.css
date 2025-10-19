@@ -1,0 +1,173 @@
+﻿
+.perfil-tutor-container {
+    display: flex;
+    gap: 20px;
+    padding: 30px;
+    background-color: #fbedd9;
+    min-height: 90vh;
+    font-family: Montserrat, sans-serif;
+}
+
+/* Panel izquierdo */
+.perfil-tutor-left {
+    margin-top:6%;
+    flex: 2;
+    background: url('../img/FondoEditar.png') repeat;
+    border-radius: 15px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px;
+}
+
+    .perfil-tutor-left .avatar-tutor img {
+        width: 260px;
+        height: auto;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #f3ca52;
+        background-color: white;
+        box-shadow: 6px 3px rgba(0,0,0,0.2);
+    }
+
+.nombre-tutor {
+    margin-top: 5px;
+    margin-bottom: 15px;
+    background-color: #f3ca52;
+    border: none;
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1.05em;
+    text-shadow: 2px 1px 3px rgba(0,0,0,0.4);
+    box-shadow: 5px 6px rgba(0,0,0,0.2);
+}
+/* === Paginación de comentarios === */
+.paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    gap: 10px;
+    margin-bottom:15px;
+}
+
+    .paginacion button {
+        background-color:#62a8cc;
+        color: #333;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .paginacion button:hover:not(:disabled) {
+            background-color: #3f7594;
+        }
+
+        .paginacion button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+#paginaActual {
+    font-weight: bold;
+    color: #444;
+}
+
+.perfil-tutor-left .info-tutor {
+    background-color: rgba(255,255,255,0.4);
+    padding: 10px 35px;
+    border-radius: 20px;
+    box-shadow: 5px 6px rgba(0,0,0,0.2);
+    width: 94%;
+    color: #444;
+}
+.perfil-tutor-left p {
+    margin: 5px 0;
+    color: #444;
+}
+
+/* Panel derecho */
+.perfil-tutor-right {
+    margin-top: 6%;
+    flex: 2.5;
+    background: url('../img/FondoRegistroUsuario.png') repeat;
+    border-radius: 15px;
+    padding: 40px 80px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+
+    .perfil-tutor-right h1 {
+        font-size: 35px;
+        color: #fbc959;
+        margin-bottom: 20px;
+        text-align: center;
+        text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+        4px 3px 0px rgba(0,0,0,0.4);
+    }
+
+.comentario-card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+    .comentario-card .usuario {
+        font-weight: bold;
+        color: #555;
+    }
+
+    .comentario-card .texto {
+        margin: 8px 0;
+        color: #333;
+    }
+
+    .comentario-card .calificacion {
+        background-color: #eee;
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 8px;
+        color: #555;
+        font-weight: 600;
+    }
+.estrellas {
+    display: inline-block;
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.valor {
+    font-weight: bold;
+    color: #555;
+}
+
+.acciones{
+    text-align:center;
+}
+.btn-valoracion {
+    display: inline-block;
+    margin-top: 0px;
+    background-color: #f3ca52;
+    font-size:1.05em;
+    color: white;
+    font-weight: 800;
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    text-shadow: 2px 1px 0px rgba(0,0,0,0.3);
+    box-shadow: 5px 6px rgba(0,0,0,0.2);
+    border:none;
+}
+
+    .btn-valoracion:hover {
+        background-color: #e8b844;
+        transform: scale(1.05);
+    }

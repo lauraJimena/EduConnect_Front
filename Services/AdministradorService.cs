@@ -30,8 +30,8 @@ namespace EduConnect_Front.Services
         public async Task<(bool Ok, string Msg, ObtenerUsuarioDto? Usuario)> ObtenerUsuarioPorIdAsync(int id, string token, CancellationToken ct = default)
         {
             return await _api.ObtenerUsuarioPorIdAsync(id, token, ct);
-        }
-       
+
+        }    
 
 
         public async Task<(bool Ok, string Msg)> ActualizarUsuarioAsync(ActualizarUsuarioDto dto, string token, CancellationToken ct = default)
@@ -39,9 +39,9 @@ namespace EduConnect_Front.Services
             return await _api.ActualizarUsuarioAsync(dto, token, ct);
         }
 
-        public async Task<(bool Ok, string Msg)> EliminarUsuarioAsync(int idUsuario, CancellationToken ct = default)
+        public async Task<(bool Ok, string Msg)> EliminarUsuarioAsync(int idUsuario, string token, CancellationToken ct = default)
         {
-            return await _api.EliminarUsuarioAsync(idUsuario, ct);
+            return await _api.EliminarUsuarioAsync(idUsuario, token, ct);
         }
         public async Task<List<CarreraDto>> ObtenerCarrerasAsync()
         {

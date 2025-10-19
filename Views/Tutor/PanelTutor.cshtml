@@ -1,7 +1,8 @@
 ﻿
 @{
     ViewData["Title"] = "Tutorado";
-    Layout = "_Layout";
+    Layout = "_LayoutUsuario";
+
 }
 @section Styles {
     <link rel="stylesheet" href="~/estilos/panelTutor.css" />
@@ -13,10 +14,10 @@
         <h1>BIENVENIDO @Model.Nombre.ToUpper()</h1>
 
         <div class="opciones">
-            <button>
+             <a asp-controller="Tutor" asp-action="EditarTutor" class="btn-panel">
                 <img src="~/img/Editar.png" alt="icono editar">
                 EDITAR PERFIL
-            </button>
+            </a>
 
            
             <a asp-controller="Tutor" asp-action="SolicitudesTutorias" class="btn-panel">
@@ -32,6 +33,10 @@
                 <img src="~/img/MisComent.png" alt="icono comentarios">
                 MIS COMENTARIOS
             </button>
+            <a asp-controller="Tutor" asp-action="RegistrarMaterias" class="btn-panel">
+                <img src="~/img/RegistrarUsu.png" alt="icono comentarios">
+                AREGAR MATERIAS
+            </a>
         </div>
 
         <div class="imagen-personaje">

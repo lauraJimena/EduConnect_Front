@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EduConnect</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/estilos/layoutUsuario.css" />
+
+    @RenderSection("Styles", required: false)
+</head>
+
+
+<body>
+    @{
+        var nombreUsuario = Context.Session.GetString("UsuarioNombre") ?? "Usuario";
+        var avatarUrl = Context.Session.GetString("AvatarUrl") ?? Url.Content("~/img/avatars/avatar1.png");
+    }
+
+    <header class="usuario-header">
+        <nav class="navbar">
+            <div class="logo">
+                <img src="~/img/Logo.png" alt="Logo EduConnect" class="logo-img" />
+
+            </div>
+
+            <div class="usuario-info">
+                <span class="nombre-usuario">@nombreUsuario.ToUpper()</span>
+                <img src="/img/avatars/@avatarUrl" alt="Avatar de @nombreUsuario" class="avatar-usuario" />
+            </div>
+        </nav>
+
+
+
+       
+    </header>
+
+
+    <div class="usuario-content">
+        @RenderBody()
+    </div>
+
+    <footer class="pie-pagina">
+        <div class="contenedor-footer">
+            <!-- Frase -->
+            <div class="frase-footer">
+                <span class="icono-comilla">❝</span>
+                <p>Aprendizaje que conecta, conocimiento que crece</p>
+            </div>
+
+            <!-- Correo -->
+            <div class="correo-footer">
+                <span class="icono-correo">✉</span>
+                <p>educonnect@gmail.com</p>
+            </div>
+
+            <!-- Logo y nombre -->
+            <div class="logo-footer">
+                <img src="~/img/Logo.png" alt="Logo EduConnect">
+
+            </div>
+        </div>
+    </footer>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

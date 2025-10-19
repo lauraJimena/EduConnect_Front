@@ -9,5 +9,6 @@
         public string? MateriaNombre { get; set; }
         public int Semestre { get; set; }
         public string? CarreraNombre { get; set; }
+        public string? Avatar { get; set; }
     }
 }
