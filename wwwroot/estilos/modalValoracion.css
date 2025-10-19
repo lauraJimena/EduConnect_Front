@@ -1,0 +1,127 @@
+﻿/* ==== MODAL DE VALORACIÓN ==== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    font-family: Montserrat, sans-serif;
+
+}
+
+.modal {
+    background: #fff;
+    border-radius: 15px;
+    padding: 25px;
+    width: 500px;
+    max-width: 90%;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    animation: pop 0.3s ease-in-out;
+    font-family: Montserrat, sans-serif;
+    position:relative;
+
+}
+/* === Botón de cierre superior === */
+.btn-cerrar-superior {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.btn-cerrar-superior:hover {
+    color: black;
+}
+
+
+@keyframes pop {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal h2 {
+    text-align: center;
+    color: #fbc959;
+    margin-bottom: 20px;
+    font-size:2.1em;
+    text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+    4px 3px 0px rgba(0,0,0,0.4);
+}
+
+.modal label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.modal textarea,
+.modal input[type="number"] {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 5px;
+    resize: none;
+    font-family: Montserrat, sans-serif;
+}
+
+.modal .modal-buttons {
+    text-align: center;
+    margin-top: 20px;
+  
+}
+
+.modal .btn {
+    background-color: #fbc959;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    margin: 0 10px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1.05em;
+    border-radius: 30px;
+    color: #333;
+    text-shadow: 2px 1px 3px rgba(0,0,0,0.4);
+    box-shadow: 5px 6px rgba(0,0,0,0.2);
+}
+
+
+    .modal .btn[type=button] {
+        background: #3f7594;
+        color:white;
+    }
+    .modal .btn[type=submit] {
+        background: #4ebbb0;
+        color: white;
+    }
+    .modal .btn:hover[type=submit] {
+        background-color: #0ab0b3;
+    }
+    .modal .btn:hover[type=button] {
+        background: rgba(30, 42, 120, 0.7);
+    }
+
+/* Estilo iconos de info */
+.icono-info {
+    color: #444;
+    margin-right: 6px;
+}

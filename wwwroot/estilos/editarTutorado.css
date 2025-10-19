@@ -8,7 +8,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: stretch;
-    height: 700px;
+    height: 720px;
     padding: 20px;
     gap: 15px;
     margin-top:5.8%;
@@ -25,9 +25,11 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 0px 20px;
+  
+    justify-content: flex-start;
+    padding: 8px 10px; 
     box-shadow: 0 0 8px rgba(0,0,0,0.2);
+    height: auto; 
 }
 
     .perfil-left .avatar {
@@ -35,15 +37,15 @@ body {
         border-radius: 50%;
         border: 6px solid white;
         box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-        margin-top:-40px;
+        margin-top:10px;
         
     }
 
-    .perfil-left .avatar img {
-        width: 230px;
-        height: auto;
-       
-    }
+        .perfil-left .avatar img {
+            width: 240px;
+            height: auto;
+            border-radius: 50%;
+        }
 
 .nombre-tutorado {
     margin-top: 15px;
@@ -59,17 +61,22 @@ body {
 }
 /* Avatares */
 .avatar-selector {
-    margin-top: 20px;
+    margin-top: 10px;
     text-align: center;
 }
     .avatar-selector p {
         font-family: Montserrat, sans-serif;
-        margin-bottom:10px;
+        margin-bottom:5px;
+        color:#333;
+        font-weight:600;
+        margin-top:20px;
+
     }
 .avatar-opciones {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    border-radius: 50%;
 }
 
     .avatar-opciones label {
@@ -77,24 +84,27 @@ body {
         display: flex;
         flex-direction: column;
         align-items: center;
+        border-radius: 50%;
     }
 
     .avatar-opciones input {
         display: none;
+      
     }
 
     .avatar-opciones img {
-        width: 80px;
-        height: 80px;
+        width: 75px;
+        height: 75px;
         border-radius: 50%;
         border: 2px solid transparent;
         transition: border 0.3s ease;
+    
     }
 
     /* Cuando el usuario selecciona un avatar */
     .avatar-opciones input:checked + img {
         padding: 3px;
-        border: 2.8px solid rgba(30, 42, 120, 0.8);
+        border: 2.9px solid rgba(30, 42, 120, 0.8);
         box-shadow: 2px 2px 15px rgba(30, 42, 120, 0.8); /* glow morado */
     
     }
@@ -103,7 +113,7 @@ body {
     flex: 2;
     background: #e6e6e6 url('../img/FondoPuntos.png') repeat; /* azul claro */
     border-radius: 15px;
-    padding: 50px 150px;
+    padding: 100px 130px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -120,15 +130,15 @@ body {
         text-shadow: 3px 3px #1e5778;
         margin-bottom: 25px;
         display: flex;
-        align-items: center;
+        margin-left:16%;
         gap: 10px;
-        margin-left:auto;
-        margin-right:auto;
         font-family: 'League Spartan', sans-serif;
+        text-align:center;
     }
 
         .perfil-right h1 img {
             width: 60px;
+            margin-top:-20px;
         }
 /* Nueva grilla de dos columnas */
 .form-grid {
@@ -152,7 +162,6 @@ body {
         font-weight: 600;
         margin-bottom: 5px;
         color: #333;
-
     }
     .form-grid input, .form-grid select {
         padding: 11px;
@@ -165,42 +174,10 @@ body {
         color: gray;
         width: 100%;
         box-sizing: border-box;
+        
        
     }
-
-
-
-
-    /* Inputs */
-    /*.perfil-right form {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-        .perfil-right form label {
-            font-family: Montserrat, sans-serif;
-            margin-bottom:-10px;
-        }
-        .perfil-right form input,
-        .perfil-right form select {
-            padding: 11px;
-            border: none;
-            border-radius: 25px;
-            font-size: 14px;
-            outline: none;
-            box-shadow: inset 2px 3px 3px rgba(0,0,0,0.25);
-            font-family: Montserrat, sans-serif;
-            color: gray;
-            
-        }
-
-            .perfil-right form input:focus,
-            .perfil-right form select:focus {
-                border: 2px solid rgba(30, 42, 120, 0.8);*/ /* morado */
-                /*box-shadow: 1.6px 1.6px 15px rgba(30, 42, 120, 0.8);*/ /* glow morado */
-            /*}*/
-
-/* Botón */
+       
 .btn-guardar {
     margin-top: 20px;
     padding: 12px;

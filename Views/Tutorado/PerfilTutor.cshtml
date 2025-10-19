@@ -1,0 +1,94 @@
+﻿@model EduConnect_Front.Dtos.PerfilTutorComentariosDto
+
+@{
+    ViewData["Title"] = "Perfil del Tutor";
+    Layout = "_LayoutUsuario";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/perfilTutor.css">
+    <link rel="stylesheet" href="~/estilos/modalValoracion.css"> <!-- ✅ NUEVO -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+}
+
+<main class="perfil-tutor-container">
+
+    <!-- PANEL IZQUIERDO -->
+    <section class="perfil-tutor-left">
+        <div class="avatar-tutor">
+            <img src="~/img/avatars/@(Model.Perfil.AvatarUrl ?? "avatar1.png")" alt="Avatar del Tutor" />
+        </div>
+
+        <button class="nombre-tutor">@Model.Perfil.NombreTutor.ToUpper()</button>
+        <div class="info-tutor">
+            <p><i class="fas fa-graduation-cap icono-info"></i><b> Carrera:</b> @Model.Perfil.Carrera</p>
+            <p><i class="fas fa-layer-group icono-info"></i><b> Semestre:</b> @Model.Perfil.Semestre</p>
+            <p><i class="fas fa-book icono-info"></i><b> Materias que domina:</b> @Model.Perfil.Materias</p>
+            <p><i class="fas fa-envelope icono-info"></i><b> Correo:</b> @Model.Perfil.Correo</p>
+            <p><i class="fas fa-phone icono-info"></i><b> Teléfono:</b> @Model.Perfil.Telefono</p>
+        </div>
+    </section>
+
+    <!-- PANEL DERECHO -->
+    <section class="perfil-tutor-right">
+        <h1>COMENTARIOS</h1>
+
+        @if (Model.Comentarios != null && Model.Comentarios.Any())
+        {
+            <div id="comentarios-container">
+                @foreach (var c in Model.Comentarios)
+                {
+                    <div class="comentario-card">
+                        <p class="usuario">@c.Usuario</p>
+                        <p class="texto">@c.Comentario</p>
+                        <div class="calificacion" data-rating="@c.Calificacion">
+                            <div class="estrellas"></div>
+                            <span class="valor">@c.Calificacion / 5</span>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="paginacion">
+                <button id="btnPrev" disabled>Anterior</button>
+                <span id="paginaActual">1</span>
+                <button id="btnNext">Siguiente</button>
+            </div>
+        }
+        else
+        {
+            <p class="sin-comentarios">Este tutor aún no tiene comentarios.</p>
+        }
+
+        <div class="acciones">
+            <button id="abrirModal" class="btn-valoracion">AGREGAR VALORACIÓN</button>
+        </div>
+    </section>
+</main>
+
+<!-- Modal flotante -->
+<div class="modal-overlay" id="modalValoracion">
+    <div class="modal">
+        <button type="button" class="btn-cerrar-superior" id="cerrarModalSuperior">&times;</button>
+        <h2>Agregar Valoración</h2>
+        <form id="formValoracion" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="IdTutor" value="@Model.Perfil.IdUsuario" />
+
+            <label for="Calificacion">Calificación (1 a 5)</label>
+            <input type="number" name="Calificacion" min="1" max="5" required />
+
+            <label for="Texto">Comentario</label>
+            <textarea name="Texto" rows="4" placeholder="Escribe tu opinión..." required></textarea>
+
+            <div class="modal-buttons">
+                <button type="submit" class="btn">Enviar</button>
+                <button type="button" class="btn" id="cerrarModal">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/perfilTutor.js"></script> 
+}

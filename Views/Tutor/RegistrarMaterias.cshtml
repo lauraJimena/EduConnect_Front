@@ -1,0 +1,94 @@
+﻿@using EduConnect_Front.Dtos
+@model List<EduConnect_Front.Dtos.MateriaDto>
+
+@{
+    ViewData["Title"] = "Completar Perfil";
+    Layout = "_LayoutUsuario";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/registrarMaterias.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+}
+
+<main class="completar-perfil-container">
+
+    <div class="completar-perfil-card">
+        <h1><i class="fas fa-pencil-alt"></i> COMPLETAR PERFIL</h1>
+        <p class="descripcion">
+            Selecciona las materias en las que puedes ofrecer una tutoría.
+            Para ello da click sobre el recuadro que contiene información de la materia:
+        </p>
+
+        <!-- 🔹 BUSCADOR Y FILTRO -->
+        <div class="buscador-filtro">
+            <div class="buscador">
+                <input type="text" id="busquedaMateria" placeholder="Ingresa la materia que buscas aquí" />
+                <button type="button" id="btnBuscar"><i class="fas fa-search"></i></button>
+            </div>
+
+            <div class="filtro">
+                <label for="filtroSemestre">Filtrar por:</label>
+                <select id="filtroSemestre">
+                    <option value="">Semestre</option>
+                    @for (int i = 1; i <= 6; i++)
+                    {
+                        <option value="@i">@i° semestre</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <!-- 🔹 LISTA DE MATERIAS -->
+        <form asp-action="GuardarMaterias" asp-controller="Tutor" method="post">
+            @Html.AntiForgeryToken()
+
+            <div id="listaMaterias" class="lista-materias">
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var m in Model)
+                    {
+                        <label class="materia-card @(m.TieneMateria ? "selected" : "")"
+                               data-semestre="@m.Semestre"
+                               data-nombre="@m.NombreMateria.ToLower()">
+
+                            <input type="checkbox"
+                                   name="MateriasSeleccionadas"
+                                   value="@m.IdMateria"
+                                   @(m.TieneMateria ? "checked" : "")
+                                   hidden />
+
+                            <div class="materia-info">
+                                <h3>@m.NombreMateria.ToUpper()</h3>
+                                <p>@m.CarreraNombre</p>
+                                <p>@m.Semestre° semestre</p>
+                            </div>
+                        </label>
+
+
+                    }
+                }
+                else
+                {
+                    <p class="sin-materias">No hay materias disponibles para seleccionar.</p>
+                }
+            </div>
+            <!-- 🔹 Paginación -->
+            <div class="paginacion">
+                <button type="button" id="btnAnterior" disabled>Anterior</button>
+                <span id="paginaActual">Página 1</span>
+                <button type="button" id="btnSiguiente">Siguiente</button>
+            </div>
+
+
+            <!-- 🔹 BOTÓN GUARDAR -->
+            <div class="acciones">
+                <button type="submit" class="btn-guardar">GUARDAR</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+@section Scripts {
+    <script src="~/js/registrarMaterias.js"></script>
+}

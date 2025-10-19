@@ -10,7 +10,8 @@ namespace EduConnect_Front.Controllers
     {
         
         private readonly GeneralService _generalService = new GeneralService();
-        private readonly AdministradorService _administradorService = new AdministradorService(); 
+        private readonly AdministradorService _administradorService = new AdministradorService();
+        private readonly TutorService _tutorService = new TutorService();
 
 
         public IActionResult IniciarSesion()
@@ -60,8 +61,11 @@ namespace EduConnect_Front.Controllers
 
             if (ok && usuario != null)
             {
-                // Guarda el token
-                HttpContext.Session.SetString("Token", usuario.Token ?? string.Empty);
+               
+                //HttpContext.Session.SetString("Token", usuario.Token ?? string.Empty);
+              
+                var token = usuario.Token ?? string.Empty;
+                HttpContext.Session.SetString("Token", token);
 
                 //Decodifica el token para obtener el ID
                 var idUsuario = JwtUtility.ObtenerIdUsuarioDesdeToken(usuario.Token ?? "");
@@ -82,19 +86,33 @@ namespace EduConnect_Front.Controllers
                 }
 
                 //Guarda el usuario completo en sesión
-                HttpContext.Session.SetObject("Usuario", infoUsuario);
+                //HttpContext.Session.SetObject("Usuario", infoUsuario);
                 HttpContext.Session.SetInt32("IdRol", infoUsuario.IdRol);
                 HttpContext.Session.SetInt32("IdUsu", infoUsuario.IdUsu);
                 HttpContext.Session.SetString("UsuarioNombre", infoUsuario.Nombre ?? "");
+                HttpContext.Session.SetString("AvatarUrl", infoUsuario.Avatar ?? "/img/avatars/avatar3.png");
+                // Validar si es tutor
+                if (okUsuario && infoUsuario.IdRol == 2)
+                {
+                    var (tieneMaterias, msgValidacion) = await _tutorService.ValidarMateriasTutorAsync(infoUsuario.IdUsu, token);
+
+                    if (!tieneMaterias)
+                    {
+                        TempData["Advertencia"] = "Aún no tienes registradas las materias que dominas. Por favor complétalas para que los estudiantes puedan ver tu perfil.";
+                        return RedirectToAction("RegistrarMaterias", "Tutor");
+                    }
+
+                    return RedirectToAction("PanelTutor", "Tutor");
+                }
 
                 //Redirige según el rol
                 switch (infoUsuario.IdRol)
                 {
                     case 1: return RedirectToAction("PanelTutorado", "Tutorado");
-                    case 2: return RedirectToAction("PanelTutor", "Tutor");
+                   
                     case 3: return RedirectToAction("PanelAdministrador", "Administrador");
                     case 4: return RedirectToAction("PanelCoordinador", "Coordinador");
-                    default: return RedirectToAction("Index", "Home");
+                    default: return RedirectToAction("Inicio", "Home");
                 }
             }
 

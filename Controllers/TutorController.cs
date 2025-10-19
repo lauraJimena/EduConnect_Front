@@ -11,7 +11,7 @@ namespace EduConnect_Front.Controllers
         private readonly TutoradoService _tutoradoService = new TutoradoService();
         private readonly GeneralService _generalService = new GeneralService();
         private readonly TutorService _tutorService;
-       
+        private readonly AdministradorService _administradorService = new AdministradorService();
 
         public TutorController(TutorService tutorService)
         {
@@ -201,32 +201,101 @@ namespace EduConnect_Front.Controllers
             try
             {
                 var token = HttpContext.Session.GetString("Token");
+
                 if (string.IsNullOrEmpty(token))
                 {
-                    TempData["Error"] = "No se encontró el token de autenticación. Inicia sesión nuevamente.";
+                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
                     return RedirectToAction("IniciarSesion", "General");
                 }
+                var mensaje = await _tutorService.ActualizarPerfilTutorAsync(perfil, token);
 
-                var (ok, msg) = await _tutorService.ActualizarPerfilTutorAsync(perfil, token);
+                TempData["Success"] = mensaje;
+                // 🔹 Redirige al GET de esta acción (para evitar reenvío del formulario)
+                return RedirectToAction("EditarTutor");
 
-                if (!ok)
-                {
-                    TempData["Error"] = msg;
-                    return View(perfil);
-                }
+               
 
-                //Éxito: guarda mensaje y activa redirección
-                TempData["Success"] = msg;
-                TempData["RedirectToPanelTutor"] = true;
-
-                return View(perfil);
+               
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Error al actualizar perfil: " + ex.Message;
-                return View(perfil);
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("EditarTutor");
             }
         }
+
+        //[HttpGet]
+        //public async Task<IActionResult> RegistrarMaterias()
+        //{
+        //    var token = HttpContext.Session.GetString("Token");
+        //    var idTutor = HttpContext.Session.GetInt32("IdUsu");
+
+        //    if (string.IsNullOrEmpty(token) || idTutor == null)
+        //    {
+        //        TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+        //        return RedirectToAction("IniciarSesion", "General");
+        //    }
+
+        //    var (ok, msg, materias) = await _tutorService.ObtenerMateriasPorTutorAsync(idTutor.Value, token);
+
+        //    if (!ok)
+        //    {
+        //        TempData["Error"] = msg;
+        //        return RedirectToAction("PanelTutor", "Tutor");
+        //    }
+
+        //    return View(materias);
+        //}
+        [HttpGet]
+        public async Task<IActionResult> RegistrarMaterias()
+        {
+            var token = HttpContext.Session.GetString("Token");
+            var idTutor = HttpContext.Session.GetInt32("IdUsu");
+
+            if (string.IsNullOrEmpty(token) || idTutor == null)
+            {
+                TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                return RedirectToAction("IniciarSesion", "General");
+            }
+
+            var (ok, msg, materias) = await _tutorService.ObtenerMateriasPorTutorAsync(idTutor.Value, token);
+
+            if (!ok)
+            {
+                TempData["Error"] = msg;
+                return RedirectToAction("PanelTutor", "Tutor");
+            }
+
+            return View(materias);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GuardarMaterias(int[] MateriasSeleccionadas)
+        {
+            var token = HttpContext.Session.GetString("Token");
+            var idTutor = HttpContext.Session.GetInt32("IdUsu");
+
+            if (string.IsNullOrEmpty(token) || idTutor == null)
+            {
+                TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                return RedirectToAction("IniciarSesion", "General");
+            }
+
+            if (MateriasSeleccionadas == null || MateriasSeleccionadas.Length == 0)
+            {
+                TempData["Error"] = "Debes seleccionar al menos una materia.";
+                return RedirectToAction("RegistrarMaterias");
+            }
+
+            var (ok, msg) = await _tutorService.RegistrarMateriasAsync(idTutor.Value, MateriasSeleccionadas, token);
+
+            TempData[ok ? "Success" : "Error"] = msg;
+            return RedirectToAction("PanelTutor");
+        }
+
+
 
 
 

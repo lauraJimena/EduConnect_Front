@@ -161,15 +161,24 @@ namespace EduConnect_Front.Controllers
         //    return View(items);
         //}
         [HttpPost]
-        public async Task<IActionResult> EliminarUsuario(int idUsuario, CancellationToken ct)
-        {
-            var (ok, msg) = await _administradorService.EliminarUsuarioAsync(idUsuario, ct);
+        public async Task<IActionResult> EliminarUsuario(int idUsuario,CancellationToken ct) { 
+
+
+              var token = HttpContext.Session.GetString("Token");
+        if (string.IsNullOrEmpty(token))
+            {
+                TempData["Error"] = "No se encontró token de sesión. Inicia sesión nuevamente.";
+                return RedirectToAction("IniciarSesion", "General");
+            }
+            var(ok, msg) = await _administradorService.EliminarUsuarioAsync(idUsuario, token, ct);
+
 
             if (ok)
                 return Ok(msg);
             else
                 return BadRequest(msg);
         }
+
         [HttpGet]
 
         public async Task<IActionResult> ConsultarUsuarios(int? idRol, int? idEstado, string? numIdent)
