@@ -1,0 +1,22 @@
+@model List<EduConnect_Front.Dtos.ObtenerMensajeDto>
+
+@{
+    int usuarioActual = Context.Session.GetInt32("IdUsu") ?? 0;
+}
+
+<div class="chat-conversacion-mensajes" id="contenedorMensajes">
+    @if (!Model.Any())
+    {
+        <div class="mensaje mensaje-receptor">No hay mensajes aún</div>
+    }
+    else
+    {
+        @foreach (var mensaje in Model)
+        {
+            bool esEmisor = mensaje.IdEmisor == usuarioActual;
+            <div class="mensaje @(esEmisor ? "mensaje-emisor" : "mensaje-receptor")">
+                @mensaje.Contenido
+            </div>
+        }
+    }
+</div>

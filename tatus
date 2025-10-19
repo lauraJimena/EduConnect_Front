@@ -1,0 +1,23 @@
+[33m761030d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mQAJuanM[m[33m)[m HEAD@{0}: reset: moving to 761030d06799dcb998f40a3a2b8f750485664198
+[33m761030d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mQAJuanM[m[33m)[m HEAD@{1}: reset: moving to HEAD
+[33m761030d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mQAJuanM[m[33m)[m HEAD@{2}: reset: moving to HEAD
+[33m761030d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mQAJuanM[m[33m)[m HEAD@{3}: checkout: moving from QA to QAJuanM
+[33mb70c38a[m[33m ([m[1;31morigin/QA[m[33m, [m[1;32mQA[m[33m)[m HEAD@{4}: checkout: moving from QAJuanM to QA
+[33m761030d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mQAJuanM[m[33m)[m HEAD@{5}: merge QA: Merge made by the 'ort' strategy.
+[33m3ffd18a[m[33m ([m[1;31morigin/QAJuanM[m[33m)[m HEAD@{6}: checkout: moving from QA to QAJuanM
+[33mb70c38a[m[33m ([m[1;31morigin/QA[m[33m, [m[1;32mQA[m[33m)[m HEAD@{7}: pull --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33me902f14[m HEAD@{8}: checkout: moving from QAJuanM to QA
+[33m3ffd18a[m[33m ([m[1;31morigin/QAJuanM[m[33m)[m HEAD@{9}: reset: moving to HEAD
+[33m3ffd18a[m[33m ([m[1;31morigin/QAJuanM[m[33m)[m HEAD@{10}: checkout: moving from QA to QAJuanM
+[33me902f14[m HEAD@{11}: checkout: moving from QAJuanM to QA
+[33m3ffd18a[m[33m ([m[1;31morigin/QAJuanM[m[33m)[m HEAD@{12}: commit: PB021-Frontchats v1
+[33me902f14[m HEAD@{13}: checkout: moving from QA to QAJuanM
+[33me902f14[m HEAD@{14}: checkout: moving from QAJuanM to QA
+[33me902f14[m HEAD@{15}: checkout: moving from QA to QAJuanM
+[33me902f14[m HEAD@{16}: checkout: moving from QAJuanM to QA
+[33me902f14[m HEAD@{17}: checkout: moving from QA to QAJuanM
+[33me902f14[m HEAD@{18}: checkout: moving from QAJuanM to QA
+[33me902f14[m HEAD@{19}: checkout: moving from QA to QAJuanM
+[33me902f14[m HEAD@{20}: pull --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33mebb1058[m HEAD@{21}: checkout: moving from master to QA
+[33mc007538[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{22}: clone: from https://github.com/lauraJimena/EduConnect_Front

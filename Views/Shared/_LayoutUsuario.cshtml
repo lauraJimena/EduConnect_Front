@@ -6,6 +6,8 @@
     <title>@ViewData["Title"] - EduConnect</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/estilos/layoutUsuario.css" />
+    <link rel="stylesheet" href="~/estilos/estilos.css">
+    <link rel="stylesheet" href="~/estilos/popup.css" />
 
     @RenderSection("Styles", required: false)
 </head>
@@ -38,6 +40,17 @@
 
     <div class="usuario-content">
         @RenderBody()
+        @{
+            var usuarioLogueado = Context.Session.GetInt32("IdUsu");
+        }
+
+        @if (usuarioLogueado != null)
+        {
+            <div class="boton-chat">
+                <img src="~/img/chat.png" alt="Logo chat" />
+            </div>
+            <div class="popup-chat" id="popupChat" data-id-usuario="@usuarioLogueado"></div>
+        }
     </div>
 
     <footer class="pie-pagina">
@@ -63,5 +76,8 @@
     </footer>
 
     @RenderSection("Scripts", required: false)
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--<script src="~/js/chat-popup.js">-->
+    <script src="/js/chat-popup.js"></script>
 </body>
 </html>

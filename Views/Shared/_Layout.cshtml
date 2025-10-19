@@ -29,12 +29,8 @@
 
     <main>
         @RenderBody()
-       <div class="boton-chat">
-            <img src="~/img/chat.png" alt="Logo chat" />
-       </div>
-        <div class="popup-chat" id="popupChat">
-           
-        </div>
+
+
 </div>
     </main>
 
@@ -63,9 +59,7 @@
 
     @await RenderSectionAsync("Scripts", required: false)
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <!--<script src="~/js/chat-popup.js">-->
-    <script src="/js/chat-popup.js"></script>
+
 
 </body>
 </html>

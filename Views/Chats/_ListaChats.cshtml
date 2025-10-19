@@ -1,15 +1,22 @@
-@model List<(string Nombre, string Materia)>
+@model List<EduConnect_Front.Dtos.ObtenerChatDto>
 
 <div class="popup-chat-header">CHATS</div>
 <div class="popup-chat-list">
-    @foreach (var chat in Model)
+    @if (!Model.Any())
     {
-        <div class="popup-chat-item">
-            <img src="~/img/chat.png" alt="Chat Bot" />
-            <div class="popup-chat-item-info">
-                <span class="popup-chat-item-nombre">@chat.Nombre</span>
-                <span class="popup-chat-item-materia">@chat.Materia</span>
+        <div class="popup-chat-item">No tienes chats disponibles.</div>
+    }
+    else
+    {
+        @foreach (var chat in Model)
+        {
+            <div class="popup-chat-item" data-chat-id="@chat.IdChat">
+                <img src="~/img/chat.png" alt="Chat Icon" />
+                <div class="popup-chat-item-info">
+                    <span class="popup-chat-item-nombre">@chat.NombreReceptor</span>
+                    <span class="popup-chat-item-materia">@chat.NombreMateria</span>
+                </div>
             </div>
-        </div>
+        }
     }
 </div>

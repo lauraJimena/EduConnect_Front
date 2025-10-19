@@ -1184,6 +1184,7 @@ namespace EduConnect_Front.Services
                 return (false, "Error de conexión con la API: " + ex.Message, null);
             }
         }
+
         public async Task<(bool Ok, string Msg)> RegistrarMateriasTutorAsync(int idTutor, int[] materias, string token)
         {
             try
@@ -1210,50 +1211,109 @@ namespace EduConnect_Front.Services
         }
 
 
+        public async Task<List<ObtenerChatDto>> ObtenerChatsAsync(int idUsuario, string token, CancellationToken ct = default)
+        {
+
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                using var resp = await _httpClient.GetAsync($"Chats/ObtenerChatsPorUsuario?usuarioId={idUsuario}", ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
 
 
+                if (resp.IsSuccessStatusCode)
+                {
+
+                    var chats = JsonSerializer.Deserialize<List<ObtenerChatDto>>(body,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    return chats ?? new List<ObtenerChatDto>();
+                }
+
+                var msgError = string.IsNullOrWhiteSpace(body)
+                    ? $"Error HTTP {(int)resp.StatusCode}"
+                    : body;
 
 
+                throw new Exception(msgError);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(" 🔴 EXCEPCIÓN en ObtenerChatsAsync -> " + ex.Message);
+                throw; // deja que el controlador lo capture
+            }
+        }
 
 
+        // ---------------------------
+        // Obtener Mensajes por chat
+        // ---------------------------
+        public async Task<List<ObtenerMensajeDto>> ObtenerMensajesAsync(int idChat, string token, CancellationToken ct = default)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                using var resp = await _httpClient.GetAsync($"Chats/ObtenerMensajes?chatId={idChat}", ct);
+                var body = await resp.Content.ReadAsStringAsync(ct); 
+                if (resp.IsSuccessStatusCode)
+                { 
+                    var mensajes = JsonSerializer.Deserialize<List<ObtenerMensajeDto>>(body, new JsonSerializerOptions 
+                    { 
+                        PropertyNameCaseInsensitive = true }); return mensajes ?? new List<ObtenerMensajeDto>();
+                } 
+                var msgError = string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body; throw new Exception(msgError); 
+            } catch (HttpRequestException ex) 
+            { 
+                throw new Exception("ObtenerMensajesAsync -> " + ex.ToString());
+            } 
+            catch (TaskCanceledException) 
+            { 
+                throw new Exception("La solicitud de mensajes tardó demasiado (timeout).");
+            } 
+        }
 
-
-    
-    
-
-    public async Task<List<ObtenerChatDto>> ObtenerChatsAsync(int idUsuario, string token, CancellationToken ct = default)
+        // ---------------------------
+        // Enviar / Crear Mensaje
+        // ---------------------------
+        public async Task<(bool Success, string Message)> EnviarMensajeAsync(CrearMensajeDto mensaje, string token, CancellationToken ct = default)
         {
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                using var resp = await _httpClient.GetAsync($"Chat/ObtenerChatsPorUsuario?idUsuario={idUsuario}", ct);
+                Console.WriteLine("[API_Service] POST Chats/CrearMensaje -> " +
+                                  $"Chat:{mensaje.IdChat} Emisor:{mensaje.IdEmisor}");
+
+                using var resp = await _httpClient.PostAsJsonAsync("Chats/CrearMensaje", mensaje, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
+
                 if (resp.IsSuccessStatusCode)
                 {
-                    var chats = JsonSerializer.Deserialize<List<ObtenerChatDto>>(
-                        body,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                    );
-                    return chats ?? new List<ObtenerChatDto>();
+                    var okMsg = string.IsNullOrWhiteSpace(body) ? "Mensaje enviado correctamente" : body;
+                    return (true, okMsg);
                 }
-                // Si hubo error
-                var msgError = string.IsNullOrWhiteSpace(body)
+
+                var msg = string.IsNullOrWhiteSpace(body)
                     ? $"Error {(int)resp.StatusCode}"
                     : body;
-                throw new Exception(msgError);
+
+                return (false, msg);
             }
             catch (HttpRequestException ex)
             {
-                throw new Exception($"Error de conexión con la API: {ex.Message}");
+                return (false, $"No se pudo conectar con la API (EnviarMensajeAsync): {ex.Message}");
             }
             catch (TaskCanceledException)
             {
-                throw new Exception("La solicitud de chats tardó demasiado (timeout).");
+                return (false, "La solicitud a la API expiró (timeout).");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado en EnviarMensajeAsync: {ex.Message}");
             }
         }
-
-
     }
 }

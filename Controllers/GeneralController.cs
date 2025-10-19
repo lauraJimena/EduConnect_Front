@@ -86,7 +86,7 @@ namespace EduConnect_Front.Controllers
                 }
 
                 //Guarda el usuario completo en sesión
-                //HttpContext.Session.SetObject("Usuario", infoUsuario);
+                HttpContext.Session.SetObject("Usuario", infoUsuario);
                 HttpContext.Session.SetInt32("IdRol", infoUsuario.IdRol);
                 HttpContext.Session.SetInt32("IdUsu", infoUsuario.IdUsu);
                 HttpContext.Session.SetString("UsuarioNombre", infoUsuario.Nombre ?? "");
