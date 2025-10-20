@@ -1,0 +1,18 @@
+﻿@model EduConnect_Front.Dtos.ObtenerChatDto
+
+<div class="chat-conversacion">
+
+    <div class="chat-conversacion-header">
+        <span class="btn-volver" onclick="volverALista()">←</span>
+        @Model.NombreReceptor
+    </div>
+
+    <div class="chat-conversacion-mensajes" id="contenedorMensajes">
+        <!-- Aquí se cargarán los mensajes dinámicamente -->
+    </div>
+
+    <div class="chat-conversacion-input">
+        <input type="text" id="mensajeInput" placeholder="Escribe un mensaje..." />
+        <button id="btnEnviar">➤</button>
+    </div>
+</div>

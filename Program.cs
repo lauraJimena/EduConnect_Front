@@ -7,6 +7,7 @@ builder.Services.AddControllersWithViews();
 // ?? Registro de servicios personalizados
 builder.Services.AddScoped<API_Service>();
 builder.Services.AddScoped<TutorService>();
+builder.Services.AddScoped<ChatService>();
 
 
 // Cache para Session (requerido)
