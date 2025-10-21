@@ -216,6 +216,7 @@ h1 {
 }
     .btn-perfil:hover {
         transform: scale(1.04); /* aumenta un 10% */
+        color: #333;
     }
 
 .btn-solicitar {
@@ -229,9 +230,10 @@ h1 {
     font-size:0.96em;
     text-shadow: 1px 2px 2px rgba(0,0,0,0.5);
 }
-.btn-solicitar:hover {
-    transform: scale(1.05); /* aumenta un 10% */
-}
+    .btn-solicitar:hover {
+        transform: scale(1.05); /* aumenta un 10% */
+        color: white;
+    }
 
 .acciones-ranking {
     margin-bottom: 50px;
