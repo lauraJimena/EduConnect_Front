@@ -61,6 +61,7 @@
     text-align: center;
     color: #fbc959;
     margin-bottom: 20px;
+    font-weight:700;
     font-size:2.1em;
     text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
     4px 3px 0px rgba(0,0,0,0.4);
@@ -88,37 +89,40 @@
     margin-top: 20px;
   
 }
-
-.modal .btn {
-    background-color: #fbc959;
+.modal-buttons{
+    gap:2px;
+    padding:0px 20px;
+    margin-top:-30px;
+}
+.modal-buttons .btn {
+    background-color: #fbc959 !important;
     border: none;
-    border-radius: 10px;
     padding: 10px 20px;
     margin: 0 10px;
     font-weight: bold;
     cursor: pointer;
     font-size: 1.05em;
-    border-radius: 30px;
+    border-radius: 30px !important;
     color: #333;
     text-shadow: 2px 1px 3px rgba(0,0,0,0.4);
     box-shadow: 5px 6px rgba(0,0,0,0.2);
 }
 
 
-    .modal .btn[type=button] {
-        background: #3f7594;
-        color:white;
+.modal-buttons button[type=button] {
+    background: #3f7594 !important;
+    color: white !important;
+}
+.modal-buttons .btn[type=submit] {
+    background: #4ebbb0 !important;
+    color: white !important;
+}
+    .modal-buttons .btn:hover[type=submit] {
+        background-color: #0ab0b3 !important;
     }
-    .modal .btn[type=submit] {
-        background: #4ebbb0;
-        color: white;
-    }
-    .modal .btn:hover[type=submit] {
-        background-color: #0ab0b3;
-    }
-    .modal .btn:hover[type=button] {
-        background: rgba(30, 42, 120, 0.7);
-    }
+.modal-buttons .btn:hover[type=button] {
+    background: rgba(30, 42, 120, 0.7) !important;
+}
 
 /* Estilo iconos de info */
 .icono-info {

@@ -31,7 +31,7 @@ body {
     /* Título */
     .contenido h1 {
         font-family: 'League Spartan', sans-serif;
-        font-size: 2.5em;
+        font-size: 2.7em;
         position: absolute;
         top: 120px;
         left: 50%;
@@ -39,7 +39,8 @@ body {
         font-weight: bold;
         color: #f9bb65;
         text-shadow: 3.5px 2px 2px #1e5778, 3.5px 2px 2px #1e5778, 3.5px 2px 0 #1e5778, 1.5px 0 0 #1e5778;
-        
+        text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+        4px 3px 0px #1e5778;
     }
 
 /* Menú */

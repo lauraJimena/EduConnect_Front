@@ -276,10 +276,12 @@
     margin-top: 30px;
     margin-left: 43%;
     box-shadow: 4px 6px 5px rgba(0,0,0, .2);
+
 }
 .btn2 {
     background-color: #3f7594
 }
-    .btn-volver:hover {
-        background-color: #62a8cc;
-    }
+.btn-volver:hover {
+    background-color: #62a8cc;
+    color: white;
+}

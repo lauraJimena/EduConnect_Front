@@ -233,6 +233,7 @@ namespace EduConnect_Front.Controllers
                     return RedirectToAction("PanelTutorado");
                 }
 
+
                 // 🔸 Combos de apoyo
                 ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
                 ViewBag.Carreras = await _administradorService.ObtenerCarrerasAsync();
@@ -269,6 +270,8 @@ namespace EduConnect_Front.Controllers
 
                 ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
                 ViewBag.Carreras = await _administradorService.ObtenerCarrerasAsync();
+                HttpContext.Session.SetString("AvatarUrl", perfil.Avatar);
+                HttpContext.Session.SetString("UsuarioNombre", perfil.Nombre);
 
                 return View(modeloActualizado);
             }

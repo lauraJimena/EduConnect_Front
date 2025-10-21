@@ -76,17 +76,17 @@
     margin-right:19%;
     
 }
-.intro-texto h1 {
-    color: #f9bb65;
-    font-size: 2.45rem;
-    font-weight: 730;
-    text-shadow: 3.8px 3.2px #1e5778;
-    font-family: 'League Spartan', sans-serif;
-    margin-left:-30px;
-    margin-bottom:20px;
-    
-    
-}
+    .intro-texto h1 {
+        color: #f9bb65;
+        font-size: 2.45rem;
+        font-weight: 730;
+        text-shadow: 3.8px 3.2px #1e5778;
+        font-family: 'League Spartan', sans-serif;
+        margin-left: -30px;
+        margin-bottom: 20px;
+        text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+        4px 3px 0px #1e5778;
+    }
 
 .intro-texto p {
     margin-top: 10px;
@@ -177,7 +177,7 @@ a{
         width: 100%;
         margin-bottom: 10px;
         padding: 8px;
-        border-radius: 10px;
+        border-radius: 20px;
         border: 1px solid #ccc;
         font-size: 14px;
     }
@@ -202,6 +202,7 @@ a{
     background: rgba(30, 42, 120, 0.7);
     box-shadow: 3px 3px 10px rgba(30, 42, 120, 0.8); /* glow morado */
     border:none;
+    color: white;
 }
 
 /* Tarjetas tutores */
@@ -243,7 +244,7 @@ a{
     font-size: 14.8px;
     font-family: 'Montserrat', sans-serif;
     color: rgba(0,0,0,0.88);
-    line-height: 6px;
+    line-height: 5px;
 }
     .info-tutor p {
         line-height: 1.55em;
@@ -292,8 +293,7 @@ a{
     margin-left:9%;
     margin-right:20px;
     margin-bottom:20px;
-
-
+    
 }
 .sin-resultados {
     background-color: rgba(255,255,255, 0.5);

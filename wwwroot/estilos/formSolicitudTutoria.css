@@ -8,7 +8,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: calc(100vh - 100px);
+    height: calc(100vh - 50px);
     font-family: 'Poppins', sans-serif;
     margin-top: 15%;
     margin-bottom:8%;
@@ -22,6 +22,8 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
     text-align: center;
     width: 490px;
+    margin-top:80px;
+    margin-bottom:80px;
 }
 
     .form-section h1 {

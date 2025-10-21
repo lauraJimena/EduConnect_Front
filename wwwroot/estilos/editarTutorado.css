@@ -8,13 +8,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: stretch;
-    height: 720px;
+    height: 740px;
     padding: 20px;
     gap: 15px;
     margin-top:5.8%;
 }
 .perfil-container2{
-    height:730px;
+    height:750px;
 }
 
 /* Panel izquierdo */
@@ -124,16 +124,18 @@ body {
 
     /* Título */
     .perfil-right h1 {
-        font-size: 2.3rem;
+        font-size: 2.7rem;
         font-weight: bold;
         color: #f9bb65;
         text-shadow: 3px 3px #1e5778;
         margin-bottom: 25px;
         display: flex;
-        margin-left:16%;
+        margin-left: 16%;
         gap: 10px;
         font-family: 'League Spartan', sans-serif;
-        text-align:center;
+        text-align: center;
+        text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+        4px 3px 0px #1e5778;
     }
 
         .perfil-right h1 img {
