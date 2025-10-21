@@ -23,11 +23,11 @@
             <input type="hidden" asp-for="IdMateria" />
 
             <label for="fecha">Fecha sugerida</label>
-            <input type="date" name="Fecha" required />
+            <input type="date" id="fecha" name="Fecha" required />
 
 
             <label for="hora">Hora sugerida</label>
-            <input type="time" asp-for="Hora" id="hora" required />
+            <input type="time" id="hora" asp-for="Hora" id="hora" required />
 
             <label for="modalidad">Modalidad preferida</label>
             <select asp-for="IdModalidad" required>
@@ -77,4 +77,50 @@
         Titulo = "Error al enviar la solicitud",
         Mensaje = TempData["Error"] as string
         })
-        }
+}
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const fechaInput = document.getElementById("fecha");
+            const horaInput = document.getElementById("hora");
+
+            // 🔹 Establece la fecha mínima como hoy
+            const hoy = new Date();
+            const yyyy = hoy.getFullYear();
+            const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+            const dd = String(hoy.getDate()).padStart(2, "0");
+            const fechaMin = `${yyyy}-${mm}-${dd}`;
+            fechaInput.min = fechaMin;
+
+            // 🔹 Cuando el usuario cambia la fecha
+            fechaInput.addEventListener("change", function () {
+                const fechaSeleccionada = new Date(fechaInput.value);
+                const hoy = new Date();
+
+                // Si la fecha seleccionada es hoy → limitar hora
+                if (
+                    fechaSeleccionada.getFullYear() === hoy.getFullYear() &&
+                    fechaSeleccionada.getMonth() === hoy.getMonth() &&
+                    fechaSeleccionada.getDate() === hoy.getDate()
+                ) {
+                    const horaActual = hoy.getHours();
+                    const minutosActuales = hoy.getMinutes();
+
+                    // 🔹 Redondear a los próximos 5 minutos
+                    const minutosRedondeados = Math.ceil(minutosActuales / 5) * 5;
+                    const horaMin = `${String(horaActual).padStart(2, "0")}:${String(minutosRedondeados).padStart(2, "0")}`;
+                    horaInput.min = horaMin;
+                    horaInput.disabled = false;
+                }
+                else {
+                    // Si es una fecha futura → habilitar desde medianoche
+                    horaInput.min = "00:00";
+                    horaInput.disabled = false;
+                }
+            });
+
+            // 🔹 Al cargar la página, deshabilitamos la hora hasta elegir fecha
+            horaInput.disabled = true;
+        });
+    </script>
+}

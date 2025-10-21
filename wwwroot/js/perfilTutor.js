@@ -13,6 +13,25 @@ document.querySelectorAll('.calificacion').forEach(container => {
     estrellasDiv.innerHTML = html;
 });
 
+document.getElementById("Calificacion").addEventListener("input", function () {
+    let val = this.value;
+    // Elimina todo lo que no sea número y restringe a 0–5
+    if (!/^[1-5]?$/.test(val)) {
+        this.value = val.slice(0, -1);
+    }
+});
+const textarea = document.getElementById("Texto");
+const contador = document.getElementById("contadorTexto");
+
+textarea.addEventListener("input", () => {
+    contador.textContent = `${textarea.value.length} / 150 caracteres`;
+    if (textarea.value.length < 10) {
+        contador.style.color = "#a83244";
+    } else {
+        contador.style.color = "green";
+    }
+});
+
 // === Modal abrir/cerrar ===
 const modal = document.getElementById("modalValoracion");
 const abrir = document.getElementById("abrirModal");

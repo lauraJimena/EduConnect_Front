@@ -122,14 +122,15 @@ namespace EduConnect_Front.Controllers
                 tutores = new List<ObtenerTutorDto>();
             }
 
-            bool hasMore = tutores.Count > filtros.PageSize;     // >4
-            var tutoresMostrados = tutores.Take(filtros.PageSize).ToList(); // 4
+            bool hasMore = tutores.Count > filtros.PageSize;
+            var tutoresMostrados = tutores.Take(filtros.PageSize).ToList();
 
             ViewBag.Page = filtros.Page;
             ViewBag.HasMore = hasMore;
-            ViewBag.Filtros = filtros; // para repintar inputs y construir paginación
+            ViewBag.Filtros = filtros;
 
             return View(tutoresMostrados);
+
         }
 
         [HttpPost]
@@ -232,6 +233,7 @@ namespace EduConnect_Front.Controllers
                     return RedirectToAction("PanelTutorado");
                 }
 
+
                 // 🔸 Combos de apoyo
                 ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
                 ViewBag.Carreras = await _administradorService.ObtenerCarrerasAsync();
@@ -268,6 +270,8 @@ namespace EduConnect_Front.Controllers
 
                 ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
                 ViewBag.Carreras = await _administradorService.ObtenerCarrerasAsync();
+                HttpContext.Session.SetString("AvatarUrl", perfil.Avatar);
+                HttpContext.Session.SetString("UsuarioNombre", perfil.Nombre);
 
                 return View(modeloActualizado);
             }

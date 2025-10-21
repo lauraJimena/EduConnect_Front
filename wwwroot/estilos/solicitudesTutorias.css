@@ -151,7 +151,8 @@ body {
 
     .btn-volver:hover {
         transform: translateY(-1px);
-        
+        color:white;
+
     }
 
 /* ---------- Lateral ---------- */
@@ -249,27 +250,4 @@ body {
         filter: saturate(.9)
     }
 
-/* ---------- Botón flotante chat ---------- */
-.btn-flotante {
-    position: fixed;
-    right: 22px;
-    bottom: 22px;
-    width: 58px;
-    height: 58px;
-    border-radius: 50%;
-    background: #2cc1a4;
-    border: none;
-    box-shadow: 0 12px 20px rgba(0,0,0,.15);
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-}
 
-    .btn-flotante img {
-        width: 28px;
-        height: 28px
-    }
-
-    .btn-flotante:hover {
-        filter: brightness(.95)
-    }
