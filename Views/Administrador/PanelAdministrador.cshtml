@@ -4,6 +4,9 @@
 }
 @section Styles {
     <link rel="stylesheet" href="~/estilos/panelAdministrador.css" />
+    <link rel="stylesheet" href="~/estilos/modalReportes.css" />
+    <!--Librería de iconos Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 }
 <main class="administrador-container">
 
@@ -32,15 +35,46 @@
                 CONSULTAR MATERIAS
             </a>
 
-            <a asp-controller="Administrador" asp-action="GenerarReportes" class="btn-opcion">
+            <!-- 🔹 BOTÓN QUE ABRE EL MODAL -->
+            <button type="button" id="abrirModalReportes" class="btn-opcion">
                 <img src="~/img/GenerarReporte.png" alt="icono generarRepo">
                 GENERAR REPORTES
-            </a>
+            </button>
         </div>
-
        
     </section>
     <div class="imagen-personaje">
         <img src="~/img/FondoAdmin.png" alt="Ilustración administrador">
     </div>
+
+
 </main>
+<!-- MODAL DE OPCIONES DE REPORTE -->
+<div id="modalReportes" class="modal-overlay">
+    <div class="modal-contenido">
+        <button id="cerrarModalReportes" class="btn-cerrar">&times;</button>
+        <h2>Seleccionar Reportes a Generar</h2>
+        <form id="formReportes">
+            <div class="checkbox-buttons">
+                <label class="checkbox-btn">
+                    <input type="checkbox" id="chkTutores" />
+                    <span><i class="fas fa-chalkboard-teacher"></i> Reporte de Tutores</span>
+                </label>
+
+                <label class="checkbox-btn">
+                    <input type="checkbox" id="chkTutorados" />
+                    <span><i class="fas fa-user-graduate"></i>Reporte de Tutorados</span>
+                </label>
+            </div>
+
+
+            <div class="botones-modal">
+                <button type="button" id="btnGenerar" class="btn-generar">Generar</button>
+                <button type="button" id="btnCancelar" class="btn-cancelar">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/modalReportes.js"></script>
+}

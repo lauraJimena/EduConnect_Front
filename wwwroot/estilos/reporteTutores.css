@@ -1,0 +1,129 @@
+﻿body {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    margin: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 15px;
+    background: #7ec0e0;
+    border-radius: 20px;
+    padding-bottom:20px;
+}
+
+    header img {
+        height: 200px;
+        margin-bottom: -30px;
+    }
+
+h2 {
+    color: #fbc959;
+    text-shadow: 3px 3px #1e5778;
+    text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+    4px 3px 0px #1e5778;
+    margin-bottom: 5px;
+    margin-top:-38px;
+    font-size:3em;
+    font-family: Montserrat, sans-serif;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    text-align: center;
+    font-size:17px;
+    font-weight:400;
+}
+
+th {
+    background-color: #f3ca52;
+    color: #333;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.activo {
+    color: green;
+    font-weight: bold;
+}
+
+.inactivo {
+    color: red;
+    font-weight: bold;
+}
+
+.pie-pagina {
+    background-color: #7ec0e0;
+    padding: 20px;
+    color: #333;
+    border-radius: 20px;
+    margin-top: 15px;
+}
+
+/* Contenedor general */
+.contenedor-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* En pantallas pequeñas se apila */
+    gap: 20px;
+}
+
+/* Agrupa la frase y el correo en la misma línea */
+.frase-correo {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap; /* para que en móviles se acomode */
+}
+
+/* Frase */
+.frase-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    color: #1c3c50;
+}
+
+    .frase-footer p {
+        text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
+        font-size: 1.25em;
+        margin: 0;
+    }
+
+.icono-comilla {
+    font-size: 2rem;
+    color: #1c3c50;
+    margin-top: -5px;
+}
+
+
+
+/* Logo */
+.logo-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: right;
+    margin-top: -55px;
+}
+
+    .logo-footer img {
+        height: 120px;
+    }
+
+/* Opcional: centrado vertical si el footer crece */
+.contenedor-footer > * {
+    flex: 1;
+}
+

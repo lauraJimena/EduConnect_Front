@@ -331,3 +331,21 @@ a{
         color: white;
     }
 
+.btn-volver {
+    margin-top: -5px;
+    text-align: center;
+    color: white;
+    font-weight: 700;
+    text-shadow: 1px 1px 2.5px rgba(0,0,0,.7);
+    margin-left: 46%;
+    background-color: #7ec0e0;
+    padding: 6px 15px;
+    border-radius: 30px;
+    font-size: 0.96em;
+    box-shadow: 4px 5px #ccc;
+}
+
+    .btn-volver:hover {
+        color: rgba(0,0,0,0.5);
+        text-shadow: none
+    }

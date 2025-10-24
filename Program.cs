@@ -1,4 +1,5 @@
-using EduConnect_Front.Services;
+﻿using EduConnect_Front.Services;
+using Rotativa.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,10 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;              // requerido si usas GDPR/cookie consent
 });
 
+// ✅ Configuración Rotativa (también antes del Build)
+Rotativa.AspNetCore.RotativaConfiguration.Setup(builder.Environment.ContentRootPath, "Rotativa");
+
+// ✅ Ahora sí se construye la app
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

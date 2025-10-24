@@ -84,6 +84,8 @@ body {
     .btn-opcion:hover {
         background: rgba(12, 55, 105, 0.8);
         width: 400px;
+        color: white;
+
     }
 
     .btn-opcion img {
