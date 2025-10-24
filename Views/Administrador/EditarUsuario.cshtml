@@ -7,41 +7,71 @@
     var tipoIdent = ViewBag.TipoIdent as List<TipoIdentDto>;
 }
 @section Styles {
-    <link rel="stylesheet" href="~/estilos/editarTutorado.css">
+    <link rel="stylesheet" href="~/estilos/editarUsuario.css">
+}
+@if (TempData["Success"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "exito",
+        Titulo = "Perfil actualizado con éxito",
+        Mensaje = TempData["Success"] as string
+    })
+<script>
+    setTimeout(() => {
+        const popup = document.querySelector('.modal-fondo');
+        if (popup) popup.style.display = 'none';
+        // 🔹 Redirigir después de 3 segundos
+        window.location.href = '@Url.Action("PanelAdministrador", "Administrador")';
+    }, 3000);
+</script>
 }
 
+
+@if (TempData["Error"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "error",
+        Titulo = "Error al actualizar el perfil",
+        Mensaje = TempData["Error"] as string
+    })
+}
 <main class="perfil-container perfil-container2">
     <!-- Panel izquierdo -->
     <section class="perfil-left">
+
         <div class="avatar">
-            <img src="~/img/IconoAvatar.png" alt="Avatar Tutorado" id="avatarSeleccionado">
+            <!-- Si no tiene avatar guardado, se muestra avatar1.png -->
+            <img id="avatarSeleccionado"
+                 src="~/img/avatars/@(Model.Avatar ?? "avatar1.png")"
+                 alt="Avatar seleccionado">
         </div>
-
-        <!-- 🔹 Muestra el nombre del usuario -->
         <button class="nombre-tutorado">@Model.Nombre.ToUpper() @Model.Apellido.ToUpper()</button>
-
-        <!-- Selección de avatares -->
+        <!--Selección de avatares -->
         <div class="avatar-selector">
             <p>Elige tu avatar:</p>
             <div class="avatar-opciones">
-                @for (int i = 1; i <= 6; i++)
+                @for (int i = 1; i <= 12; i++)
                 {
+                    var avatarFile = $"avatar{i}.png";
+                    var isSelected = Model.Avatar == avatarFile ? "checked" : "";
                     <label>
-                        <input type="radio" name="avatar" value="@i" @(i == 1 ? "checked" : "") />
-                        <img src="@Url.Content($"~/img/avatars/avatar{i}.png")" alt="Avatar @i" />
+                        <input type="radio" name="AvatarRadio" value="@avatarFile" @isSelected />
+                        <img src="~/img/avatars/@avatarFile" alt="Avatar @i" />
                     </label>
                 }
             </div>
-
         </div>
     </section>
 
     <!-- Panel derecho -->
     <section class="perfil-right">
-        <h1><img src="~/img/IconoEditar.png" alt="icono editar"> EDITAR PERFIL</h1>
-
         <form asp-action="EditarUsuario" asp-controller="Administrador" method="post">
-            @Html.AntiForgeryToken()
+        @Html.AntiForgeryToken()
+        <h1><img src="~/img/IconoEditar.png" alt="icono editar"> EDITAR PERFIL</h1>
+            
+            <input type="hidden" id="Avatar" name="Avatar" value="@Model.Avatar" />
             <input type="hidden" asp-for="IdUsu" />
 
             <div class="form-grid">
@@ -109,6 +139,10 @@
                         <option value="4">4</option>
                         <option value="5">5</option>
                         <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
                     </select>
                 </div>
 
@@ -117,8 +151,7 @@
                     <select asp-for="IdRol" required>
                         <option value="">ROL</option>
                         <option value="1">Tutor</option>
-                        <option value="2">Tutorado</option>
-                        <option value="3">Administrador</option>
+                        <option value="2">Tutorado</option>                      
                         <option value="4">Coordinador</option>
                     </select>
                 </div>
@@ -131,44 +164,25 @@
         </form>
 
     </section>
+    <!-- Script que actualiza la imagen y el campo hidden -->
+    <script>
+        document.querySelectorAll("input[name='AvatarRadio']").forEach(radio => {
+            radio.addEventListener("change", function () {
+                const imgSrc = this.nextElementSibling.getAttribute("src");
+                const avatarValue = this.value;
+                document.getElementById("avatarSeleccionado").setAttribute("src", imgSrc);
+                document.getElementById("Avatar").value = avatarValue;
+            });
+        });
+    </script>
+
 </main>
-<!-- 🔹 POPUPS DE MENSAJES -->
-@if (TempData["Success"] != null && !string.IsNullOrWhiteSpace(TempData["Success"].ToString()))
-{
-    @await Html.PartialAsync("_Popup", new PopupDto
-    {
-        Tipo = "exito",
-        Titulo = "Actualización exitosa",
-        Mensaje = TempData["Success"] as string
-    })
-
-<script>
-    setTimeout(() => {
-        const popup = document.querySelector('.modal-fondo');
-        if (popup) popup.style.display = 'none';
-        window.location.href = '@Url.Action("ConsultarUsuarios", "Administrador")';
-    }, 2500);
-</script>
-}
 
 
-@if (TempData["Error"] != null)
-{
-    @await Html.PartialAsync("_Popup", new PopupDto
-    {
-        Tipo = "error",
-        Titulo = "Error al actualizar usuario",
-        Mensaje = TempData["Error"] as string
-    })
 
-<script>
-    // 🔸 Cierra el popup de error sin redirigir
-    setTimeout(() => {
-        const popup = document.querySelector('.modal-fondo');
-        if (popup) popup.style.display = 'none';
-    }, 3000);
-</script>
-}
+
+
+
 
 
 

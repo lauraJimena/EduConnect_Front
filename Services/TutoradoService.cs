@@ -63,11 +63,19 @@ namespace EduConnect_Front.Services
             return await _api.ObtenerSolicitudesTutoriasAsync(filtro, token, ct);
         }
 
-        public async Task<(bool Success, string Message)> CrearSolicitudTutoriaAsync(
+        public async Task<(bool Success, string Message, int IdTutoria)> CrearSolicitudTutoriaAsync(
             SolicitudTutoriaRespuestaDto solicitud,
             string token)
         {
-            return await _api.CrearSolicitudTutoriaAsync(solicitud, token);
+            try
+            {
+                var result = await _api.CrearSolicitudTutoriaAsync(solicitud, token);
+                return (result.Success, result.Message, result.IdTutoria);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error al crear tutoría: {ex.Message}", 0);
+            }
         }
 
         public async Task<(bool Ok, string Msg, List<ObtenerTutorDto> Tutores)> BuscarTutoresAsync(BuscarTutorDto filtros, string token)
@@ -156,6 +164,10 @@ namespace EduConnect_Front.Services
                 throw new ArgumentException("El comentario debe tener al menos 10 caracteres.");
 
             return await _api.CrearComentarioAsync(dto, token);
+        }
+        public async Task<bool> EnviarCorreoConfirmacionTutoriaAsync(string token, int idTutoria)
+        {
+            return await _api.EnviarConfirmacionTutoriaAsync(token, idTutoria);
         }
 
 

@@ -1,7 +1,11 @@
 ﻿using EduConnect_Front.Dtos;
 using EduConnect_Front.Services;
+using EduConnect_Front.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Rotativa.AspNetCore;
+using System.Reflection;
+
 
 namespace EduConnect_Front.Controllers
 {
@@ -9,6 +13,8 @@ namespace EduConnect_Front.Controllers
     {
         private readonly TutoradoService _tutoradoService = new TutoradoService();
         private readonly AdministradorService _administradorService = new AdministradorService();
+        private readonly GeneralService _generalService = new GeneralService();
+
         // GET: TutoradoController
         [HttpGet]
         public IActionResult RegistrarUsuarios()
@@ -22,7 +28,9 @@ namespace EduConnect_Front.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegistrarUsuarios(CrearUsuarioDto dto, CancellationToken ct)
         {
-            var (ok, msg) = await _administradorService.RegistrarUsuario(dto, ct);
+            var token = dto.Token ?? string.Empty;
+            token=HttpContext.Session.GetString("Token");
+            var (ok, msg) = await _administradorService.RegistrarUsuario(dto,token,ct);
 
             if (ok)
             {
@@ -72,7 +80,7 @@ namespace EduConnect_Front.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> EditarUsuario(int id, CancellationToken ct)
+        public async Task<IActionResult> EditarUsuario(int id)
         {
             try
             {
@@ -84,7 +92,7 @@ namespace EduConnect_Front.Controllers
                     return RedirectToAction("IniciarSesion", "General");
                 }
 
-                var (ok, msg, usuario) = await _administradorService.ObtenerUsuarioPorIdPerfil(id, token, ct);
+                var (ok, msg, usuario) = await _administradorService.ObtenerUsuarioPorIdPerfil(id, token);
 
                 if (!ok || usuario == null)
                 {
@@ -112,7 +120,7 @@ namespace EduConnect_Front.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditarUsuario(ActualizarUsuarioDto dto)
+        public async Task<IActionResult> EditarUsuario(ActualizarUsuarioDto perfil)
         {
             try
             {
@@ -122,30 +130,36 @@ namespace EduConnect_Front.Controllers
                     TempData["Error"] = "No se encontró el token de autenticación. Inicia sesión nuevamente.";
                     return RedirectToAction("IniciarSesion", "General");
                 }
-
-                // ✅ Desempaquetamos la tupla correctamente
-                var (ok, msg) = await _administradorService.ActualizarUsuarioAsync(dto, token);
+                
+                var (ok, msg) = await _administradorService.ActualizarUsuarioAsync(perfil, token);
 
                 if (ok)
-                {
-                    // Solo guardamos el mensaje de texto
                     TempData["Success"] = msg;
-                }
                 else
-                {
                     TempData["Error"] = msg;
-                }
 
-                // ✅ Redirigimos al GET (para mostrar el popup si aplica)
-                return RedirectToAction("EditarUsuario", new { id = dto.IdUsu });
+                // ✅ Desestructuramos la tupla que devuelve el método
+                var (okUsuario, msgUsuario, usuarioDto) = await _administradorService.ObtenerUsuarioPorIdPerfil(perfil.IdUsu, token);
+
+                ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
+                ViewBag.Carreras = await _administradorService.ObtenerCarrerasAsync();
+
+                HttpContext.Session.SetString("AvatarUrl", perfil.Avatar);
+                HttpContext.Session.SetString("UsuarioNombre", perfil.Nombre);
+
+                // ✅ Ahora sí, le pasas solo el modelo correcto
+                return View(usuarioDto);
             }
             catch (Exception ex)
             {
                 TempData["Error"] = ex.Message;
-                return RedirectToAction("EditarUsuario", new { id = dto.IdUsu });
+                ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
+                ViewBag.Carreras = await _administradorService.ObtenerCarrerasAsync();
+
+                return View(perfil);
             }
         }
-
+        
 
         //[HttpGet]
         //public async Task<IActionResult> ConsultarUsuarios(CancellationToken ct)
@@ -202,7 +216,55 @@ namespace EduConnect_Front.Controllers
             return View(usuarios);
         }
 
+    
+        [HttpGet]
+        public async Task<IActionResult> ReporteTutoresPdf()
+        {
+            var token = HttpContext.Session.GetString("Token");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("IniciarSesion", "General");
 
+            var (ok, msg, reporte) = await _administradorService.ObtenerReporteTutoresAsync(token);
+            if (!ok || reporte == null || !reporte.Any())
+            {
+                TempData["Error"] = msg ?? "No hay datos para el reporte.";
+                return RedirectToAction("PanelAdministrador", "Administrador"); // redirige al panel de control
+            }
+
+            //Generar PDF 
+            return new ViewAsPdf("ReporteTutoresPdf", reporte)
+            {
+                FileName = $"Reporte_Tutores_{DateTime.Now:yyyyMMdd}.pdf",
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Landscape,
+                CustomSwitches = "--footer-center \"Página [page] de [toPage]\" --footer-font-size 9"
+            };
+        }
+        [HttpGet]
+        public async Task<ActionResult> ReporteTutoradosPdfAsync()
+        {
+            var token = HttpContext.Session.GetString("Token");
+            if (string.IsNullOrEmpty(token))
+            {
+                TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                return RedirectToAction("IniciarSesion", "General");
+            }
+
+            var reporte = await _administradorService.ObtenerReporteTutoradosActivosAsync(token);
+
+            if (reporte == null || !reporte.Any())
+            {
+                TempData["Error"] = "No hay datos para generar el reporte.";
+                return RedirectToAction("PanelAdministrador", "Administrador");
+            }
+            
+            return new ViewAsPdf("ReporteTutoradosPdf", reporte)
+            {
+                FileName = $"ReporteTutorados_{DateTime.Now:yyyyMMdd_HHmm}.pdf",
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Portrait
+            };
+        }
 
     }
 }

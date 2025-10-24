@@ -6,26 +6,14 @@ namespace EduConnect_Front.Services
     {
         private readonly API_Service _api = new API_Service();
 
-
-        //public async Task<(bool Ok, string Msg, List<ListadoUsuariosDto>? Items)>
-        //        ConsultarUsuarios(CancellationToken ct = default)
-        //    {
-
-        //        return await _api.ConsultarUsuariosAsync(ct);
-        //    }
-        //public async Task<List<ListadoUsuariosDto>> ObtenerUsuariosAsync(int? idRol = null, int? idEstado = null, string? numIdent = null)
-        //{
-        //    return await _api.ObtenerUsuariosAsync(idRol, idEstado, numIdent);
-        //}
-
-        public async Task<(bool Ok, string Msg)> RegistrarUsuario(CrearUsuarioDto dto, CancellationToken ct = default)
+        public async Task<(bool Ok, string Msg)> RegistrarUsuario(CrearUsuarioDto dto, string token, CancellationToken ct = default)
         {
-            return await _api.RegistrarUsuarioAdminAsync(dto, ct);
+            return await _api.RegistrarUsuarioAdminAsync(dto, token, ct);
         }
 
-        public async Task<(bool Ok, string Msg, ActualizarUsuarioDto? Usuario)> ObtenerUsuarioPorIdPerfil(int id, string token, CancellationToken ct = default)
+        public async Task<(bool Ok, string Msg, ActualizarUsuarioDto? Usuario)> ObtenerUsuarioPorIdPerfil(int id, string token)
         {
-            return await _api.ObtenerUsuarioPorIdPerfil(id, token, ct);
+            return await _api.ObtenerUsuarioPorIdPerfil(id, token);
         }
         public async Task<(bool Ok, string Msg, ObtenerUsuarioDto? Usuario)> ObtenerUsuarioPorIdAsync(int id, string token, CancellationToken ct = default)
         {
@@ -52,6 +40,27 @@ namespace EduConnect_Front.Services
             ObtenerUsuariosAsync(string token, int? idRol = null, int? idEstado = null, string? numIdent = null)
         {
             return await _api.ObtenerUsuariosAsync(token, idRol, idEstado, numIdent);
+        }
+        // 🔹 Método que llama al ApiService
+        public async Task<(bool Ok, string Msg, List<ReporteTutorDto> Reporte)> ObtenerReporteTutoresAsync(string token)
+        {
+            try
+            {
+                var (ok, msg, reporte) = await _api.ObtenerReporteTutoresAsync(token);
+
+                if (!ok)
+                    return (false, msg, new List<ReporteTutorDto>());
+
+                return (true, msg, reporte);
+            }
+            catch (Exception ex)
+            {
+                return (false, "Error al obtener reporte: " + ex.Message, new List<ReporteTutorDto>());
+            }
+        }
+        public async Task<List<ReporteTutoradoDto>> ObtenerReporteTutoradosActivosAsync(string token)
+        {
+            return await _api.ObtenerReporteTutoradosActivosAsync(token);
         }
 
 

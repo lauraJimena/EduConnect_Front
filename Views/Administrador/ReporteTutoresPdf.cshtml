@@ -1,0 +1,72 @@
+﻿@model List<EduConnect_Front.Dtos.ReporteTutorDto>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Reporte de Tutores</title>
+    <link rel="stylesheet" href="~/estilos/reporteTutores.css" />
+
+</head>
+<body>
+    <header>
+        <img src="~/img/logo.png" alt="Logo EduConnect" />
+        <h2>Reporte de Tutores Activos e Inactivos</h2>
+        <p>Generado el @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</p>
+
+    </header>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nombre Tutor</th>
+                <th>Carrera</th>
+                <th>Semestre</th>
+                <th>Estado</th>
+                <th>Materias</th>
+                <th>Promedio ⭐</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var i = 1;
+                foreach (var t in Model)
+                {
+                    <tr>
+                        <td>@i</td>
+                        <td>@t.NombreTutor</td>
+                        <td>@t.Carrera</td>
+                        <td>@t.Semestre</td>
+                        <td class="@(t.Estado == "Activo" ? "activo" : "inactivo")">@t.Estado</td>
+                        <td>@t.CantidadMaterias</td>
+                        <td>@t.PromedioCalificacion.ToString("0.0")</td>
+                    </tr>
+                    i++;
+                }
+            }
+        </tbody>
+    </table>
+
+    <footer class="pie-pagina">
+        <div class="contenedor-footer">
+            <!-- Frase y correo en la misma línea -->
+            <div class="frase-correo">
+                <div class="frase-footer">
+                    <span class="icono-comilla">❝</span>
+                    <p>Aprendizaje que conecta, conocimiento que crece</p>
+                </div>
+            </div>
+
+            <!-- Logo -->
+            <div class="logo-footer">
+                <img src="~/img/Logo.png" alt="Logo EduConnect" />
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
+

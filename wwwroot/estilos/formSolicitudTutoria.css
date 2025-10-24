@@ -8,7 +8,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: calc(100vh - 50px);
+    height: calc(100vh - 0px);
     font-family: 'Poppins', sans-serif;
     margin-top: 15%;
     margin-bottom:8%;
@@ -18,7 +18,7 @@ body {
     background-color: rgba(14, 43, 91, 0.8);
     color: white;
     padding: 2.5rem 3rem;
-    border-radius: 10px;
+    border-radius: 30px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
     text-align: center;
     width: 490px;
@@ -87,13 +87,34 @@ body {
     font-weight: bold;
     font-size: 1rem;
     border-radius: 25px;
-    padding: 0.8rem;
+    padding: 10px 15px;
     cursor: pointer;
+    box-shadow: 4px 5px #ccc;
     transition: 0.3s ease;
 }
 
     .btn-enviar:hover {
         background-color: #f9bb65;
+        transform: scale(1.03);
+    }
+.btn-volver {
+    margin-top: 5px;
+    text-align: center;
+    color: white;
+    font-weight: 700;
+    text-shadow: 1px 1px 2.5px rgba(0,0,0,.7);
+    background-color: #7ec0e0;
+    padding: 10px 15px;
+    border-radius: 30px;
+    font-size: 0.96em;
+    box-shadow: 4px 5px #ccc;
+    text-decoration: none;
+    transition: 0.3s ease;
+}
+
+    .btn-volver:hover {
+        color: rgba(0,0,0,0.5);
+        text-shadow: none;
         transform: scale(1.03);
     }
 

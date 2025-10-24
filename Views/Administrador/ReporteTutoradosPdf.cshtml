@@ -1,0 +1,83 @@
+﻿@model List<EduConnect_Front.Dtos.ReporteTutoradoDto>
+
+@{
+    Layout = null;
+    <!-- 🔹 Muy importante: evita usar el layout del sistema -->
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Reporte de Tutorados Activos</title>
+      <link rel="stylesheet" href="~/estilos/reporteTutorados.css" />   
+</head>
+
+<body>
+    <header>
+        <img src="~/img/logo.png" alt="Logo EduConnect" />
+        <h2>Reporte de Tutorados Activos</h2>
+        <p class="fecha">Generado el @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</p>
+    </header>
+
+    @if (Model != null && Model.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre del Tutorado</th>
+                    <th>Carrera</th>
+                    <th>Total de Tutorías</th>
+                    <th>Materias Solicitadas</th>
+                    <th>Última Tutoría</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var i = 1;
+                    foreach (var t in Model)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            <td>@t.NombreTutorado</td>
+                            <td>@t.Carrera</td>
+                            <td>@t.TotalTutorias</td>
+                            <td>@t.MateriasMasSolicitadas</td>
+                            <td>@(t.UltimaTutoria.HasValue? t.UltimaTutoria.Value.ToString("dd/MM/yyyy") : "Sin registro")</td>
+
+                        </tr>
+                        ;
+                        i++;
+                    }
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="sin-registros">
+            <p>No se encontraron tutorados con tutorías registradas.</p>
+        </div>
+    }
+
+    <footer class="pie-pagina">
+        <div class="contenedor-footer">
+            <!-- Frase y correo en la misma línea -->
+            <div class="frase-correo">
+                <div class="frase-footer">
+                    <span class="icono-comilla">❝</span>
+                    <p>Aprendizaje que conecta, conocimiento que crece</p>
+                </div>
+            </div>
+
+            <!-- Logo -->
+            <div class="logo-footer">
+                <img src="~/img/Logo.png" alt="Logo EduConnect" />
+            </div>
+        </div>
+    </footer>
+
+
+</body>
+</html>

@@ -347,11 +347,25 @@ namespace EduConnect_Front.Controllers
                 return RedirectToAction("IniciarSesion", "General");
             }
 
-            var (success, message) = await _tutoradoService.CrearSolicitudTutoriaAsync(modelo, token);
+            var (success, message, idTutoria) = await _tutoradoService.CrearSolicitudTutoriaAsync(modelo, token);
 
             if (success)
             {
-                TempData["Success"] = message;
+                // 📩 Enviar correo de confirmación automáticamente
+                try
+                {
+                    bool correoEnviado = await _tutoradoService.EnviarCorreoConfirmacionTutoriaAsync(token, idTutoria);
+
+                    if (correoEnviado)
+                        TempData["Success"] = $"{message} ✅ Se envió un correo de confirmación al tutorado.";
+                    else
+                        TempData["Warning"] = $"{message} ⚠️ La solicitud se creó, pero no se pudo enviar el correo.";
+                }
+                catch (Exception ex)
+                {
+                    TempData["Warning"] = $"{message} ⚠️ La solicitud se creó, pero hubo un error al enviar el correo: {ex.Message}";
+                }
+
                 return View("FormSolicitudTutoria", modelo);
             }
 
@@ -465,19 +479,8 @@ namespace EduConnect_Front.Controllers
                 return RedirectToAction("PerfilTutor", new { id = dto.IdTutor });
             }
         }
+      
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    }
+        }
 }

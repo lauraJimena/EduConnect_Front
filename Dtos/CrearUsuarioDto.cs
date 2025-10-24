@@ -14,6 +14,7 @@
         public int IdCarrera { get; set; }
         public int IdSemestre { get; set; }
         public int IdRol { get; set; }
-        public int IdEstado { get; set; } = 1; 
+        public int IdEstado { get; set; } = 1;
+        public string Token { get; set; } = string.Empty;
     }
 }

@@ -33,9 +33,9 @@ namespace EduConnect_Front.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> Registro(CrearUsuarioDto dto, CancellationToken ct)
+        public async Task<IActionResult> Registro(CrearUsuarioDto dto, string token, CancellationToken ct)
         {
-            var (ok, msg) = await _generalService.RegistrarUsuario(dto, ct);
+            var (ok, msg) = await _generalService.RegistrarUsuario(dto, token, ct);
 
             if (ok)
             {

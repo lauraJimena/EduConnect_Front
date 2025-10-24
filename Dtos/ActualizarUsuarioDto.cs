@@ -14,8 +14,8 @@
         public int IdSemestre { get; set; }                 // Semestre (FK)
         public int IdRol { get; set; }                      // Rol del usuario
         public int IdEstado { get; set; }                   // Estado (Activo/Inactivo)
-        
 
+        public string Avatar{ get; set; } = string.Empty;
 
 
     }
