@@ -113,22 +113,16 @@
                
             }
         </div>
+ 
+       
+
+
 
         <!-- 🔹 Panel lateral de filtros -->
         <aside class="panel-filtros">
-            <form asp-action="SolicitudesTutorias" method="post" class="filtros-form">
+            <form asp-action="SolicitudesTutoriasEnviar" method="post" class="filtros-form">
                 @Html.AntiForgeryToken()
                 <h3>FILTRAR POR:</h3>
-
-                <div class="campo-filtro">
-                    <label for="idMateria">Materia</label>
-                    <select id="idMateria" name="idMateria">
-                        <option value="0">Todas</option>
-                        <option value="1">Matemáticas</option>
-                        <option value="2">Programación</option>
-                        <option value="3">Psicología</option>
-                    </select>
-                </div>
 
                 <div class="campo-filtro">
                     <label for="fecha">Modalidad sugerida</label>
@@ -144,6 +138,31 @@
             </form>
         </aside>
     </section>
+    @if (ViewBag.TotalPaginas > 1)
+    {
+        <div class="paginacion">
+            @if (ViewBag.PaginaActual > 1)
+            {
+                <a asp-action="SolicitudesTutorias"
+                   asp-route-page="@(ViewBag.PaginaActual - 1)"
+                   asp-route-idMateria="@ViewBag.FiltroMateria"
+                   asp-route-idModalidad="@ViewBag.FiltroModalidad"
+                   class="btn-pagina">⬅ Anterior</a>
+            }
+
+            <span>Página @ViewBag.PaginaActual de @ViewBag.TotalPaginas</span>
+
+            @if (ViewBag.PaginaActual < ViewBag.TotalPaginas)
+            {
+                <a asp-action="SolicitudesTutorias"
+                   asp-route-page="@(ViewBag.PaginaActual + 1)"
+                   asp-route-idMateria="@ViewBag.FiltroMateria"
+                   asp-route-idModalidad="@ViewBag.FiltroModalidad"
+                   class="btn-pagina">Siguiente ➡</a>
+            }
+        </div>
+    }
+    <a asp-controller="Tutor" asp-action="PanelTutor" class="btn-volver">VOLVER</a>
    
 </main>
 

@@ -18,9 +18,14 @@ namespace EduConnect_Front.Controllers
         {
             return View();
         }
+        public IActionResult AccesoDenegado()
+        {
+            return View();
+        }
 
 
         [HttpGet]
+
         public async Task<IActionResult> RegistroAsync()
         {
             AdministradorService _administradorService = new AdministradorService();
@@ -86,7 +91,7 @@ namespace EduConnect_Front.Controllers
                 }
 
                 //Guarda el usuario completo en sesión
-                HttpContext.Session.SetObject("Usuario", infoUsuario);
+                //HttpContext.Session.SetObject("Usuario", infoUsuario);
                 HttpContext.Session.SetInt32("IdRol", infoUsuario.IdRol);
                 HttpContext.Session.SetInt32("IdUsu", infoUsuario.IdUsu);
                 HttpContext.Session.SetString("UsuarioNombre", infoUsuario.Nombre ?? "");
@@ -120,5 +125,14 @@ namespace EduConnect_Front.Controllers
             ModelState.AddModelError(string.Empty, msg);
             return View(dto);
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CerrarSesion()
+        {
+            HttpContext.Session.Clear();
+            TempData["Success"] = "Sesión cerrada correctamente.";
+            return RedirectToAction("IniciarSesion", "General");
+        }
+
     }
 }

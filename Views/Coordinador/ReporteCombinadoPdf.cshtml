@@ -1,0 +1,85 @@
+﻿@{
+    Layout = null;
+    var totales = (EduConnect_Front.Dtos.ReporteGestionAdministrativaDto)Model.GetType().GetProperty("Totales").GetValue(Model);
+    var desempeno = (IEnumerable<EduConnect_Front.Dtos.ReporteDesempenoTutorDto>)Model.GetType().GetProperty("Desempeno").GetValue(Model);
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Reporte Combinado - Coordinador</title>
+    <link rel="stylesheet" href="~/estilos/reporteCombinado.css" />
+
+</head>
+<body>
+    <header>
+        <img src="~/img/logo.png" alt="Logo EduConnect" />
+        <h2>Reporte de Desempeño de Tutores</h2>
+        <p class="fecha">Generado el @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</p>
+    </header>
+    <h3 class="titulo">Resumen General</h3>
+    <div class="tarjetas-totales">
+        <div class="tarjeta">
+            <h4>Tutores Activos</h4>
+            <p>@totales.TotalTutoresActivos</p>
+        </div>
+       
+        <div class="tarjeta">
+            <h4>Total Tutorías</h4>
+            <p>@totales.TotalTutorias</p>
+        </div>
+        <div class="tarjeta">
+            <h4>Virtuales</h4>
+            <p>@totales.Virtuales (@totales.PorcentajeVirtual %)</p>
+        </div>
+        <div class="tarjeta">
+            <h4>Presenciales</h4>
+            <p>@totales.Presenciales (@totales.PorcentajePresencial %)</p>
+        </div>
+    </div>
+
+    <h3 class="titulo">Desempeño por Tutor</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre Tutor</th>
+                <th>Correo</th>
+                <th>Total Solicitudes</th>
+                <th>Aceptadas</th>
+                <th>Finalizadas</th>
+                <th>Rechazadas</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in desempeno)
+            {
+                <tr>
+                    <td>@t.NombreTutor</td>
+                    <td>@t.CorreoTutor</td>
+                    <td>@t.TotalSolicitudes</td>
+                    <td>@t.Aceptadas</td>
+                    <td>@t.Finalizadas</td>
+                    <td>@t.Rechazadas</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <footer class="pie-pagina">
+        <div class="contenedor-footer">
+            <!-- Frase y correo en la misma línea -->
+            <div class="frase-correo">
+                <div class="frase-footer">
+                    <span class="icono-comilla">❝</span>
+                    <p>Aprendizaje que conecta, conocimiento que crece</p>
+                </div>
+            </div>
+
+            <!-- Logo -->
+            <div class="logo-footer">
+                <img src="~/img/Logo.png" alt="Logo EduConnect" />
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

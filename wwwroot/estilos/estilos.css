@@ -1,4 +1,4 @@
-    @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;900&display=swap');
+﻿    @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@900&family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Quicksand:wght@300..700&display=swap');
 
 
@@ -9,13 +9,13 @@
     
 }
 
-/* Hace que el header est� siempre arriba del contenido */
+/* Hace que el header esté siempre arriba del contenido */
 header {
     position: absolute; /* o fixed si quieres que siga al hacer scroll */
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 1000; /* asegura que est� encima de todo */
+    z-index: 1000; /* asegura que esté encima de todo */
     padding: 10px;
     color: #333;
 }
@@ -51,7 +51,7 @@ header {
 }
 
     .logo img {
-        object-fit: contain; /* mantiene proporci�n */
+        object-fit: contain; /* mantiene proporción */
         margin-top:18px;
         height: 130px;
         display: block; /* elimina espacio fantasma de inline-img */
@@ -135,7 +135,7 @@ p {
     border-radius:45px;
 }
 
-/* T�tulo */
+/* Título */
 .hero h1 {
     font-family: Montserrat, sans-serif;
     font-size: 1.9rem;
@@ -145,7 +145,7 @@ p {
     line-height:1.5em;
 }
 
-/* Bot�n */
+/* Botón */
 .btn-hero {
     display: inline-block;
     background-color: #228f8f;
@@ -172,7 +172,7 @@ p {
     position: relative;
     overflow: hidden;
     width: 100%;
-    height: 400px; /* ajusta seg�n tu dise�o */
+    height: 400px; /* ajusta según tu diseño */
 }
 
 /* Contenedor de las diapositivas */
@@ -212,7 +212,7 @@ p {
         color: white;
     }
 
-    /* Personalizaci�n de lados */
+    /* Personalización de lados */
     .mitad.izquierda {       
         background-color: #2a6f97; /* azul */
         color: white;
@@ -276,7 +276,7 @@ p {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap; /* se acomoda en pantallas peque�as */
+    flex-wrap: wrap; /* se acomoda en pantallas pequeñas */
 }
 
 /* Frase con comilla */
@@ -328,12 +328,12 @@ p {
 
 .boton-chat {
     position: fixed;
-    bottom: 32px;
-    right: 32px;
+    bottom: 15px;
+    right: 22px;
     z-index: 1000;
     cursor: pointer;
-    width: 64px;
-    height: 64px;
+    width: 70px;
+    height: 70px;
     background: #fff;
     border-radius: 50%;
     box-shadow: 0 4px 16px rgba(0,0,0,0.15);
@@ -356,9 +356,11 @@ p {
 .popup-chat {
     display: none;
     position: fixed;
-    bottom: 110px;
+    bottom: 100px;
     right: 32px;
     width: 320px;
+    max-height: 550px; /* 👈 evita que crezca más que la pantalla */
+    overflow-y: auto; /* 👈 habilita scroll vertical */
     background: #fff;
     border-radius: 20px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.18);
@@ -401,12 +403,31 @@ p {
         margin: 8px auto 0 auto;
     }
 
+/* Para el listado de chats */
 .popup-chat-list {
-    padding: 18px 18px 0 18px;
+    padding: 18px;
     display: flex;
     flex-direction: column;
     gap: 14px;
+    max-height: 330px; /* 👈 límite específico para la lista */
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #a084e8 #f0f0f0;
 }
+
+    /* Personalización del scroll */
+    .popup-chat-list::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .popup-chat-list::-webkit-scrollbar-thumb {
+        background: #a084e8;
+        border-radius: 10px;
+    }
+
+    .popup-chat-list::-webkit-scrollbar-track {
+        background: #f0f0f0;
+    }
 
 
 .popup-chat-item {
@@ -462,29 +483,32 @@ p {
 .chat-conversacion-mensajes {
     flex: 1;
     padding: 12px;
-    overflow-y: auto;
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse; /* 👈 esto invierte el orden visual */
+    overflow-y: auto;
     gap: 8px;
 }
 
 .mensaje {
     max-width: 80%;
     padding: 10px 14px;
-    border-radius: 12px;
+    border-radius: 30px;
     font-size: 0.95rem;
 }
 
 .mensaje-receptor {
-    background: white;
     align-self: flex-start;
-    border: 1px solid #ddd;
+    border: 2px solid #ddd;
+    background: #6e99b2;
+    color: white;
+   
 }
 
 .mensaje-emisor {
-    background: #8BC34A; /* Verde */
+    background: #6ec1a2; /* Verde */
     color: white;
     align-self: flex-end;
+    border: 2px solid #ddd;
 }
 
 .chat-conversacion-input {
@@ -497,19 +521,25 @@ p {
     .chat-conversacion-input input {
         flex: 1;
         padding: 8px;
-        border-radius: 8px;
+        border-radius: 20px;
         border: 1px solid #ccc;
     }
+        .chat-conversacion-input input:focus {
+            border: 2px solid #a084e8; /* 💜 borde morado */
+            box-shadow: 0 0 4px rgba(160, 132, 232, 0.5); /* 💫 efecto sutil de brillo */
+            outline: none; /* asegúrate de quitar el outline */
+        }
 
     .chat-conversacion-input button {
         margin-left: 8px;
         padding: 8px 12px;
-        background: #4CAF50;
+        background: #a084e8;
         color: white;
         border: none;
         border-radius: 8px;
         cursor: pointer;
     }
+
 .btn-volver {
     cursor: pointer;
     margin-right: 8px;

@@ -1,0 +1,17 @@
+﻿<link rel="stylesheet" href="~/estilos/cerrarSesion.css" />
+<div id="modalCerrarSesion" onclick="event.stopPropagation()" class="popup-cerrar-sesion" style="display:none;">
+    <div class="popup-contenido">
+        <button class="btn-cerrar" onclick="cerrarModalCerrarSesion()">×</button>
+        <h3>¡Hola @Context.Session.GetString("UsuarioNombre")!</h3>
+        <p>¿Deseas cerrar tu sesión?</p>
+
+        <form asp-controller="General" asp-action="CerrarSesion" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-cerrar-sesion">CERRAR SESIÓN</button>
+        </form>
+    </div>
+</div>
+
+<script src="/js/cerrarSesion.js"></script>
+
+

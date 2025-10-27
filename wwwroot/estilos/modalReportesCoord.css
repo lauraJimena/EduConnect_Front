@@ -1,0 +1,197 @@
+﻿.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-contenido {
+    background: #fff;
+    border-radius: 15px;
+    padding: 40px 30px;
+    width: 600px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    position: relative;
+    border: 5px solid #5886a5;
+    box-shadow: 3px 3px 3px rgba(0,0,0,0.4);
+}
+
+.modal-contenido {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-contenido h2 {
+    margin-bottom: 15px;
+    color: #5886a5;
+    text-shadow: 3px 3px #1e5778;
+    text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+    4px 3px 5px gray;
+    font-family: Montserrat, sans-serif;
+    font-weight: 600;
+}
+
+.modal-contenido form {
+    margin-top: 30px;
+}
+
+.modal-contenido label {
+    font-size: 1.2em;
+    display: block;
+    margin: 5px 0;
+    color: #333;
+}
+
+.checkbox-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Estilo base del botón */
+.checkbox-btn {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 55px;
+    width: 380px;
+    cursor: pointer;
+    border-radius: 50px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    color: #2f4f63;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    border: 2px #eaf6fb solid;
+}
+
+    /* Fondo claro cuando está inactivo */
+    .checkbox-btn span {
+        background: linear-gradient(180deg, #eaf6fb, #d5edf7);
+        color: #2f4f63;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+    }
+
+    /* Ocultar el checkbox real */
+    .checkbox-btn input {
+        display: none;
+    }
+
+    /* Hover: azul suave */
+    .checkbox-btn:hover span {
+        background: linear-gradient(180deg, #9fd5ec, #7ec0e0);
+        transform: scale(1.02);
+    }
+
+    /* Estado seleccionado: azul intenso y más grande */
+    .checkbox-btn input:checked + span {
+        background: linear-gradient(180deg, #3f7594, #2d5670);
+        color: white;
+        transform: scale(1.04);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Ícono dentro del botón */
+    .checkbox-btn span i {
+        margin-right: 8px;
+        font-size: 20px;
+        color: inherit;
+        transition: color 0.3s ease;
+    }
+
+    .checkbox-btn input:checked + span {
+        animation: pulseIn 0.3s ease-out;
+    }
+
+@keyframes pulseIn {
+    0% {
+        transform: scale(1);
+    }
+
+    60% {
+        transform: scale(1.09);
+    }
+
+    100% {
+        transform: scale(1.1);
+    }
+}
+
+
+.botones-modal {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-generar {
+    background: #3f7594;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+    .btn-generar:hover {
+        transform: scale(1.08);
+    }
+
+.btn-cancelar {
+    background: #f3ca52;
+    color: #333;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+    .btn-cancelar:hover {
+        color: #333;
+        transform: scale(1.08);
+    }
+
+.btn-cerrar {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #777;
+}
+
+    .btn-cerrar:hover {
+        color: #333;
+        transform: scale(1.05);
+    }

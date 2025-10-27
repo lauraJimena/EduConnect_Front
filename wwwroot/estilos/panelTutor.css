@@ -15,7 +15,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 108vh;
+    height: 105vh;
 }
 
 /* Contenido */
@@ -43,30 +43,31 @@ body {
 
 /* Menú */
 .opciones {
-    background: rgba(192, 192, 192, 0.5);
-    padding: 35px;
+    background: rgba(253, 240, 203, 0.6);
+    padding: 23px 5px;
     border-radius: 20px;
     box-shadow: 0px 0px 15px rgba(0,0,0,0.7);
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    width: 500px;
-    margin-top: 14%;
-    align-items:center;
-    margin-left:4%;
-    margin-bottom:0%;
+    gap: 14px;
+    width: 450px;
+    margin-top: 12%;
+    align-items: center;
+    margin-left: 8%;
+    margin-bottom: 0%;
+
 }
 
     .opciones button, .opciones a {
         display: flex;
         align-items: center;
-        gap: 15px;
+       
         background: #1f827c;
         color: white;
         font-size: 18px;
         font-weight: bold;
-        padding: 7px 10px;
-        border: none;
+        padding: 5px 15px;
+        border: 1px solid rgba(0,0,0,0.2);
         border-radius: 50px;
         cursor: pointer;
         transition: background 0.3s ease;

@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Acceso Denegado";
+    Layout = "_LayoutUsuario";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/accesoDenegado.css">
+}
+
+<div class="acceso-denegado-container">
+    <img src="~/img/AccesoDenegado.png" alt="Acceso Denegado" />
+    <h1>🚫 Acceso Denegado</h1>
+    <p>No tienes permisos para acceder a esta sección del sistema.</p>
+    <p>Si crees que esto es un error, contacta con el administrador.</p>
+
+    <a asp-controller="General" asp-action="IniciarSesion" class="btn-volver">Volver al Inicio</a>
+</div>
