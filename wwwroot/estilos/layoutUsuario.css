@@ -70,14 +70,17 @@
 }
 
 .avatar-usuario {
-    width: 68px;
+    width: 65px;
     height: 65px;
     border-radius: 50%;
-    background-color: #f0a34c; /* color del círculo naranja */
+
     object-fit: cover;
     box-shadow: 2px 2px rgba(0,0,0,0.1);
     border: white solid 3px;
     margin-right:10px;
+}
+.avatar-usuario:hover{
+    transform: scale(1.1)
 }
 /* Footer */
 .pie-pagina {

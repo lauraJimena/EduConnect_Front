@@ -14,6 +14,7 @@ namespace EduConnect_Front.Controllers
 
         // GET: TutoradoController
         [HttpGet]
+        [ValidarRol(1)]
         public async Task<IActionResult> PanelTutorado()
         {
             
@@ -56,9 +57,10 @@ namespace EduConnect_Front.Controllers
 
 
         [HttpGet]
+        [ValidarRol(1)]
         public async Task<IActionResult> HistorialTutorias([FromQuery] List<int>? idsEstado)
         {
-            // 🔹 Recuperar el usuario y el token de la sesión
+           
             var IdUsu = HttpContext.Session.GetInt32("IdUsu");
             var token = HttpContext.Session.GetString("Token");
 
@@ -66,15 +68,13 @@ namespace EduConnect_Front.Controllers
                 return RedirectToAction("IniciarSesion", "General");
 
             //ViewBag.Usuario = usuario; // Para saludo en la vista
-
-            // 🔹 Llamar al servicio con el token y el Id del usuario (tutorado)
+           
             var (ok, msg, datos) = await _tutoradoService.ObtenerHistorialAsync(
                 IdUsu.Value,
-                token,          // ✅ Agregar el token aquí
+                token,         
                 idsEstado
             );
 
-            // 🔹 Validar respuesta
             if (!ok)
             {
                 ViewData["Error"] = msg;
@@ -85,8 +85,9 @@ namespace EduConnect_Front.Controllers
         }
 
         // GET: /Tutorado/BusquedaTutores
-        // Carga inicial y paginación SIEMPRE con filtros desde querystring.
+      
         [HttpGet]
+        [ValidarRol(1)]
         public async Task<IActionResult> BusquedaTutores(
             int page = 1,
             string Nombre = "",
@@ -135,6 +136,7 @@ namespace EduConnect_Front.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidarRol(1)]
         public IActionResult BusquedaTutores(BuscarTutorDto filtros)
         {
             var token = HttpContext.Session.GetString("Token");
@@ -209,8 +211,9 @@ namespace EduConnect_Front.Controllers
         //    ViewBag.Carreras = await _administradorService.ObtenerCarrerasAsync();
         //    return View(modelo);
         //}
-        // 🔹 GET: Mostrar el perfil con datos actuales (incluido avatar)
+     
         [HttpGet]
+        [ValidarRol(1)]
         public async Task<IActionResult> EditarTutorado()
         {
             try
@@ -249,6 +252,7 @@ namespace EduConnect_Front.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidarRol(1)]
         public async Task<IActionResult> EditarTutorado(EditarPerfilDto perfil)
         {
             try
@@ -286,6 +290,7 @@ namespace EduConnect_Front.Controllers
         }
 
         [HttpGet]
+        [ValidarRol(1)]
         public async Task<ActionResult> SolicitudesTutoriasAsync()
         {
 
@@ -306,6 +311,7 @@ namespace EduConnect_Front.Controllers
 
         }
         [HttpPost]
+        [ValidarRol(1)]
         public async Task<IActionResult> SolicitudesTutorias(FiltroSolicitudesDto filtro, CancellationToken ct)
         {
             try
@@ -338,6 +344,7 @@ namespace EduConnect_Front.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidarRol(1)]
         public async Task<IActionResult> FormSolicitudTutoria(SolicitudTutoriaRespuestaDto modelo)
         {
             var token = HttpContext.Session.GetString("Token");
@@ -373,6 +380,7 @@ namespace EduConnect_Front.Controllers
             return View("FormSolicitudTutoria", modelo);
         }
         [HttpGet]
+        [ValidarRol(1)]
         public IActionResult FormSolicitudTutoria(int idTutor, int idMateria)
         {
             var token = HttpContext.Session.GetString("Token");
@@ -392,6 +400,7 @@ namespace EduConnect_Front.Controllers
 
         //RANKING DE TUTORES
         [HttpGet]
+        [ValidarRol(1)]
         public async Task<IActionResult> RankingTutores()
         {
             try
@@ -422,6 +431,7 @@ namespace EduConnect_Front.Controllers
         }
         
         [HttpGet]
+        [ValidarRol(1)]
         public async Task<IActionResult> PerfilTutor(int idTutor)
         {
             try
@@ -445,6 +455,7 @@ namespace EduConnect_Front.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidarRol(1)]
         public async Task<IActionResult> AgregarValoracion(CrearComentarioDto dto)
         {
             try

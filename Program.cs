@@ -3,6 +3,15 @@ using Rotativa.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(20); // Expira tras 20 min de inactividad
+    options.Cookie.HttpOnly = true; // Protege contra scripts
+    options.Cookie.IsEssential = true; // Necesario para funcionamiento básico
+});
+
+
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 // ?? Registro de servicios personalizados
@@ -23,10 +32,9 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;              // requerido si usas GDPR/cookie consent
 });
 
-// ✅ Configuración Rotativa (también antes del Build)
+// Configuración Rotativa (también antes del Build)
 Rotativa.AspNetCore.RotativaConfiguration.Setup(builder.Environment.ContentRootPath, "Rotativa");
 
-// ✅ Ahora sí se construye la app
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -44,7 +52,7 @@ app.UseRouting();
 
 //Habilitar Session 
 app.UseSession();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

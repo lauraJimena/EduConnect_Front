@@ -10,7 +10,10 @@
     {
         @foreach (var chat in Model)
         {
-            <div class="popup-chat-item" data-chat-id="@chat.IdChat">
+            <div class="popup-chat-item" data-chat-id="@chat.IdChat"
+                 data-nombre="@chat.NombreReceptor"
+                 data-materia="@chat.NombreMateria">
+                
                 <img src="~/img/chat.png" alt="Chat Icon" />
                 <div class="popup-chat-item-info">
                     <span class="popup-chat-item-nombre">@chat.NombreReceptor</span>

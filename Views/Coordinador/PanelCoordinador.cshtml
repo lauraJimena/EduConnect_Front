@@ -4,6 +4,7 @@
 }
 @section Styles {
     <link rel="stylesheet" href="~/estilos/panelCoordinador.css" />
+    <link rel="stylesheet" href="~/estilos/modalReportesCoord.css" />
 }
 <main class="coordinador-container">
 
@@ -12,17 +13,17 @@
         <h1>BIENVENIDO COORDINADOR</h1>
 
         <div class="opciones">
-            <button>
+           @*  <button>
                 <img src="~/img/BloqueoComentario.png" alt="icono bloqueo">
                 BLOQUEAR COMENTARIOS
-            </button>
+            </button> *@
 
             <button>
                 <img src="~/img/ConsultarTuto.png" alt="icono consultarTuto">
                 CONSULTAR TUTORÍAS
             </button>
-            <button>
-                <img src="~/img/GenerarReporte2.png" alt="icono generarReportes">
+            <button type="button" id="abrirModalReportes" class="btn-opcion">
+                <img src="~/img/GenerarReporte2.png" alt="icono generarRepo">
                 GENERAR REPORTES
             </button>
             
@@ -33,3 +34,32 @@
         </div>
     </section>
 </main>
+<!-- MODAL DE OPCIONES DE REPORTE -->
+<div id="modalReportes" class="modal-overlay">
+    <div class="modal-contenido">
+        <button id="cerrarModalReportes" class="btn-cerrar">&times;</button>
+        <h2>Seleccionar Reportes a Generar</h2>
+        <form id="formReportes">
+            <div class="checkbox-buttons">
+                <label class="checkbox-btn">
+                    <input type="checkbox" id="chkTutores" />
+                    <span><i class="fas fa-chalkboard-teacher"></i> Reporte Demanda Academica</span>
+                </label>
+
+                <label class="checkbox-btn">
+                    <input type="checkbox" id="chkTutorados" />
+                    <span><i class="fas fa-user-graduate"></i>Reporte de Tutores</span>
+                </label>
+            </div>
+
+
+            <div class="botones-modal">
+                <button type="button" id="btnGenerar" class="btn-generar">Generar</button>
+                <button type="button" id="btnCancelar" class="btn-cancelar">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/modalReporteCoor.js"></script>
+}

@@ -2,6 +2,7 @@
 using EduConnect_Front.Services;
 using EduConnect_Front.Utilities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace EduConnect_Front.Controllers
 {
@@ -30,6 +31,7 @@ namespace EduConnect_Front.Controllers
         //    return View(usuario); // Pasa el DTO completo a la vista
         //}
         [HttpGet]
+        [ValidarRol(2)]
         public async Task<IActionResult> PanelTutor()
         {
 
@@ -68,49 +70,112 @@ namespace EduConnect_Front.Controllers
 
         }
 
+        //[HttpGet]
+        //[ValidarRol(2)]
+        //public async Task<IActionResult> SolicitudesTutorias(int page = 1, int pageSize = 4)
+        //{
+        //    var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
+        //    var token = HttpContext.Session.GetString("Token");
+
+        //    // Llamada al servicio con filtros vacíos (0 y null)
+        //    var (ok, msg, solicitudes) =
+        //        await _tutorService.ObtenerSolicitudesTutoriasAsync(idTutor, 0, 0, token);
+
+        //    if (!ok)
+        //    {
+        //        TempData["Error"] = msg;
+        //        return View(new List<SolicitudTutorDto>());
+        //    }
+        //    // 🔹 Paginación
+        //    int totalRegistros = solicitudes.Count;
+        //    int totalPaginas = (int)Math.Ceiling(totalRegistros / (double)pageSize);
+
+        //    var solicitudesPaginadas = solicitudes
+        //        .Skip((page - 1) * pageSize)
+        //        .Take(pageSize)
+        //        .ToList();
+
+        //    ViewBag.PaginaActual = page;
+        //    ViewBag.TotalPaginas = totalPaginas;
+
+        //    return View(solicitudes);
+        //}
 
 
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //[ValidarRol(2)]
+        //public async Task<IActionResult> SolicitudesTutoriasEnviar(int idMateria, int idModalidad)
+        //{
+        //    var token = HttpContext.Session.GetString("Token");
+        //    var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
+
+        //    var (ok, msg, solicitudes) =
+        //        await _tutorService.ObtenerSolicitudesTutoriasAsync(idTutor, idMateria, idModalidad, token);
+
+        //    if (!ok)
+        //    {
+        //        TempData["Error"] = msg;
+        //        return View(new List<SolicitudTutorDto>());
+        //    }
+
+
+
+        //    return View(solicitudes);
+        //}
         [HttpGet]
-        public async Task<IActionResult> SolicitudesTutorias()
+        [ValidarRol(2)]
+        public async Task<IActionResult> SolicitudesTutorias(int page = 1, int pageSize = 4, int idMateria = 0, int idModalidad = 0)
         {
             var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
             var token = HttpContext.Session.GetString("Token");
 
-            // Llamada al servicio con filtros vacíos (0 y null)
-            var (ok, msg, solicitudes) =
-                await _tutorService.ObtenerSolicitudesTutoriasAsync(idTutor, 0, 0, token);
+            if (idTutor == 0 || string.IsNullOrEmpty(token))
+            {
+                TempData["Error"] = "No se encontró la sesión del usuario.";
+                return RedirectToAction("IniciarSesion", "General");
+            }
 
-            if (!ok)
+            // 🔹 Llamada al servicio (con filtros si los hay)
+            var (ok, msg, solicitudes) = await _tutorService.ObtenerSolicitudesTutoriasAsync(idTutor, idMateria, idModalidad, token);
+
+            if (!ok || solicitudes == null)
             {
                 TempData["Error"] = msg;
                 return View(new List<SolicitudTutorDto>());
             }
 
-            
-            return View(solicitudes);
+            // 🔹 Paginación
+            int totalRegistros = solicitudes.Count;
+            int totalPaginas = (int)Math.Ceiling(totalRegistros / (double)pageSize);
+
+            var solicitudesPaginadas = solicitudes
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // 🔹 Guardamos datos en ViewBag para conservar filtros al paginar
+            ViewBag.PaginaActual = page;
+            ViewBag.TotalPaginas = totalPaginas;
+            ViewBag.FiltroMateria = idMateria;
+            ViewBag.FiltroModalidad = idModalidad;
+
+            return View(solicitudesPaginadas);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SolicitudesTutorias(int idMateria, int idModalidad)
+        [ValidarRol(2)]
+        public IActionResult SolicitudesTutoriasEnviar(int idMateria, int idModalidad)
         {
-            var token = HttpContext.Session.GetString("Token");
-            var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
-
-            var (ok, msg, solicitudes) =
-                await _tutorService.ObtenerSolicitudesTutoriasAsync(idTutor, idMateria, idModalidad, token);
-
-            if (!ok)
-            {
-                TempData["Error"] = msg;
-                return View(new List<SolicitudTutorDto>());
-            }
-
-            
-            return View(solicitudes);
+            // Redirige al método GET, pero conservando los filtros como parámetros
+            return RedirectToAction("SolicitudesTutorias", new { idMateria, idModalidad });
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidarRol(2)]
         public async Task<IActionResult> AceptarSolicitud(int idTutoria)
         {
             var token = HttpContext.Session.GetString("Token");
@@ -127,6 +192,7 @@ namespace EduConnect_Front.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidarRol(2)]
         public async Task<IActionResult> RechazarSolicitud(int idTutoria)
         {
             var token = HttpContext.Session.GetString("Token");
@@ -142,6 +208,7 @@ namespace EduConnect_Front.Controllers
             return RedirectToAction("SolicitudesTutorias");
         }
         [HttpGet]
+        [ValidarRol(2)]
         public async Task<IActionResult> HistorialTutor(List<int>? idEstados)
         {
             var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
@@ -159,6 +226,7 @@ namespace EduConnect_Front.Controllers
             return View(historial);
         }
         [HttpGet]
+        [ValidarRol(2)]
         public async Task<IActionResult> EditarTutor()
         {
             try
@@ -196,6 +264,7 @@ namespace EduConnect_Front.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidarRol(2)]
         public async Task<IActionResult> EditarTutor(EditarPerfilDto perfil)
         {
             try
@@ -210,7 +279,7 @@ namespace EduConnect_Front.Controllers
                 var mensaje = await _tutorService.ActualizarPerfilTutorAsync(perfil, token);
 
                 TempData["Success"] = mensaje;
-                // 🔹 Redirige al GET de esta acción (para evitar reenvío del formulario)
+                //Redirige al GET de esta acción (para evitar reenvío del formulario)
                 return RedirectToAction("EditarTutor");
 
                
@@ -247,6 +316,7 @@ namespace EduConnect_Front.Controllers
         //    return View(materias);
         //}
         [HttpGet]
+        [ValidarRol(2)]
         public async Task<IActionResult> RegistrarMaterias()
         {
             var token = HttpContext.Session.GetString("Token");
@@ -272,6 +342,7 @@ namespace EduConnect_Front.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidarRol(2)]
         public async Task<IActionResult> GuardarMaterias(int[] MateriasSeleccionadas)
         {
             var token = HttpContext.Session.GetString("Token");

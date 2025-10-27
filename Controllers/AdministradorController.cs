@@ -15,8 +15,9 @@ namespace EduConnect_Front.Controllers
         private readonly AdministradorService _administradorService = new AdministradorService();
         private readonly GeneralService _generalService = new GeneralService();
 
-        // GET: TutoradoController
+        
         [HttpGet]
+        [ValidarRol(3)]
         public IActionResult RegistrarUsuarios()
         {
             // Estado 1 por defecto (activo)
@@ -25,6 +26,7 @@ namespace EduConnect_Front.Controllers
         }
 
         [HttpPost]
+        [ValidarRol(3)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegistrarUsuarios(CrearUsuarioDto dto, CancellationToken ct)
         {
@@ -44,6 +46,7 @@ namespace EduConnect_Front.Controllers
             return View(dto);
         }
 
+        [ValidarRol(3)]
         public async Task<IActionResult> PanelAdministrador()
         {
             {
@@ -80,6 +83,7 @@ namespace EduConnect_Front.Controllers
 
 
         [HttpGet]
+        [ValidarRol(3)]
         public async Task<IActionResult> EditarUsuario(int id)
         {
             try
@@ -116,10 +120,9 @@ namespace EduConnect_Front.Controllers
             }
         }
 
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidarRol(3)]
         public async Task<IActionResult> EditarUsuario(ActualizarUsuarioDto perfil)
         {
             try
@@ -138,7 +141,7 @@ namespace EduConnect_Front.Controllers
                 else
                     TempData["Error"] = msg;
 
-                // ✅ Desestructuramos la tupla que devuelve el método
+                // Desestructuramos la tupla que devuelve el método
                 var (okUsuario, msgUsuario, usuarioDto) = await _administradorService.ObtenerUsuarioPorIdPerfil(perfil.IdUsu, token);
 
                 ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
@@ -146,8 +149,7 @@ namespace EduConnect_Front.Controllers
 
                 HttpContext.Session.SetString("AvatarUrl", perfil.Avatar);
                 HttpContext.Session.SetString("UsuarioNombre", perfil.Nombre);
-
-                // ✅ Ahora sí, le pasas solo el modelo correcto
+             
                 return View(usuarioDto);
             }
             catch (Exception ex)
@@ -160,20 +162,6 @@ namespace EduConnect_Front.Controllers
             }
         }
         
-
-        //[HttpGet]
-        //public async Task<IActionResult> ConsultarUsuarios(CancellationToken ct)
-        //{
-        //    var (ok, msg, items) = await _administradorService.ConsultarUsuarios(ct);
-
-        //    if (!ok)
-        //    {
-        //        ModelState.AddModelError(string.Empty, msg);
-        //        items = new List<ListadoUsuariosDto>();
-        //    }
-
-        //    return View(items);
-        //}
         [HttpPost]
         public async Task<IActionResult> EliminarUsuario(int idUsuario,CancellationToken ct) { 
 
@@ -194,7 +182,7 @@ namespace EduConnect_Front.Controllers
         }
 
         [HttpGet]
-
+        [ValidarRol(3)]
         public async Task<IActionResult> ConsultarUsuarios(int? idRol, int? idEstado, string? numIdent)
         {
             var token = HttpContext.Session.GetString("Token");
@@ -218,6 +206,7 @@ namespace EduConnect_Front.Controllers
 
     
         [HttpGet]
+        [ValidarRol(3)]
         public async Task<IActionResult> ReporteTutoresPdf()
         {
             var token = HttpContext.Session.GetString("Token");
@@ -240,7 +229,9 @@ namespace EduConnect_Front.Controllers
                 CustomSwitches = "--footer-center \"Página [page] de [toPage]\" --footer-font-size 9"
             };
         }
+
         [HttpGet]
+        [ValidarRol(3)]
         public async Task<ActionResult> ReporteTutoradosPdfAsync()
         {
             var token = HttpContext.Session.GetString("Token");

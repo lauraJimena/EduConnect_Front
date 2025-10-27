@@ -1,4 +1,6 @@
-﻿$(function () {
+﻿
+
+$(function () {
     // ✅ Mostrar/Ocultar lista de chats
     $('.boton-chat').on('click', function () {
         var $popup = $('#popupChat');
@@ -15,6 +17,8 @@
 // ✅ Abrir conversación al hacer clic en un chat
 $(document).on('click', '.popup-chat-item', function () {
     var chatId = $(this).data('chat-id');
+    var nombre = $(this).data('nombre');
+    var materia = $(this).data('materia');
     var idUsuarioLogueado = $('#popupChat').data('id-usuario'); // <-- Esto debe configurarse en Razor
 
     console.log("Chat seleccionado:", chatId);
@@ -24,7 +28,10 @@ $(document).on('click', '.popup-chat-item', function () {
             <div class="chat-conversacion" data-chat-id="${chatId}" data-id-usuario="${idUsuarioLogueado}">
                 <div class="chat-conversacion-header">
                     <span class="btn-volver" onclick="volverALista()">←</span>
-                    Chat #${chatId}
+                     <div class="chat-header-info">
+                        <strong>${nombre}</strong><br>
+                        <small>${materia}</small>
+                    </div>
                 </div>
                 ${data}
                 <div class="chat-conversacion-input">
@@ -73,7 +80,8 @@ $(document).on('click', '#btnEnviar', function () {
         }),
         success: function () {
             var nuevoMensaje = `<div class="mensaje mensaje-emisor">${mensaje}</div>`;
-            $('#contenedorMensajes').append(nuevoMensaje);
+            $('#contenedorMensajes').prepend(nuevoMensaje);
+
             $('#mensajeInput').val('');
             $('#contenedorMensajes').scrollTop($('#contenedorMensajes')[0].scrollHeight);
         },

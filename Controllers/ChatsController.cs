@@ -14,15 +14,15 @@ namespace EduConnect_Front.Controllers
 
         public async Task<IActionResult> Lista()
         {
-            var usuario = HttpContext.Session.GetObject<ObtenerUsuarioDto>("Usuario");
-
-            if (usuario == null)
+            //var usuario = HttpContext.Session.GetObject<ObtenerUsuarioDto>("Usuario");
+            string token = HttpContext.Session.GetString("Token") ?? "";
+            if (token == null)
             {
                 return Unauthorized("El usuario no está autenticado.");
             }
-
-            int idUsuario = usuario.IdUsu;
-            string token = HttpContext.Session.GetString("Token") ?? "";
+            int idUsuario = (int)HttpContext.Session.GetInt32("IdUsu");
+            //int idUsuario = usuario.IdUsu;
+           
 
             if (string.IsNullOrEmpty(token))
             {
@@ -43,13 +43,14 @@ namespace EduConnect_Front.Controllers
 
         public async Task<IActionResult> Mensajes(int idChat, CancellationToken cancellationToken) 
         { 
-            var usuario = HttpContext.Session.GetObject<ObtenerUsuarioDto>("Usuario");
-            if (usuario == null) 
+            //var usuario = HttpContext.Session.GetObject<ObtenerUsuarioDto>("Usuario");
+            string token = HttpContext.Session.GetString("Token") ?? "";
+            if (token == null) 
             { 
                 return Unauthorized("El usuario no está autenticado.");
             } 
-            int idUsuario = usuario.IdUsu; 
-            string token = HttpContext.Session.GetString("Token") ?? "";
+            
+            
             if (string.IsNullOrEmpty(token)) 
             { 
                 return Unauthorized("Token no encontrado en sesión."); 
@@ -71,11 +72,8 @@ namespace EduConnect_Front.Controllers
         [HttpPost]
         public async Task<IActionResult> EnviarMensaje([FromBody] CrearMensajeDto nuevoMensaje)
         {
-            var usuario = HttpContext.Session.GetObject<ObtenerUsuarioDto>("Usuario");
-            if (usuario == null) return Unauthorized();
-
             string token = HttpContext.Session.GetString("Token") ?? "";
-
+            if (token == null) return Unauthorized();    
             var (success, message) = await _chatService.EnviarMensaje(nuevoMensaje, token);
             return success ? Ok() : BadRequest(message);
         }

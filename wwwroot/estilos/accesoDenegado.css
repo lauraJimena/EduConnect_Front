@@ -1,0 +1,53 @@
+﻿.acceso-denegado-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 105vh;
+    text-align: center;
+    color: #1c3c50;
+    background: url('../img/FondoConsultarUsu.png') repeat;
+    font-family: 'Montserrat', sans-serif;
+    padding-top:32px;
+}
+
+    .acceso-denegado-container img {
+        width: 345px;
+        margin-bottom: 20px;
+        margin-top:12px;
+    }
+
+h1 {
+    font-size: 2.5em;
+    color: #c0392b;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 1px rgba(0,0,0,0.3);
+    font-weight: 600;
+    margin-top: -30px;
+    text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+    4px 3px 0px rgba(0,0,0,0.4);
+}
+
+p {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    
+}
+
+.btn-volver {
+    background-color: #62a8cc;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 6px 5px rgba(0,0,0,0.2);
+    margin-top:10px;
+}
+
+    .btn-volver:hover {
+        background-color: #274a66;
+        transform: scale(1.05);
+        color: white;
+    }

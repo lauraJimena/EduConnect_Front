@@ -1359,6 +1359,89 @@ namespace EduConnect_Front.Services
             throw new Exception($"Error al enviar el correo: {error}");
         }
 
+        public async Task<List<TutoriaConsultaDto>> ConsultarTutoriasCoordAsync(
+             string? carrera, int? semestre, string? materia, int? idEstado, int? ordenFecha, string token, CancellationToken ct = default)
+        {
+            // 👇 Importante: autorización
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            // 👇 Asegura que coincide con la ruta exacta del endpoint
+            var url = "Coordinador/ConsultarTutorias?";
+
+            // ✅ Agrega filtros solo si existen
+            if (!string.IsNullOrWhiteSpace(carrera)) url += $"carrera={Uri.EscapeDataString(carrera)}&";
+            if (semestre.HasValue) url += $"semestre={semestre}&";
+            if (!string.IsNullOrWhiteSpace(materia)) url += $"materia={Uri.EscapeDataString(materia)}&";
+            if (idEstado.HasValue) url += $"idEstado={idEstado}&";
+            if (ordenFecha.HasValue) url += $"ordenFecha={ordenFecha}&";
+
+            try
+            {
+                using var resp = await _httpClient.GetAsync(url, ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (!resp.IsSuccessStatusCode)
+                    throw new Exception($"Error al consultar tutorías: {body}");
+
+                var tutorias = JsonSerializer.Deserialize<List<TutoriaConsultaDto>>(body,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                return tutorias ?? new List<TutoriaConsultaDto>();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener tutorías desde la API: " + ex.Message);
+            }
+        }
+        public async Task<ReporteDemandaAcademicaDto?> ObtenerReporteDemandaAcademicaAsync(string token)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var resp = await _httpClient.GetAsync("Coordinador/ReporteDemandaAcademica");
+            if (!resp.IsSuccessStatusCode) return null;
+
+            var body = await resp.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<ReporteDemandaAcademicaDto>(body, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+        }
+        public async Task<(ReporteGestionAdministrativaDto? Totales, List<ReporteDesempenoTutorDto>? Desempeno)>
+            ObtenerReporteCombinadoAsync(string token)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var resp = await _httpClient.GetAsync("Coordinador/ReporteCombinado");
+
+                if (!resp.IsSuccessStatusCode)
+                    return (null, null);
+
+                var json = await resp.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+
+                var totales = JsonSerializer.Deserialize<ReporteGestionAdministrativaDto>(
+                    root.GetProperty("totales").GetRawText(), options);
+                var desempeno = JsonSerializer.Deserialize<List<ReporteDesempenoTutorDto>>(
+                    root.GetProperty("desempeno").GetRawText(), options);
+
+                return (totales, desempeno);
+            }
+            catch (Exception)
+            {
+                return (null, null);
+            }
+        }
+
+
+
 
 
 
