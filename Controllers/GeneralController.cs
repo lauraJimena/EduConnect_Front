@@ -130,7 +130,7 @@ namespace EduConnect_Front.Controllers
         public IActionResult CerrarSesion()
         {
             HttpContext.Session.Clear();
-            TempData["Success"] = "Sesión cerrada correctamente.";
+            TempData["CerrarSesion"] = "Sesión cerrada correctamente.";
             return RedirectToAction("IniciarSesion", "General");
         }
 

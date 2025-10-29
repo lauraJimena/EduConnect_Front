@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Administrador";
+    ViewData["Title"] = "Coordinador";
     Layout = "_LayoutUsuario";
 }
 @section Styles {
@@ -17,11 +17,11 @@
                 <img src="~/img/BloqueoComentario.png" alt="icono bloqueo">
                 BLOQUEAR COMENTARIOS
             </button> *@
-
-            <button>
+            <a asp-controller="Coordinador" asp-action="ConsultarTutorias" class="btn-panel">
                 <img src="~/img/ConsultarTuto.png" alt="icono consultarTuto">
                 CONSULTAR TUTORÍAS
-            </button>
+            </a>
+
             <button type="button" id="abrirModalReportes" class="btn-opcion">
                 <img src="~/img/GenerarReporte2.png" alt="icono generarRepo">
                 GENERAR REPORTES

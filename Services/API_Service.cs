@@ -1,6 +1,7 @@
 ﻿using EduConnect_Front.Dtos;
 
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -1439,6 +1440,40 @@ namespace EduConnect_Front.Services
                 return (null, null);
             }
         }
+        public async Task<List<ComentarioTutorDto>?> ObtenerComentariosTutorAsync(FiltrosComentariosTutorDto filtro, string token)
+        {
+            try
+            {
+                // 🔹 Autenticación con el token JWT
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                // 🔹 Envía el filtro como JSON con POST
+                var response = await _httpClient.PostAsJsonAsync("Tutor/Comentarios", filtro);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"❌ Error HTTP {response.StatusCode} al obtener comentarios del tutor");
+                    return null;
+                }
+
+                // 🔹 Leer el cuerpo JSON de la respuesta
+                var json = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+                // 🔹 Deserializar la lista de comentarios
+                var comentarios = JsonSerializer.Deserialize<List<ComentarioTutorDto>>(json, options);
+
+                return comentarios ?? new List<ComentarioTutorDto>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"⚠️ Error en ObtenerComentariosTutorAsync: {ex.Message}");
+                return null;
+            }
+        }
+
+
 
 
 

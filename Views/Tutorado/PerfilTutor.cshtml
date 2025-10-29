@@ -39,8 +39,13 @@
                 @foreach (var c in Model.Comentarios)
                 {
                     <div class="comentario-card">
-                        <p class="usuario">@c.Usuario</p>
+                        <div class="comentario-header">
+                            <p class="usuario">@c.Usuario</p>
+                            <p class="fecha">@c.Fecha.ToString("dd/MM/yyyy hh:mm tt")</p>
+                        </div>
+
                         <p class="texto">@c.Comentario</p>
+
                         <div class="calificacion" data-rating="@c.Calificacion">
                             <div class="estrellas"></div>
                             <span class="valor">@c.Calificacion / 5</span>

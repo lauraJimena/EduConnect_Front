@@ -381,7 +381,7 @@ namespace EduConnect_Front.Controllers
         }
         [HttpGet]
         [ValidarRol(1)]
-        public IActionResult FormSolicitudTutoria(int idTutor, int idMateria)
+        public IActionResult FormSolicitudTutoria(int idTutor, int idMateria, string nombreMateria)
         {
             var token = HttpContext.Session.GetString("Token");
             var idTutorado = HttpContext.Session.GetInt32("IdUsu");
@@ -391,7 +391,8 @@ namespace EduConnect_Front.Controllers
             {
                 IdTutor = idTutor,
                 IdTutorado= idTutorado.Value,
-                IdMateria = idMateria
+                IdMateria = idMateria,
+                NombreMateria = nombreMateria 
                 //Fecha = DateTime.Today 
             };
 

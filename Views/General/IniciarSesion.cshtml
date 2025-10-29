@@ -32,21 +32,49 @@
         </form>
     </section>
 </main>
+<!--  Popup de CIERRE DE SESIÓN -->
+@if (TempData["CerrarSesion"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "exito",
+        Titulo = "Sesión cerrada",
+        Mensaje = TempData["CerrarSesion"] as string
+    })
 
-@await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto {
-Tipo = "exito",
-    Titulo = "Registro exitoso",
-    Mensaje = TempData["RegisterSuccess"] as string
-})
+<script>
+    // 🔹 Cierra el popup automáticamente después de 3 segundos
+    setTimeout(() => {
+        const popup = document.querySelector('.modal-fondo');
+        if (popup) popup.style.display = 'none';
+    }, 3000);
+</script>
+}
+<!-- Popup de REGISTRO EXITOSO -->
+@if (TempData["RegisterSuccess"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "exito",
+        Titulo = "Registro exitoso",
+        Mensaje = TempData["RegisterSuccess"] as string
+    })
+}
 
+
+<!--Popup de ERROR -->
 @{
     var errorGeneral = ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage;
 }
-@await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto {
-Tipo = "error",
-    Titulo = "Error de inicio de sesión",
-    Mensaje = errorGeneral
-})
+@if (!string.IsNullOrEmpty(errorGeneral))
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "error",
+        Titulo = "Error de inicio de sesión",
+        Mensaje = errorGeneral
+    })
+}
 
 <script>
     document.getElementById("togglePassword").addEventListener("click", function () {

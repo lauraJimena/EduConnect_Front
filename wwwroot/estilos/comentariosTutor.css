@@ -1,0 +1,147 @@
+﻿.comentarios-container {
+    position: relative;
+    background: url('/img/FondoZig.png') center;
+    background-size: cover;
+    min-height: 100vh;
+    padding: 40px;
+    font-family: 'Montserrat', sans-serif;
+}
+/* 🔹 Capa semitransparente encima del fondo */
+.comentarios-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5); /* blanco con opacidad */
+    z-index: 0;
+}
+
+/* 🔹 Asegura que el contenido quede arriba */
+.comentarios-container > * {
+    position: relative;
+    z-index: 2;
+}
+
+h1 {
+    color: #f9bb65;
+    text-align:center;
+    font-size: 2.55rem;
+    font-weight: 730;
+    text-shadow: 3.8px 3.2px #1e5778;
+    font-family: Montserrat, sans-serif;
+    margin-top: 70px;
+    margin-bottom: 25px;
+    text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+    4px 3px 0px #1e5778;
+}
+
+.filtros {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+    .filtros form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+        .filtros form select {
+            border-radius: 20px;
+            padding: 8px 10px;
+        }
+
+.btn-filtrar, .btn-limpiar {
+    background-color: #ffd966;
+    color: rgba(0,0,0,0.7);
+    border: none;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+}
+
+.btn-limpiar {
+    background: #7ec0e0;
+    text-decoration: none;
+    color: white;
+}
+    .btn-limpiar:hover {
+        color: white;
+        background: #5aaac7;
+        transform: scale(1.05);
+    }
+
+.btn-filtrar:hover {
+    background-color: #fbc959;
+    transform: scale(1.05);
+}
+
+.lista-comentarios {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 740px;
+    margin: 0 auto;
+    background: url('../img/FondoPanelT.png') repeat;
+    padding: 50px 100px;
+    border-radius: 30px;
+}
+
+.comentario-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.comentario-header {
+    display: flex;
+    justify-content: space-between;
+    color: #444;
+    font-weight: 600;
+}
+
+.comentario-texto {
+    margin-top: 10px;
+    font-size: 1rem;
+    color: #333;
+}
+
+.comentario-calificacion {
+    margin-top: 8px;
+    color: #fbc959;
+    font-size: 1.2rem;
+}
+
+.sin-comentarios {
+    text-align: center;
+    font-style: italic;
+    color: #666;
+}
+.btn-volver {
+    margin-top: 10px;
+    text-align: center;
+    color: white;
+    font-weight: 700;
+    text-shadow: 1px 1px 2.5px rgba(0,0,0,.7);
+    margin-left: 46%;
+    background-color: #7ec0e0;
+    padding: 6px 15px;
+    border-radius: 30px;
+    font-size: 1.05em;
+    box-shadow: 4px 5px #ccc;
+    text-decoration:none;
+}
+
+    .btn-volver:hover {
+        color: white;
+        text-shadow: none;
+        background: #5aaac7;
+    }
