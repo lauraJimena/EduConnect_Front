@@ -719,15 +719,30 @@ namespace EduConnect_Front.Services
                 }
 
 
-                //Manejo de errores devueltos por la API (400, 401, 500, etc.)
-                var msg = string.IsNullOrWhiteSpace(body)
-                    ? $"Error {(int)resp.StatusCode}"
-                    : body;
+                // ⚠️ Manejo de errores de la API (400, 401, 500, etc.)
+                string mensajeError;
+
+                try
+                {
+                    // Intentar deserializar el JSON de error
+                    var error = JsonSerializer.Deserialize<Dictionary<string, string>>(body,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    mensajeError = error != null && error.ContainsKey("mensaje")
+                        ? error["mensaje"]
+                        : body;
+                }
+                catch
+                {
+                    // Si no se puede deserializar, usar el texto plano
+                    mensajeError = body;
+                }
+
 
                 if (resp.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    msg = "Tu sesión ha expirado o el token no es válido. Por favor, inicia sesión nuevamente.";
+                    mensajeError = "Tu sesión ha expirado o el token no es válido. Por favor, inicia sesión nuevamente.";
 
-                return (false, msg, 0);
+                return (false, mensajeError, 0);
             }
             catch (HttpRequestException ex)
             {
@@ -1015,25 +1030,6 @@ namespace EduConnect_Front.Services
             var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             return JsonSerializer.Deserialize<ObtenerUsuarioDto>(body, opts);
         }
-        //// OBTENER TUTOR POR ID
-        //public async Task<ObtenerUsuarioDto?> ObtenerTutorPorIdAsync(int idUsuario, string token)
-        //{
-        //    var request = new HttpRequestMessage(HttpMethod.Get, $"Tutor/ObtenerTutorPorId/{idUsuario}");
-        //    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        //    request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-        //    using var response = await _httpClient.SendAsync(request);
-        //    var body = await response.Content.ReadAsStringAsync();
-
-        //    if (response.StatusCode == HttpStatusCode.NotFound)
-        //        return null;
-
-        //    if (!response.IsSuccessStatusCode)
-        //        throw new Exception($"Error al obtener tutorado: {body}");
-
-        //    var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        //    return JsonSerializer.Deserialize<ObtenerUsuarioDto>(body, opts);
-        //}
         // ACTUALIZAR PERFIL TUTORADO
         public async Task<string> ActualizarPerfilTutorado(EditarPerfilDto perfil, string token)
         {
@@ -1084,7 +1080,26 @@ namespace EduConnect_Front.Services
             throw new Exception($"Error al obtener comentarios: {error}");
         }
         //CREAR COMENTARIO 
-        public async Task<string> CrearComentarioAsync(CrearComentarioDto comentario, string token)
+        //public async Task<int> CrearComentarioAsync(CrearComentarioDto comentario, string token)
+        //{
+        //    _httpClient.DefaultRequestHeaders.Authorization =
+        //        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        //    var response = await _httpClient.PostAsJsonAsync("Tutorado/CrearComentario", comentario);
+
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        // El backend devuelve { mensaje = "Comentario creado correctamente." }
+        //        var resultado = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+        //        return resultado?["mensaje"] ?? "Comentario creado correctamente.";
+        //    }
+        //    else
+        //    {
+        //        var error = await response.Content.ReadAsStringAsync();
+        //        throw new Exception($"Error al crear el comentario: {error}");
+        //    }
+        //}
+        public async Task<int> CrearComentarioAsync(CrearComentarioDto comentario, string token)
         {
             _httpClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
@@ -1093,9 +1108,13 @@ namespace EduConnect_Front.Services
 
             if (response.IsSuccessStatusCode)
             {
-                // El backend devuelve { mensaje = "Comentario creado correctamente." }
-                var resultado = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-                return resultado?["mensaje"] ?? "Comentario creado correctamente.";
+                // 🔹 Tu backend devuelve un objeto con el idComentario generado
+                var resultado = await response.Content.ReadFromJsonAsync<ComentarioRespuestaDto>();
+
+                if (resultado == null)
+                    throw new Exception("No se pudo leer la respuesta del servidor.");
+
+                return resultado.IdComentario; // 👈 devolvemos el ID generado
             }
             else
             {
@@ -1103,6 +1122,7 @@ namespace EduConnect_Front.Services
                 throw new Exception($"Error al crear el comentario: {error}");
             }
         }
+
         public async Task<(bool Ok, bool TieneMaterias, string Msg)> ValidarMateriasTutorAsync(int idTutor, string token)
         {
             try
@@ -1216,10 +1236,7 @@ namespace EduConnect_Front.Services
             }
         }
 
-
-        // ---------------------------
-        // Obtener Mensajes por chat
-        // ---------------------------
+        // OBTENER MENSAJES POR CHAT
         public async Task<List<ObtenerMensajeDto>> ObtenerMensajesAsync(int idChat, string token, CancellationToken ct = default)
         {
             try
@@ -1244,9 +1261,7 @@ namespace EduConnect_Front.Services
             } 
         }
 
-        // ---------------------------
         // Enviar / Crear Mensaje
-        // ---------------------------
         public async Task<(bool Success, string Message)> EnviarMensajeAsync(CrearMensajeDto mensaje, string token, CancellationToken ct = default)
         {
             try
@@ -1346,6 +1361,7 @@ namespace EduConnect_Front.Services
                 throw new Exception("Error al obtener el reporte de tutorados activos: " + ex.Message);
             }
         }
+        //CORREO SOLICITUD ENVIADA DE TUTORIA
         public async Task<bool> EnviarConfirmacionTutoriaAsync(string token, int idTutoria)
         {
             _httpClient.DefaultRequestHeaders.Authorization =
@@ -1359,18 +1375,32 @@ namespace EduConnect_Front.Services
             var error = await response.Content.ReadAsStringAsync();
             throw new Exception($"Error al enviar el correo: {error}");
         }
+        public async Task<bool> EnviarCorreoCalificacionBajaAsync(string token, int idComentario)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            // ✅ Usa query string en lugar de ruta
+            var response = await _httpClient.PostAsync($"Tutorado/EnviarCalificacionBaja?idComentario={idComentario}", null);
+
+            if (response.IsSuccessStatusCode)
+                return true;
+
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Error al enviar el correo: {error}");
+        }
+
 
         public async Task<List<TutoriaConsultaDto>> ConsultarTutoriasCoordAsync(
              string? carrera, int? semestre, string? materia, int? idEstado, int? ordenFecha, string token, CancellationToken ct = default)
         {
-            // 👇 Importante: autorización
+            
             _httpClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-            // 👇 Asegura que coincide con la ruta exacta del endpoint
+            
             var url = "Coordinador/ConsultarTutorias?";
 
-            // ✅ Agrega filtros solo si existen
             if (!string.IsNullOrWhiteSpace(carrera)) url += $"carrera={Uri.EscapeDataString(carrera)}&";
             if (semestre.HasValue) url += $"semestre={semestre}&";
             if (!string.IsNullOrWhiteSpace(materia)) url += $"materia={Uri.EscapeDataString(materia)}&";
@@ -1472,7 +1502,46 @@ namespace EduConnect_Front.Services
                 return null;
             }
         }
+        public async Task<string> InactivarComentarioAsync(int idComentario, string token)
+        {
+            // Agregar encabezado de autorización
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
 
+            // Realizar la llamada PUT
+            var response = await _httpClient.PutAsync($"Coordinador/InactivarComentario/{idComentario}", null);
+
+            // Manejo de respuesta
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Error al inactivar el comentario: {error}");
+            }
+        }
+        public async Task<List<ListaComentariosDto>> ObtenerComentariosAsync(string token)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.GetAsync("Coordinador/Comentarios");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var lista = await response.Content.ReadFromJsonAsync <List <ListaComentariosDto>>();
+                return lista ?? new List<ListaComentariosDto>();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Error al obtener comentarios: {error}");
+            }
+        }
+
+       
 
 
 

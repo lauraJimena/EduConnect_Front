@@ -35,11 +35,35 @@
             <a asp-action="ComentariosTutor" class="btn-limpiar">🔄 Limpiar</a>
         </form>
     </section>
+    @{
+        // Configuración de la paginación
+        int pageSize = 3;
+        int page = 1;
+
+        // Obtener el número de página desde la URL (querystring)
+        var queryPage = Context.Request.Query["page"].ToString();
+        if (!string.IsNullOrEmpty(queryPage) && int.TryParse(queryPage, out int p))
+        {
+            page = p;
+        }
+
+
+        // Calcular total de páginas
+        int totalComentarios = Model.Count;
+        int totalPages = (int)Math.Ceiling((double)totalComentarios / pageSize);
+
+        // Obtener los elementos de la página actual
+        var comentariosPaginados = Model
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToList();
+    }
+
 
     <section class="lista-comentarios">
-        @if (Model != null && Model.Any())
+        @if (comentariosPaginados.Any())
         {
-            foreach (var c in Model)
+            foreach (var c in comentariosPaginados)
             {
                 <div class="comentario-card">
                     <div class="comentario-header">
@@ -61,5 +85,26 @@
             <p class="sin-comentarios">No hay comentarios disponibles.</p>
         }
     </section>
+    @if (totalPages > 1)
+    {
+        <div class="paginacion">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                if (i == page)
+                {
+                    <!-- Página actual -->
+                    <span class="pagina pagina-actual">@i</span>
+                }
+                else
+                {
+                    <!-- Otras páginas -->
+                    <a href="?page=@i" class="pagina">@i</a>
+                }
+            }
+        </div>
+    }
+
+
+
     <a asp-controller="Tutor" asp-action="PanelTutor" class="btn-volver">VOLVER</a>
 </main>

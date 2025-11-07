@@ -1,4 +1,5 @@
 ﻿using EduConnect_Front.Dtos;
+using Newtonsoft.Json.Linq;
 using System.Reflection;
 using System.Text.Json;
 
@@ -152,7 +153,7 @@ namespace EduConnect_Front.Services
                 Comentarios = comentarios?.ToList() ?? new List<ComentarioTutorInfoDto>()
             };
         }
-        public async Task<string> CrearComentarioAsync(CrearComentarioDto dto, string token)
+        public async Task<int> CrearComentarioAsync(CrearComentarioDto dto, string token)
         {
             if (dto.Calificacion < 1 || dto.Calificacion > 5)
                 throw new ArgumentException("La calificación debe estar entre 1 y 5 estrellas.");
@@ -168,6 +169,10 @@ namespace EduConnect_Front.Services
         public async Task<bool> EnviarCorreoConfirmacionTutoriaAsync(string token, int idTutoria)
         {
             return await _api.EnviarConfirmacionTutoriaAsync(token, idTutoria);
+        }
+        public async Task<bool> EnviarCorreoCalificacionBajaAsync(string token, int idComentario)
+        {
+            return await _api.EnviarCorreoCalificacionBajaAsync(token, idComentario);
         }
 
 

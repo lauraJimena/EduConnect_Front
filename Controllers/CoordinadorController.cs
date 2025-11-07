@@ -83,13 +83,44 @@ namespace EduConnect_Front.Controllers
                 Desempeno = desempeno
             };
 
-            // 🔹 Generar PDF directamente
+            //Generar PDF directamente
             return new ViewAsPdf("ReporteCombinadoPdf", modelo)
             {
                 FileName = "Reporte_Combinado.pdf",
                 PageOrientation = Rotativa.AspNetCore.Options.Orientation.Landscape,
                 PageSize = Rotativa.AspNetCore.Options.Size.A4
             };
+        }
+        public async Task<IActionResult> ListaComentarios()
+        {
+            try
+            {
+                var token = HttpContext.Session.GetString("Token");
+                var comentarios = await _coordinadorService.ObtenerComentariosAsync(token);
+                return View(comentarios); 
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = ex.Message;
+                return View(new List<ComentarioTutorInfoDto>());
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> InactivarComentario(int idComentario)
+        {
+            try
+            {
+                var token = HttpContext.Session.GetString("Token"); // si usas sesión JWT
+                var mensaje = await _coordinadorService.InactivarComentarioAsync(idComentario, token);
+                TempData["MensajeExito"] = "Comentario inactivado correctamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = ex.Message;
+            }
+
+            
+            return RedirectToAction("ListaComentarios");
         }
 
 

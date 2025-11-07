@@ -1,4 +1,33 @@
-﻿.comentarios-container {
+﻿.paginacion {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+    .paginacion a,
+    .paginacion span {
+        padding: 8px 12px;
+        border-radius: 6px;
+        background-color: #e0e0e0;
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+        transition: background-color 0.2s;
+    }
+
+        .paginacion a:hover {
+            background-color: #6fa8dc;
+            color: white;
+        }
+
+.pagina-actual {
+    background-color: #4a90e2 !important;
+    color: #fff !important;
+    pointer-events: none; /* para que no se pueda hacer clic */
+    cursor: default;
+}
+.comentarios-container {
     position: relative;
     background: url('/img/FondoZig.png') center;
     background-size: cover;
@@ -41,7 +70,7 @@ h1 {
     display: flex;
     justify-content: center;
     gap: 20px;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
 }
 
     .filtros form {
@@ -90,7 +119,7 @@ h1 {
     max-width: 740px;
     margin: 0 auto;
     background: url('../img/FondoPanelT.png') repeat;
-    padding: 50px 100px;
+    padding: 30px 90px;
     border-radius: 30px;
 }
 
@@ -125,8 +154,11 @@ h1 {
     font-style: italic;
     color: #666;
 }
+
+
+
 .btn-volver {
-    margin-top: 10px;
+    margin-top: 20px;
     text-align: center;
     color: white;
     font-weight: 700;
