@@ -23,5 +23,30 @@ namespace EduConnect_Front.Services
         {
             return await _api.ObtenerReporteCombinadoAsync(token);
         }
+        public async Task<List<ListaComentariosDto>> ObtenerComentariosAsync(string token)
+        {
+            try
+            {
+                return await _api.ObtenerComentariosAsync(token);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener la lista de comentarios: " + ex.Message);
+            }
+        }
+        public async Task<string> InactivarComentarioAsync(int idComentario, string token)
+        {
+            if (idComentario <= 0)
+                throw new ArgumentException("El Id del comentario no es válido.");
+
+            try
+            {
+                return await _api.InactivarComentarioAsync(idComentario, token);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al intentar inactivar el comentario: " + ex.Message);
+            }
+        }
     }
 }

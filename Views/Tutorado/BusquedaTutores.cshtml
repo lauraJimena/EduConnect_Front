@@ -26,6 +26,7 @@
     </section>
 <section class="busqueda-filtros">
     <form asp-controller="Tutorado" asp-action="BusquedaTutores" method="post" class="filtros-form">
+           
         @Html.AntiForgeryToken()
 
         <div class="barra-busqueda">
@@ -120,13 +121,17 @@
                            asp-action="FormSolicitudTutoria"
                            asp-route-idTutor="@t.IdUsuario"
                            asp-route-idMateria="@t.IdMateria"
+                           asp-route-nombreMateria="@t.MateriaNombre"
                            class="btn-solicitar">
                             SOLICITAR TUTORÍA
                         </a>
                     </div>
                 </div>
             </div>
+         
+            <input name="MateriaNombre" type="hidden" value="@t.MateriaNombre" />
         }
+           
     }
     else
     {

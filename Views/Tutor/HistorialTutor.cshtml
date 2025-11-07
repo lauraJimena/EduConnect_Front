@@ -17,6 +17,29 @@
     <section class="contenido">
         <!-- 🔹 Tabla principal -->
         <div class="tabla-contenedor">
+            @{
+                // Configuración de paginación
+                int pageSize = 5; // Número de registros por página
+                int page = 1;
+
+                // Leer la página actual desde la URL
+                var queryPage = Context.Request.Query["page"].ToString();
+                if (!string.IsNullOrEmpty(queryPage) && int.TryParse(queryPage, out int p))
+                {
+                    page = p;
+                }
+
+                // Calcular total de registros y páginas
+                int totalRegistros = Model?.Count ?? 0;
+                int totalPages = (int)Math.Ceiling((double)totalRegistros / pageSize);
+
+                // Obtener los registros de la página actual
+                var registrosPaginados = Model?
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList() ?? new List<EduConnect_Front.Dtos.HistorialTutoriaDto>();
+            }
+
             <table class="tabla-historial">
                 <thead>
                     <tr>
@@ -31,7 +54,8 @@
                 <tbody>
                     @if (Model != null && Model.Any())
                     {
-                        foreach (var item in Model)
+                        foreach (var item in registrosPaginados)
+
                         {
                             <tr>
                                 <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
@@ -51,6 +75,23 @@
                     }
                 </tbody>
             </table>
+            @if (totalPages > 1)
+            {
+                <div class="paginacion">
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        if (i == page)
+                        {
+                            <span class="pagina pagina-actual">@i</span>
+                        }
+                        else
+                        {
+                            <a href="?page=@i" class="pagina">@i</a>
+                        }
+                    }
+                </div>
+            }
+
         </div>
 
         <!-- 🔹 Panel lateral de filtros -->
@@ -78,14 +119,6 @@
         })
         }
 
-    @if (TempData["Success"] != null)
-    {
-        @await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto
-        {
-            Tipo = "exito",
-        Titulo = "Historial cargado correctamente",
-        Mensaje = TempData["Success"] as string
-        })
-        }
+    <a asp-controller="Tutor" asp-action="PanelTutor" class="btn-volver">VOLVER</a>
 </main>
 

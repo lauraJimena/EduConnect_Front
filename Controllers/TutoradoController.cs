@@ -157,60 +157,6 @@ namespace EduConnect_Front.Controllers
                 IdEstado = filtros?.IdEstado
             });
         }
-
-
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> EditarTutorado(EditarPerfilDto perfil)
-        //{
-        //    try { 
-        //    var token = HttpContext.Session.GetString("Token");
-        //    if (string.IsNullOrEmpty(token))
-        //    {
-        //        TempData["Error"] = "No se encontró el token de autenticación. Inicia sesión nuevamente.";
-        //        return RedirectToAction("IniciarSesion", "General");
-        //    }
-
-        //    var mensaje = await _tutoradoService.ActualizarPerfilAsync(perfil, token);
-        //    TempData["Success"] = mensaje;
-        //        TempData["RedirectToPanel"] = true;
-
-        //        var tipoIdent = await _generalService.ObtenerTipoIdentAsync();
-        //        var carreras = await _administradorService.ObtenerCarrerasAsync();
-        //        ViewBag.TipoIdent = tipoIdent;
-        //        ViewBag.Carreras = carreras;
-        //        return View(perfil);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        TempData["Error"] = ex.Message;
-        //        ViewBag.Carreras = await _generalService.ObtenerCarrerasAsync();
-        //        ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
-        //        return View(perfil);
-        //    }
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> EditarTutorado(CancellationToken ct)
-        //{
-        //    var token = HttpContext.Session.GetString("Token");
-        //    var idUsu = HttpContext.Session.GetInt32("IdUsu");
-
-        //    if (string.IsNullOrEmpty(token) || !idUsu.HasValue)
-        //        return RedirectToAction("IniciarSesion", "General");
-
-        //    var modelo = await _tutoradoService.ObtenerUsuarioParaEditarAsync(idUsu.Value, token, ct);
-        //    if (modelo == null)
-        //    {
-        //        TempData["Error"] = "Usuario no encontrado.";
-        //        return RedirectToAction("PanelTutorado");
-        //    }
-
-        //    ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
-        //    ViewBag.Carreras = await _administradorService.ObtenerCarrerasAsync();
-        //    return View(modelo);
-        //}
      
         [HttpGet]
         [ValidarRol(1)]
@@ -381,7 +327,7 @@ namespace EduConnect_Front.Controllers
         }
         [HttpGet]
         [ValidarRol(1)]
-        public IActionResult FormSolicitudTutoria(int idTutor, int idMateria)
+        public IActionResult FormSolicitudTutoria(int idTutor, int idMateria, string nombreMateria)
         {
             var token = HttpContext.Session.GetString("Token");
             var idTutorado = HttpContext.Session.GetInt32("IdUsu");
@@ -391,7 +337,8 @@ namespace EduConnect_Front.Controllers
             {
                 IdTutor = idTutor,
                 IdTutorado= idTutorado.Value,
-                IdMateria = idMateria
+                IdMateria = idMateria,
+                NombreMateria = nombreMateria 
                 //Fecha = DateTime.Today 
             };
 
@@ -473,10 +420,37 @@ namespace EduConnect_Front.Controllers
                 dto.IdTutorado = idTutorado.Value;
                 dto.IdEstado = 1; // activo
 
-                var mensaje = await _tutoradoService.CrearComentarioAsync(dto, token);
-                TempData["Success"] = mensaje;
+                // ✅ Crear comentario y obtener el ID generado desde la API
+                dto.IdComentario = await _tutoradoService.CrearComentarioAsync(dto, token);
 
-                // Redirige al perfil del tutor valorado
+                if (dto.IdComentario > 0)
+                {
+                    TempData["Success"] = "Tu valoración se registró correctamente.";
+
+                    // ✅ Enviar correo si la calificación es menor o igual a 2
+                    if (dto.Calificacion <= 2)
+                    {
+                        try
+                        {
+                            bool correoEnviado = await _tutoradoService.EnviarCorreoCalificacionBajaAsync(token, dto.IdComentario);
+
+                            if (correoEnviado)
+                                TempData["Info"] = "Se ha notificado al tutor sobre tu experiencia.";
+                            else
+                                TempData["Info"] = "No se pudo notificar al tutor en este momento.";
+                        }
+                        catch (Exception ex)
+                        {
+                            TempData["Info"] = "Hubo un error al notificar al tutor: " + ex.Message;
+                        }
+                    }
+                }
+                else
+                {
+                    TempData["Error"] = "No se pudo registrar tu comentario.";
+                }
+
+                // 🔁 Redirige al perfil del tutor valorado
                 return RedirectToAction("PerfilTutor", new { id = dto.IdTutor });
             }
             catch (ArgumentException ex)
@@ -490,8 +464,9 @@ namespace EduConnect_Front.Controllers
                 return RedirectToAction("PerfilTutor", new { id = dto.IdTutor });
             }
         }
-      
 
 
-        }
+
+
+    }
 }

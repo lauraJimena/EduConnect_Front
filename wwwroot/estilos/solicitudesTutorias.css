@@ -138,7 +138,7 @@ body {
 .btn-volver {
     display: inline-block;
     margin-top: 12px;
-    padding: 10px 14px;
+    padding: 7px 10px;
     background: #ffffffd9;
     border: 1px solid var(--card-border);
     border-radius: 10px;

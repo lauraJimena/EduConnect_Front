@@ -30,7 +30,7 @@ body {
 
     /* Título */
     .contenido h1 {
-        font-family: 'League Spartan', sans-serif;
+       
         font-size: 2.4em;
         position: absolute;
         top: 120px;
@@ -59,7 +59,7 @@ body {
     margin-left: 8%;
 }
 
-    .opciones button {
+    .opciones button, .opciones a {
         display: flex;
         align-items: center;
         gap: 15px;
@@ -76,16 +76,17 @@ body {
         border: 2px solid #1e7b76; /* Borde azul oscuro */
         box-shadow: 8px 10px white;
         width:90%;
+        text-decoration: none;
     }
 
-        .opciones button img {
+        .opciones button img, .opciones a img {
             width: 52px;
             height: auto;
         }
 
-        .opciones button:hover {
+        .opciones button:hover, .opciones a:hover {
             background: #185d59;
-           transform: scale(1.05)
+            transform: scale(1.05)
         }
 
 /* Imagen personaje */

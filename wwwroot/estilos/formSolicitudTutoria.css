@@ -3,6 +3,17 @@ body {
     background: #e6e6e6 url('../img/FondoPuntos.png') repeat;
     font-family: 'Montserrat', sans-serif;
 }
+.nombreMate{
+    text-align: center;
+    font-weight: 600;
+    color: white;
+    margin-bottom: -0.9rem;
+    margin-top: 0.8rem;
+    font-size: 1rem;
+    display: block;
+    text-shadow: 2px 1px 1px rgba(0,0,0,0.5);
+    font-family: 'Montserrat', sans-serif;
+}
 /* Contenedor principal */
 .solicitud-container {
     display: flex;
@@ -10,8 +21,8 @@ body {
     align-items: center;
     height: calc(100vh - 0px);
     font-family: 'Poppins', sans-serif;
-    margin-top: 15%;
-    margin-bottom:8%;
+    margin-top: 17%;
+    margin-bottom:10%;
 }
 /* Tarjeta del formulario */
 .form-section {

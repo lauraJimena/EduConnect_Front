@@ -14,7 +14,9 @@
         public int? IdCarrera { get; set; }
         public int? IdSemestre { get; set; }
         public string NumIdent { get; set; } = string.Empty;
-        public string? Avatar { get; set; } 
+        public string? Avatar { get; set; }
+        public string ContrasenaHash { get; set; } = string.Empty;
+
 
 
     }

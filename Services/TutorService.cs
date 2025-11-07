@@ -92,6 +92,23 @@ namespace EduConnect_Front.Services
 
             return (result.Ok, result.Msg);
         }
+        public async Task<(bool Ok, string Msg, List<ComentarioTutorDto>? Data)> ObtenerComentariosTutorAsync(
+    int idTutor, int? calificacion, int? ordenFecha, string token)
+        {
+            var filtro = new FiltrosComentariosTutorDto
+            {
+                IdTutor = idTutor,
+                Calificacion = calificacion,
+                OrdenFecha = ordenFecha
+            };
+
+            var resultado = await _apiService.ObtenerComentariosTutorAsync(filtro, token);
+
+            if (resultado == null)
+                return (false, "Error al consultar comentarios.", null);
+
+            return (true, "OK", resultado);
+        }
 
 
 

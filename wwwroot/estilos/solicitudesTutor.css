@@ -3,7 +3,7 @@
     position: relative;
     background: url('../img/FondoPanelT.png') repeat;
     min-height: calc(100vh - 100px);
-    padding: 30px 100px;
+    padding: 30px 35px;
     font-family: Montserrat, sans-serif;
     overflow: hidden;
 }
@@ -48,13 +48,14 @@
 
 /* ---------- Lista de tarjetas ---------- */
 .lista-solicitudes {
-    flex: 2;
+    flex: 2.5;
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* 🔹 dos columnas iguales */
     gap: 1.5rem 2rem; /* 🔹 espacio entre filas y columnas */
     align-items: stretch;
     align-items: start; /* 🔹 Alinea las tarjetas arriba sin espacio extra */
     justify-content: center; /* 🔹 centra el grid */
+    padding: 0;
 }
 
 /* ---------- Tarjeta individual ---------- */

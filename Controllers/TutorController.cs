@@ -249,10 +249,13 @@ namespace EduConnect_Front.Controllers
                     TempData["Error"] = "Usuario no encontrado.";
                     return RedirectToAction("ConsultarUsuarios");
                 }
+               
+
                 var tipoIdent = await _generalService.ObtenerTipoIdentAsync();
                 var carreras = await _generalService.ObtenerCarrerasAsync();
                 ViewBag.TipoIdent = tipoIdent;
                 ViewBag.Carreras = carreras;
+
                 return View(modelo);
             }
             catch (Exception ex)
@@ -279,7 +282,9 @@ namespace EduConnect_Front.Controllers
                 var mensaje = await _tutorService.ActualizarPerfilTutorAsync(perfil, token);
 
                 TempData["Success"] = mensaje;
-                //Redirige al GET de esta acción (para evitar reenvío del formulario)
+               
+                HttpContext.Session.SetString("AvatarUrl", perfil.Avatar);
+                HttpContext.Session.SetString("UsuarioNombre", perfil.Nombre);
                 return RedirectToAction("EditarTutor");
 
                
@@ -365,6 +370,49 @@ namespace EduConnect_Front.Controllers
             TempData[ok ? "Success" : "Error"] = msg;
             return RedirectToAction("PanelTutor");
         }
+        [HttpGet]
+        [ValidarRol(2)] // solo los tutores
+        public async Task<IActionResult> ComentariosTutor()
+        {
+            var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
+            var token = HttpContext.Session.GetString("Token");
+
+            if (idTutor == 0 || string.IsNullOrEmpty(token))
+            {
+                TempData["Error"] = "Sesión no válida.";
+                return RedirectToAction("IniciarSesion", "General");
+            }
+
+            var (ok, msg, data) = await _tutorService.ObtenerComentariosTutorAsync(idTutor, null, 1, token);
+
+            if (!ok)
+            {
+                TempData["Error"] = msg;
+                return View(new List<ComentarioTutorDto>());
+            }
+
+            return View(data);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ValidarRol(2)]
+        public async Task<IActionResult> ComentariosTutorFiltrar(int? calificacion, int? ordenFecha)
+        {
+            var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
+            var token = HttpContext.Session.GetString("Token");
+
+            var (ok, msg, data) = await _tutorService.ObtenerComentariosTutorAsync(idTutor, calificacion, ordenFecha, token);
+
+            if (!ok)
+            {
+                TempData["Error"] = msg;
+                return View("ComentariosTutor", new List<ComentarioTutorDto>());
+            }
+
+            return View("ComentariosTutor", data);
+        }
+
 
 
 

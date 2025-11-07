@@ -16,7 +16,7 @@
 
         <form asp-controller="Tutorado" asp-action="FormSolicitudTutoria" method="post" class="formulario-tutoria">
             @Html.AntiForgeryToken()
-
+            <p class="nombreMate">@Model.NombreMateria</p>
             <!-- 🔹 Campo oculto para el IdTutor -->
             <input type="hidden" asp-for="IdTutor" />
             <input type="hidden" asp-for="IdTutorado" />
@@ -66,7 +66,7 @@
     // Espera 2 segundos y redirige
     setTimeout(() => {
         window.location.href = '@Url.Action("BusquedaTutores", "Tutorado")';
-    }, 7000);
+    }, 2000);
 </script>
         }
 
