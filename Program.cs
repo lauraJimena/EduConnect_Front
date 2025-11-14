@@ -29,6 +29,7 @@ builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(60); // tiempo de inactividad
     options.Cookie.HttpOnly = true;                 // por seguridad
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // ❗ obliga a HTTPS
     options.Cookie.IsEssential = true;              // requerido si usas GDPR/cookie consent
 });
 
@@ -37,16 +38,41 @@ Rotativa.AspNetCore.RotativaConfiguration.Setup(builder.Environment.ContentRootP
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+//// Configure the HTTP request pipeline.
+//if (!app.Environment.IsDevelopment())
+//{
+//    app.UseExceptionHandler("/Home/Error");
+//    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+//    app.UseHsts();
+//}
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    // Manejo centralizado de errores
+    app.UseExceptionHandler("/Error/500");
+    app.UseStatusCodePagesWithReExecute("/Error/{0}");
     app.UseHsts();
 }
+else
+{
+    // En desarrollo puedes mantener las páginas de error detalladas
+    app.UseDeveloperExceptionPage();
+}
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.Use(async (context, next) =>
+{
+    await next();
+
+    // Si no se encontró la ruta (404) y aún no se ha iniciado una respuesta
+    if (context.Response.StatusCode == 404 && !context.Response.HasStarted)
+    {
+        context.Request.Path = "/Error/404"; // redirige al controlador de error
+        await next();
+    }
+});
+
 
 app.UseRouting();
 

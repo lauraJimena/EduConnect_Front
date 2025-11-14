@@ -8,7 +8,7 @@ namespace EduConnect_Front.Controllers
 {
     public class TutorController : Controller
     {
-
+        private const string AccionSolicitudesTutorias = "SolicitudesTutorias";
         private readonly TutoradoService _tutoradoService = new TutoradoService();
         private readonly GeneralService _generalService = new GeneralService();
         private readonly TutorService _tutorService;
@@ -69,65 +69,26 @@ namespace EduConnect_Front.Controllers
             }
 
         }
-
-        //[HttpGet]
-        //[ValidarRol(2)]
-        //public async Task<IActionResult> SolicitudesTutorias(int page = 1, int pageSize = 4)
-        //{
-        //    var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
-        //    var token = HttpContext.Session.GetString("Token");
-
-        //    // Llamada al servicio con filtros vacíos (0 y null)
-        //    var (ok, msg, solicitudes) =
-        //        await _tutorService.ObtenerSolicitudesTutoriasAsync(idTutor, 0, 0, token);
-
-        //    if (!ok)
-        //    {
-        //        TempData["Error"] = msg;
-        //        return View(new List<SolicitudTutorDto>());
-        //    }
-        //    // 🔹 Paginación
-        //    int totalRegistros = solicitudes.Count;
-        //    int totalPaginas = (int)Math.Ceiling(totalRegistros / (double)pageSize);
-
-        //    var solicitudesPaginadas = solicitudes
-        //        .Skip((page - 1) * pageSize)
-        //        .Take(pageSize)
-        //        .ToList();
-
-        //    ViewBag.PaginaActual = page;
-        //    ViewBag.TotalPaginas = totalPaginas;
-
-        //    return View(solicitudes);
-        //}
-
-
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //[ValidarRol(2)]
-        //public async Task<IActionResult> SolicitudesTutoriasEnviar(int idMateria, int idModalidad)
-        //{
-        //    var token = HttpContext.Session.GetString("Token");
-        //    var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
-
-        //    var (ok, msg, solicitudes) =
-        //        await _tutorService.ObtenerSolicitudesTutoriasAsync(idTutor, idMateria, idModalidad, token);
-
-        //    if (!ok)
-        //    {
-        //        TempData["Error"] = msg;
-        //        return View(new List<SolicitudTutorDto>());
-        //    }
-
-
-
-        //    return View(solicitudes);
-        //}
+        #pragma warning disable S5122 // ModelState.IsValid should be checked in controller actions
         [HttpGet]
         [ValidarRol(2)]
         public async Task<IActionResult> SolicitudesTutorias(int page = 1, int pageSize = 4, int idMateria = 0, int idModalidad = 0)
         {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Solicitud no válida.";
+                return RedirectToAction(AccionSolicitudesTutorias);
+            }
+
+            // ModelState.IsValid no aplica en este método: no se recibe un modelo complejo, solo parámetros simples de filtro/paginación.
+            if (page < 1) page = 1;
+            if (pageSize < 1 || pageSize > 50) pageSize = 10;
+            if (idMateria < 0 || idModalidad < 0)
+            {
+                TempData["Error"] = "Filtros inválidos.";
+                return RedirectToAction(AccionSolicitudesTutorias);
+            }
+
             var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
             var token = HttpContext.Session.GetString("Token");
 
@@ -163,14 +124,20 @@ namespace EduConnect_Front.Controllers
 
             return View(solicitudesPaginadas);
         }
+        #pragma warning restore S5122
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ValidarRol(2)]
         public IActionResult SolicitudesTutoriasEnviar(int idMateria, int idModalidad)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(idMateria);
+            }
             // Redirige al método GET, pero conservando los filtros como parámetros
-            return RedirectToAction("SolicitudesTutorias", new { idMateria, idModalidad });
+            return RedirectToAction(AccionSolicitudesTutorias, new { idMateria, idModalidad });
         }
 
         [HttpPost]
@@ -178,39 +145,54 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(2)]
         public async Task<IActionResult> AceptarSolicitud(int idTutoria)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(idTutoria);
+            }
             var token = HttpContext.Session.GetString("Token");
             var (ok, msg) = await _tutorService.AceptarSolicitudTutoriaAsync(idTutoria, token);
 
             if (!ok)
             {
                 TempData["Error"] = msg;
-                return RedirectToAction("SolicitudesTutorias");
+                return RedirectToAction(AccionSolicitudesTutorias);
             }
 
-            TempData["Success"] = msg;
-            return RedirectToAction("SolicitudesTutorias");
+            TempData["Exito"] = msg;
+            return RedirectToAction(AccionSolicitudesTutorias);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ValidarRol(2)]
         public async Task<IActionResult> RechazarSolicitud(int idTutoria)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(idTutoria);
+            }
             var token = HttpContext.Session.GetString("Token");
             var (ok, msg) = await _tutorService.RechazarSolicitudTutoriaAsync(idTutoria, token);
 
             if (!ok)
             {
                 TempData["Error"] = msg;
-                return RedirectToAction("SolicitudesTutorias");
+                return RedirectToAction(AccionSolicitudesTutorias);
             }
 
-            TempData["Success"] = msg;
-            return RedirectToAction("SolicitudesTutorias");
+            TempData["Exito"] = msg;
+            return RedirectToAction(AccionSolicitudesTutorias);
         }
         [HttpGet]
         [ValidarRol(2)]
         public async Task<IActionResult> HistorialTutor(List<int>? idEstados)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View();
+            }
             var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
             var token = HttpContext.Session.GetString("Token");
 
@@ -229,6 +211,7 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(2)]
         public async Task<IActionResult> EditarTutor()
         {
+
             try
             {
                 var token = HttpContext.Session.GetString("Token");
@@ -270,6 +253,11 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(2)]
         public async Task<IActionResult> EditarTutor(EditarPerfilDto perfil)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(perfil);
+            }
             try
             {
                 var token = HttpContext.Session.GetString("Token");
@@ -298,28 +286,6 @@ namespace EduConnect_Front.Controllers
             }
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> RegistrarMaterias()
-        //{
-        //    var token = HttpContext.Session.GetString("Token");
-        //    var idTutor = HttpContext.Session.GetInt32("IdUsu");
-
-        //    if (string.IsNullOrEmpty(token) || idTutor == null)
-        //    {
-        //        TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
-        //        return RedirectToAction("IniciarSesion", "General");
-        //    }
-
-        //    var (ok, msg, materias) = await _tutorService.ObtenerMateriasPorTutorAsync(idTutor.Value, token);
-
-        //    if (!ok)
-        //    {
-        //        TempData["Error"] = msg;
-        //        return RedirectToAction("PanelTutor", "Tutor");
-        //    }
-
-        //    return View(materias);
-        //}
         [HttpGet]
         [ValidarRol(2)]
         public async Task<IActionResult> RegistrarMaterias()
@@ -350,6 +316,11 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(2)]
         public async Task<IActionResult> GuardarMaterias(int[] MateriasSeleccionadas)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(MateriasSeleccionadas);
+            }
             var token = HttpContext.Session.GetString("Token");
             var idTutor = HttpContext.Session.GetInt32("IdUsu");
 
@@ -399,6 +370,11 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(2)]
         public async Task<IActionResult> ComentariosTutorFiltrar(int? calificacion, int? ordenFecha)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View();
+            }
             var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
             var token = HttpContext.Session.GetString("Token");
 

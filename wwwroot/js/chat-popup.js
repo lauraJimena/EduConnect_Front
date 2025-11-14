@@ -3,7 +3,7 @@
 $(function () {
     // ✅ Mostrar/Ocultar lista de chats
     $('.boton-chat').on('click', function () {
-        var $popup = $('#popupChat');
+        const $popup = $('#popupChat');
         if ($popup.is(':visible')) {
             $popup.hide();
         } else {
@@ -14,12 +14,13 @@ $(function () {
     });
 });
 
+
 // ✅ Abrir conversación al hacer clic en un chat
 $(document).on('click', '.popup-chat-item', function () {
-    var chatId = $(this).data('chat-id');
-    var nombre = $(this).data('nombre');
-    var materia = $(this).data('materia');
-    var idUsuarioLogueado = $('#popupChat').data('id-usuario'); // <-- Esto debe configurarse en Razor
+    const chatId = $(this).data('chat-id');
+    const nombre = $(this).data('nombre');
+    const materia = $(this).data('materia');
+    const idUsuarioLogueado = $('#popupChat').data('id-usuario'); // <-- Esto debe configurarse en Razor
 
     console.log("Chat seleccionado:", chatId);
 
@@ -61,11 +62,11 @@ $(document).on('keydown', '#mensajeInput', function (e) {
 
 // ✅ Botón de enviar (LIMPIO Y CORRECTO)
 $(document).on('click', '#btnEnviar', function () {
-    var mensaje = $('#mensajeInput').val().trim();
+    const mensaje = $('#mensajeInput').val().trim();
     if (mensaje === "") return;
 
-    var chatId = $('.chat-conversacion').data('chat-id');
-    var idEmisor = $('.chat-conversacion').data('id-usuario');
+    const chatId = $('.chat-conversacion').data('chat-id');
+    const idEmisor = $('.chat-conversacion').data('id-usuario');
 
     console.log("ENVIANDO MENSAJE A CONTROLADOR MVC:", { chatId, idEmisor, mensaje });
 
@@ -79,7 +80,7 @@ $(document).on('click', '#btnEnviar', function () {
             Contenido: mensaje
         }),
         success: function () {
-            var nuevoMensaje = `<div class="mensaje mensaje-emisor">${mensaje}</div>`;
+            const nuevoMensaje = `<div class="mensaje mensaje-emisor">${mensaje}</div>`;
             $('#contenedorMensajes').prepend(nuevoMensaje);
 
             $('#mensajeInput').val('');

@@ -1,0 +1,41 @@
+﻿@using EduConnect_Front.Dtos
+@{
+    ViewData["Title"] = "Recuperar Contraseña";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/recuperarContrasena.css" />
+}
+
+<div class="container mt-5">
+    <h3>Recuperar Contraseña</h3>
+
+    <form id="formRecuperar" asp-action="EnviarCorreoRecuperacion" method="post">
+        <div class="mb-3">
+            <label for="correo" class="form-label">Correo registrado:</label><br />
+            <input type="email" id="correo" name="correo" class="input-edc" placeholder="Ingresa tu correo" required />
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Enviar enlace de recuperación</button>
+    </form>
+</div>
+
+<!-- POPUPS -->
+@if (TempData["Exito"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "exito",
+        Titulo = "Correo enviado correctamente",
+        Mensaje = TempData["Exito"] as string
+    })
+}
+
+@if (TempData["Error"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "error",
+        Titulo = "Error al enviar el correo",
+        Mensaje = TempData["Error"] as string
+    })
+}

@@ -1,4 +1,5 @@
-﻿@{
+﻿@using EduConnect_Front.Dtos
+@{
     ViewData["Title"] = "Administrador";
     Layout = "_LayoutUsuario";
 }
@@ -7,6 +8,23 @@
     <link rel="stylesheet" href="~/estilos/modalReportes.css" />
     <!--Librería de iconos Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+}
+@if (TempData["AdminRegisterOk"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "exito",
+        Titulo = "Perfil actualizado con éxito",
+        Mensaje = TempData["AdminRegisterOk"] as string
+    })
+<script>
+    // 🔹 Cierra el popup a los 3 segundos y redirige al Panel del Tutor
+    setTimeout(() => {
+        const popup = document.querySelector('.modal-fondo');
+        if (popup) popup.style.display = 'none';
+        window.location.href = '@Url.Action("PanelAdministrador", "Administrador")'; // 🔁 Redirige
+    }, 3000);
+</script>
 }
 <main class="administrador-container">
 

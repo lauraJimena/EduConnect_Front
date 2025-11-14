@@ -149,6 +149,54 @@ namespace EduConnect_Front.Services
                 return (false, $"Error inesperado: {ex.Message}", null);
             }
         }
+        public async Task<(bool Ok, string Msg)> ActualizarPasswordAsync(ActualizarPasswordDto dto, string token, CancellationToken ct = default)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                using var resp = await _httpClient.PostAsJsonAsync("General/ActualizarPassword", dto, ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                // 🔹 Intentar extraer el campo "mensaje" si el cuerpo es JSON
+                string mensaje = body;
+                try
+                {
+                    var json = System.Text.Json.JsonDocument.Parse(body);
+                    if (json.RootElement.TryGetProperty("mensaje", out var msgProp))
+                    {
+                        mensaje = msgProp.GetString() ?? mensaje;
+                    }
+                }
+                catch
+                {
+                    // Si no es JSON, se deja el texto original
+                }
+
+                // 🔹 Si la respuesta es exitosa (HTTP 200)
+                if (resp.IsSuccessStatusCode)
+                {
+                    return (true, string.IsNullOrWhiteSpace(mensaje)
+                        ? "Contraseña actualizada correctamente."
+                        : mensaje);
+                }
+
+                // 🔹 Si hubo error, devolver mensaje limpio
+                return (false, string.IsNullOrWhiteSpace(mensaje)
+                    ? $"Error {(int)resp.StatusCode}"
+                    : mensaje);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"Error de conexión con la API: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}");
+            }
+        }
+
 
 
         // GET /Tutorado/{idTutorado}/historial
@@ -621,30 +669,7 @@ namespace EduConnect_Front.Services
             throw new Exception("Error al obtener las carreras del API");
         }
 
-        //OBETENER USUARIO POR ID
-        public async Task<ObtenerUsuarioDto?> ObtenerUsuarioPorIdAsync(int idUsuario, string token)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"Administrador/ObtenerUsuarioPorId/{idUsuario}");
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-
-            using var response = await _httpClient.SendAsync(request);
-            var body = await response.Content.ReadAsStringAsync();
-
-            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                return null;
-
-            if (!response.IsSuccessStatusCode)
-                throw new Exception($"Error al obtener usuario: {body}");
-
-           
-            var opts = new System.Text.Json.JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-
-            return System.Text.Json.JsonSerializer.Deserialize<ObtenerUsuarioDto>(body, opts);
-        }
+    
 
         //SOLICITUDES TUTORIAS TUTORADO
         public async Task<List<SolicitudTutoriaDto>> ObtenerSolicitudesTutoriasAsync(
@@ -1539,9 +1564,66 @@ namespace EduConnect_Front.Services
                 var error = await response.Content.ReadAsStringAsync();
                 throw new Exception($"Error al obtener comentarios: {error}");
             }
+
+        }
+        public async Task<(bool Ok, string Msg)> EnviarCorreoRecuperacionAsync(string correo, CancellationToken ct = default)
+        {
+            try
+            {
+                var url = $"General/EnviarCorreoRecuperacion?correo={Uri.EscapeDataString(correo)}";
+                using var resp = await _httpClient.PostAsync(url, null, ct);
+
+                var body = await resp.Content.ReadAsStringAsync(ct);
+                if (resp.IsSuccessStatusCode)
+                    return (true, "Correo de recuperación enviado correctamente.");
+
+                return (false, string.IsNullOrWhiteSpace(body) ? "No se pudo enviar el correo." : body);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error al conectar con la API: {ex.Message}");
+            }
+        }
+        // En API_Service.cs
+        public async Task<(bool Ok, string Msg)> RestablecerContrasenaAsync(RestablecerContrasenaDto dto, CancellationToken ct = default)
+        {
+            try
+            {
+                using var resp = await _httpClient.PostAsJsonAsync("General/RestablecerContrasena", dto, ct);
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                // Intenta leer { mensaje = "..." }
+                string msg = body;
+                try
+                {
+                    var anon = new { mensaje = "" };
+                    var parsed = System.Text.Json.JsonSerializer.Deserialize(body, anon.GetType(),
+                        new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    msg = (string)parsed?.GetType().GetProperty("mensaje")?.GetValue(parsed) ?? body;
+                }
+                catch { /* si no es JSON, se deja body tal cual */ }
+
+                if (resp.IsSuccessStatusCode)
+                    return (true, string.IsNullOrWhiteSpace(msg) ? "Contraseña restablecida correctamente." : msg);
+
+                return (false, string.IsNullOrWhiteSpace(msg) ? $"Error {(int)resp.StatusCode}" : msg);
+            }
+            catch (HttpRequestException ex)
+            {
+                return (false, $"Error de conexión con la API: {ex.Message}");
+            }
+            catch (TaskCanceledException)
+            {
+                return (false, "La solicitud expiró (timeout).");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error inesperado: {ex.Message}");
+            }
         }
 
-       
+
+
 
 
 

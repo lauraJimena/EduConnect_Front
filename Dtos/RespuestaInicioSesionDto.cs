@@ -8,5 +8,6 @@
         public int Respuesta { get; set; }
         public string? Mensaje { get; set; }
         public string? AvatarUrl { get; set; }
+        public bool DebeActualizarPassword { get; set; }
     }
 }

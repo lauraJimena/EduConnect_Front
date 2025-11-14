@@ -10,9 +10,9 @@
 }
 <!-- 🔹 Popup de ÉXITO -->
 <!-- 🔹 Popup de ÉXITO o RECHAZO -->
-@if (TempData["Success"] != null)
+@if (TempData["Exito"] != null)
 {
-    var mensaje = TempData["Success"] as string ?? "";
+    var mensaje = TempData["Exito"] as string ?? "";
     var titulo = mensaje.Contains("rechazada", StringComparison.OrdinalIgnoreCase)
         ? "Solicitud rechazada con éxito"
         : "Solicitud aceptada con éxito";

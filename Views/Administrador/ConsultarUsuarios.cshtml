@@ -162,7 +162,39 @@
                 </tbody>
             </table>
         </div>
+       
+
     </div>
+    <!-- PAGINACIÓN -->
+    @if (ViewBag.TotalPaginas > 1)
+    {
+        <div class="paginacion">
+            <form method="get" asp-action="ConsultarUsuarios" class="form-paginacion">
+                <input type="hidden" name="numIdent" value="@ViewBag.FiltroNumIdent" />
+                <input type="hidden" name="idRol" value="@ViewBag.FiltroRol" />
+                <input type="hidden" name="idEstado" value="@ViewBag.FiltroEstado" />
+
+                <!-- Botón Anterior -->
+                <button type="submit" name="pagina" value="@(ViewBag.PaginaActual - 1)"
+                        class="btn-pagina"
+                        @(ViewBag.PaginaActual <= 1 ? "disabled" : "")>
+                    ⬅ Anterior
+                </button>
+
+                <!-- Número de página -->
+                <span class="numero-pagina">
+                    Página @ViewBag.PaginaActual de @ViewBag.TotalPaginas
+                </span>
+
+                <!-- Botón Siguiente -->
+                <button type="submit" name="pagina" value="@(ViewBag.PaginaActual + 1)"
+                        class="btn-pagina"
+                        @(ViewBag.PaginaActual >= ViewBag.TotalPaginas ? "disabled" : "")>
+                    Siguiente ➡
+                </button>
+            </form>
+        </div>
+    }
 
     <!-- POPUPS -->
     <div id="popup-confirmacion" class="popup" style="display:none;">

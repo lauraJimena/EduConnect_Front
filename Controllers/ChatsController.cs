@@ -42,7 +42,13 @@ namespace EduConnect_Front.Controllers
 
 
         public async Task<IActionResult> Mensajes(int idChat, CancellationToken cancellationToken) 
-        { 
+        {
+
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(idChat);
+            }
             //var usuario = HttpContext.Session.GetObject<ObtenerUsuarioDto>("Usuario");
             string token = HttpContext.Session.GetString("Token") ?? "";
             if (token == null) 
@@ -72,6 +78,12 @@ namespace EduConnect_Front.Controllers
         [HttpPost]
         public async Task<IActionResult> EnviarMensaje([FromBody] CrearMensajeDto nuevoMensaje)
         {
+
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(nuevoMensaje);
+            }
             string token = HttpContext.Session.GetString("Token") ?? "";
             if (token == null) return Unauthorized();    
             var (success, message) = await _chatService.EnviarMensaje(nuevoMensaje, token);

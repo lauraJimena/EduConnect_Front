@@ -1,7 +1,9 @@
-﻿@model EduConnect_Front.Dtos.CrearUsuarioDto
+﻿@using EduConnect_Front.Dtos
+@model EduConnect_Front.Dtos.CrearUsuarioDto
 @{
     ViewData["Title"] = "Registrar Usuario";
     Layout = "_LayoutUsuario";
+    var carreras = ViewBag.Carreras as List<CarreraDto>;
 }
 @section Styles {
     <link rel="stylesheet" href="~/estilos/registroUsuarios.css" />
@@ -38,11 +40,13 @@
             <!-- Si aún no cargas catálogos desde la BD, deja opciones fijas -->
             <select asp-for="IdCarrera" required>
                 <option value="">CARRERA</option>
-                <option value="1">Administración</option>
-                <option value="2">Contaduría</option>
-                <option value="3">Ingeniería Agronímica</option>
-                <option value="4">Ingeniería Ambiental</option>               
-                <option value="5">Psicología</option>
+                @if (carreras != null)
+                {
+                    foreach (var c in carreras)
+                    {
+                        <option value="@c.IdCarrera">@c.NombreCarrera</option>
+                    }
+                }
             </select>
 
             <select asp-for="IdSemestre" required>
@@ -62,8 +66,8 @@
             <input asp-for="ContrasUsu" type="password" placeholder="CONTRASEÑA" required />
 
             <p class="radio-label">Elige el rol del usuario</p>
-            <label><input type="radio" asp-for="IdRol" value="1" required /> Tutor</label>
-            <label><input type="radio" asp-for="IdRol" value="2" /> Tutorado</label>
+            <label><input type="radio" asp-for="IdRol" value="2" required /> Tutor</label>
+            <label><input type="radio" asp-for="IdRol" value="1" /> Tutorado</label>
             <label><input type="radio" asp-for="IdRol" value="4" /> Coordinador</label>
 
             <!-- Estado por defecto activo (como en tu back) -->
@@ -87,3 +91,17 @@
                 })
     </section>
 </main>
+<script>
+    // Validar que solo se ingresen números en ambos campos
+    const numIdentInput = document.querySelector('input[name="NumIdent"]');
+    const telInput = document.querySelector('input[name="TelUsu"]');
+
+    function soloNumeros(input) {
+        input.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, ''); // elimina todo lo que no sea número
+        });
+    }
+
+    soloNumeros(numIdentInput);
+    soloNumeros(telInput);
+</script>

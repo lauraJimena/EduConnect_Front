@@ -60,7 +60,12 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(1)]
         public async Task<IActionResult> HistorialTutorias([FromQuery] List<int>? idsEstado)
         {
-           
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(idsEstado);
+            }
+
             var IdUsu = HttpContext.Session.GetInt32("IdUsu");
             var token = HttpContext.Session.GetString("Token");
 
@@ -96,6 +101,11 @@ namespace EduConnect_Front.Controllers
             string Semestre = "",
             int? IdEstado = null)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View();
+            }
             var token = HttpContext.Session.GetString("Token");
             if (string.IsNullOrEmpty(token))
             {
@@ -139,6 +149,11 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(1)]
         public IActionResult BusquedaTutores(BuscarTutorDto filtros)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(filtros);
+            }
             var token = HttpContext.Session.GetString("Token");
             if (string.IsNullOrEmpty(token))
             {
@@ -201,6 +216,11 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(1)]
         public async Task<IActionResult> EditarTutorado(EditarPerfilDto perfil)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(perfil);
+            }
             try
             {
                 var token = HttpContext.Session.GetString("Token");
@@ -260,6 +280,11 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(1)]
         public async Task<IActionResult> SolicitudesTutorias(FiltroSolicitudesDto filtro, CancellationToken ct)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(filtro);
+            }
             try
             {
                 var token = HttpContext.Session.GetString("Token");
@@ -293,6 +318,11 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(1)]
         public async Task<IActionResult> FormSolicitudTutoria(SolicitudTutoriaRespuestaDto modelo)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(modelo);
+            }
             var token = HttpContext.Session.GetString("Token");
             if (string.IsNullOrEmpty(token))
             {
@@ -329,6 +359,11 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(1)]
         public IActionResult FormSolicitudTutoria(int idTutor, int idMateria, string nombreMateria)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(idTutor);
+            }
             var token = HttpContext.Session.GetString("Token");
             var idTutorado = HttpContext.Session.GetInt32("IdUsu");
 
@@ -381,6 +416,11 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(1)]
         public async Task<IActionResult> PerfilTutor(int idTutor)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(idTutor);
+            }
             try
             {
                 var token = HttpContext.Session.GetString("Token");
@@ -400,71 +440,72 @@ namespace EduConnect_Front.Controllers
                 return RedirectToAction("BusquedaTutores");
             }
         }
+        private static bool SesionInvalida(string? token, int? idTutorado)
+    => string.IsNullOrEmpty(token) || idTutorado == null;
+
+
+        private async Task NotificarTutorAsync(string token, int idComentario)
+        {
+            try
+            {
+                bool correoEnviado = await _tutoradoService.EnviarCorreoCalificacionBajaAsync(token, idComentario);
+                TempData["Info"] = correoEnviado
+                    ? "Se ha notificado al tutor sobre tu experiencia."
+                    : "No se pudo notificar al tutor en este momento.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Info"] = "Hubo un error al notificar al tutor: " + ex.Message;
+            }
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ValidarRol(1)]
         public async Task<IActionResult> AgregarValoracion(CrearComentarioDto dto)
         {
+            if (!ModelState.IsValid)
+                return View(dto);
+
             try
             {
                 var token = HttpContext.Session.GetString("Token");
                 var idTutorado = HttpContext.Session.GetInt32("IdUsu");
 
-                if (string.IsNullOrEmpty(token) || idTutorado == null)
+                if (SesionInvalida(token, idTutorado))
                 {
                     TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
                     return RedirectToAction("IniciarSesion", "General");
                 }
 
-                // Completa el DTO
                 dto.IdTutorado = idTutorado.Value;
-                dto.IdEstado = 1; // activo
-
-                // ✅ Crear comentario y obtener el ID generado desde la API
+                dto.IdEstado = 1;
                 dto.IdComentario = await _tutoradoService.CrearComentarioAsync(dto, token);
 
-                if (dto.IdComentario > 0)
-                {
-                    TempData["Success"] = "Tu valoración se registró correctamente.";
-
-                    // ✅ Enviar correo si la calificación es menor o igual a 2
-                    if (dto.Calificacion <= 2)
-                    {
-                        try
-                        {
-                            bool correoEnviado = await _tutoradoService.EnviarCorreoCalificacionBajaAsync(token, dto.IdComentario);
-
-                            if (correoEnviado)
-                                TempData["Info"] = "Se ha notificado al tutor sobre tu experiencia.";
-                            else
-                                TempData["Info"] = "No se pudo notificar al tutor en este momento.";
-                        }
-                        catch (Exception ex)
-                        {
-                            TempData["Info"] = "Hubo un error al notificar al tutor: " + ex.Message;
-                        }
-                    }
-                }
-                else
+                if (dto.IdComentario <= 0)
                 {
                     TempData["Error"] = "No se pudo registrar tu comentario.";
+                    return RedirectToAction("PerfilTutor", new { id = dto.IdTutor });
                 }
 
-                // 🔁 Redirige al perfil del tutor valorado
+                TempData["Success"] = "Tu valoración se registró correctamente.";
+
+                if (dto.Calificacion <= 2)
+                    await NotificarTutorAsync(token!, dto.IdComentario);
+
                 return RedirectToAction("PerfilTutor", new { id = dto.IdTutor });
             }
             catch (ArgumentException ex)
             {
                 TempData["Error"] = ex.Message;
-                return RedirectToAction("PerfilTutor", new { id = dto.IdTutor });
             }
             catch (Exception ex)
             {
                 TempData["Error"] = "Error al crear el comentario: " + ex.Message;
-                return RedirectToAction("PerfilTutor", new { id = dto.IdTutor });
             }
-        }
 
+            return RedirectToAction("PerfilTutor", new { id = dto.IdTutor });
+        }
 
 
 

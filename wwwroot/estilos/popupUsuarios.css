@@ -15,18 +15,18 @@
 }
 
 .popup-contenido {
-    border-radius: 25px;
-    background: #fff;
+    border-radius: 25px !important;
+    background: #fff !important;
     padding: 15px 45px;
-    width: 490px;
-    text-align: left;
-    border: 3px solid #5886a5;
-    box-shadow: 9px 10px 0 #b5b2a7;
+    width: 490px !important;
+    text-align: left !important;
+    border: 3px solid #5886a5 !important;
+    box-shadow: 9px 10px 0 #b5b2a7 !important;
 }
 .popup-elim {
-    text-align: center;
-    padding: 40px 5px;
-    box-shadow: 5px 6px 0 #b5b2a7;
+    text-align: center !important;
+    padding: 40px 5px !important;
+    box-shadow: 5px 6px 0 #b5b2a7 !important;
 }
     .popup-elim button {
         border-radius: 20px;

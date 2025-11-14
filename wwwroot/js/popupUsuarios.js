@@ -34,7 +34,8 @@ document.querySelectorAll(".btn-cerrar-popup").forEach((btn) => {
 document.querySelectorAll(".boton-eliminar").forEach((boton) => {
     boton.addEventListener("click", function () {
         filaSeleccionada = this.closest("tr");
-        idSeleccionado = this.getAttribute("data-id");
+        
+        idSeleccionado = this.dataset.id;
 
         const estadoCelda = filaSeleccionada.querySelector(".estado");
         const estadoActual = estadoCelda ? estadoCelda.textContent.trim() : "Activo";
