@@ -1,80 +1,167 @@
-﻿@{
-    ViewData["Title"] = "Editar Perfil";
-    Layout = "_Layout";
-}
-@section Styles {
+﻿@using EduConnect_Front.Dtos
+@model EduConnect_Front.Dtos.EditarPerfilDto
 
-    <link rel="stylesheet" href="~/estilos/editarTutorado.css" )">
+@{
+    ViewData["Title"] = "Editar Perfil";
+    Layout = "_LayoutUsuario";
+    var carreras = ViewBag.Carreras as List<CarreraDto>;
+    var tipoIdent = ViewBag.TipoIdent as List<TipoIdentDto>;
 }
+
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/editarTutorado.css">
+}
+
+@if (TempData["Success"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "exito",
+        Titulo = "Perfil actualizado con éxito",
+        Mensaje = TempData["Success"] as string
+    })
+<script>
+    setTimeout(() => {
+        const popup = document.querySelector('.modal-fondo');
+        if (popup) popup.style.display = 'none';
+    }, 3000);
+</script>
+}
+
+@if (TempData["Error"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "error",
+        Titulo = "Error al actualizar el perfil",
+        Mensaje = TempData["Error"] as string
+    })
+}
+
 <main class="perfil-container">
-    <!-- Panel izquierdo -->
-    <section class="perfil-left">
-        <div class="avatar">
-            <img src="~/img/IconoAvatar.png" alt="Avatar Tutorado" id="avatarSeleccionado">
-        </div>
-        <button class="nombre-tutorado">NOMBRE DEL TUTORADO</button>
-        <!-- Selección de avatares -->
-        <div class="avatar-selector">
-            <p>Elige tu avatar:</p>
-            <div class="avatar-opciones">
-                <label>
-                    <input type="radio" name="avatar" value="1" checked>
-                    <img src="~/img/avatars/avatar1.png" alt="Avatar 1">
-                </label>
-                <label>
-                    <input type="radio" name="avatar" value="2">
-                    <img src="~/img/avatars/avatar2.png" alt="Avatar 2">
-                </label>
-                <label>
-                    <input type="radio" name="avatar" value="3">
-                    <img src="~/img/avatars/avatar3.png" alt="Avatar 3">
-                </label>
-                <label>
-                    <input type="radio" name="avatar" value="4">
-                    <img src="~/img/avatars/avatar4.png" alt="Avatar 4">
-                </label>
-                <label>
-                    <input type="radio" name="avatar" value="5">
-                    <img src="~/img/avatars/avatar5.png" alt="Avatar 5">
-                </label>
-                <label>
-                    <input type="radio" name="avatar" value="6">
-                    <img src="~/img/avatars/avatar6.png" alt="Avatar 6">
-                </label>
-            </div>
-        </div>
+    <!-- PANEL IZQUIERDO -->
     
+        
+    <section class="perfil-left">
+
+        <div class="avatar">
+            <!-- ✅ Si no tiene avatar guardado, se muestra avatar1.png -->
+            <img id="avatarSeleccionado"
+                 src="~/img/avatars/@(Model.Avatar ?? "avatar1.png")"
+                 alt="Avatar seleccionado">
+        </div>
+        <button class="nombre-tutorado">@Model.Nombre.ToUpper() @Model.Apellido.ToUpper()</button>
+            <div class="avatar-selector">
+                <p>Elige tu avatar:</p>
+                <div class="avatar-opciones">
+                    @for (int i = 1; i <= 12; i++)
+                    {
+                        var avatarFile = $"avatar{i}.png";
+                        var isSelected = Model.Avatar == avatarFile ? "checked" : "";
+                        <label>
+                            <input type="radio" name="AvatarRadio" value="@avatarFile" @isSelected />
+                            <img src="~/img/avatars/@avatarFile" alt="Avatar @i" />
+                        </label>
+                    }
+                </div>
+            </div>
+
     </section>
 
-    <!-- Panel derecho -->
+    <!-- PANEL DERECHO -->
     <section class="perfil-right">
-        <h1><img src="~/img/IconoEditar.png" alt="icono editar"> EDITAR PERFIL</h1>
+        <form asp-action="EditarTutorado" asp-controller="Tutorado" method="post">
+        @Html.AntiForgeryToken()
+        <h1><img src="~/img/IconoEditar.png" alt="icono editar"> EDITAR PERFIL</h1>       
 
-        <form>
-            <input type="text" placeholder="NOMBRES" required>
-            <input type="text" placeholder="APELLIDOS" required>
+            <!-- 🔹 Campo oculto que lleva el valor del avatar -->
+            <input type="hidden" id="Avatar" name="Avatar" value="@Model.Avatar" />          
 
-            <select required>
-                <option value="">TIPO DE DOCUMENTO</option>
-                <option value="cc">Cédula</option>
-                <option value="ti">Tarjeta de Identidad</option>
-                <option value="pp">Pasaporte</option>
-            </select>
+            <input type="hidden" asp-for="IdUsu" />
 
-            <input type="text" placeholder="NUMERO DE DOCUMENTO" required>
-            <input type="tel" placeholder="TELÉFONO" required>
-            <input type="email" placeholder="CORREO" required>
-            <input type="password" placeholder="CONTRASEÑA" required>
+            <div class="form-grid">
+                <div>
+                    <label>Nombre</label>
+                    <input asp-for="Nombre" type="text" placeholder="NOMBRES" required />
+                </div>
 
-            <button type="submit" class="btn-guardar">GUARDAR</button>
+                <div>
+                    <label>Apellido</label>
+                    <input asp-for="Apellido" type="text" placeholder="APELLIDOS" required />
+                </div>
+
+                <div>
+                    <label>Tipo de documento</label>
+                    <select asp-for="IdTipoIdent" required>
+                        <option value="">TIPO DE DOCUMENTO</option>
+                        @if (tipoIdent != null)
+                        {
+                            foreach (var t in tipoIdent)
+                            {
+                                <option value="@t.IdTipoIdent">@t.Nombre</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div>
+                    <label>Número de documento</label>
+                    <input asp-for="NumIdent" type="text" placeholder="NÚMERO DE DOCUMENTO" required />
+                </div>
+
+                <div>
+                    <label>Teléfono</label>
+                    <input asp-for="TelUsu" type="tel" placeholder="TELÉFONO" required />
+                </div>
+
+                <div>
+                    <label>Correo</label>
+                    <input asp-for="Correo" type="email" placeholder="CORREO" required />
+                </div>
+
+                <div>
+                    <label>Carrera</label>
+                    <select asp-for="IdCarrera" class="form-control" required>
+                        <option value="">CARRERA</option>
+                        @if (carreras != null)
+                        {
+                            foreach (var c in carreras)
+                            {
+                                <option value="@c.IdCarrera">@c.NombreCarrera</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div>
+                    <label>Semestre</label>
+                    <select asp-for="IdSemestre" class="form-select" required>
+                        <option value="">SEMESTRE</option>
+                        @for (int i = 1; i <= 10; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="botones-acciones">
+                <button type="submit" class="btn-guardar">GUARDAR</button><br /><br />
+                <a asp-controller="Tutorado" asp-action="PanelTutorado" class="btn-volver">VOLVER</a>
+            </div>
         </form>
     </section>
+    
 </main>
+
+<!-- Script que actualiza la imagen y el campo hidden -->
 <script>
-    document.querySelectorAll("input[name='avatar']").forEach(radio => {
+    document.querySelectorAll("input[name='AvatarRadio']").forEach(radio => {
         radio.addEventListener("change", function () {
-            let imgSrc = this.nextElementSibling.getAttribute("src");
+            const imgSrc = this.nextElementSibling.getAttribute("src");
+            const avatarValue = this.value;
             document.getElementById("avatarSeleccionado").setAttribute("src", imgSrc);
+            document.getElementById("Avatar").value = avatarValue;
         });
     });
 </script>

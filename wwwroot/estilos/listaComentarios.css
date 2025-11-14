@@ -1,0 +1,180 @@
+﻿body {
+    background: #e6e6e6 url('../img/FondoZigAzul.png') repeat; /* azul claro */
+    
+}
+/* ======================
+   CONTENEDOR GENERAL
+====================== */
+.bloquear-comentarios-container {
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.5);
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    width: 90%;
+    padding: 30px 60px;
+    font-family: 'Poppins', sans-serif;
+    height: auto;
+    font-family: Montserrat, sans-serif;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+    border-radius: 30px;
+}
+
+/* ======================
+   SECCIÓN DE COMENTARIOS
+====================== */
+/* Contenedor de comentarios */
+.comentarios-lista {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 🔹 Dos columnas */
+    gap: 15px; /* Espacio entre tarjetas */
+    width: 100%;
+    margin: 0 auto;
+    justify-items: center; /* Centra las tarjetas */
+}
+
+/* Tarjeta de comentario */
+.comentario-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 20px 25px;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    width: 100%; /* Ajusta el tamaño dentro de cada columna */
+    transition: transform 0.2s ease;
+}
+
+    .comentario-card:hover {
+        transform: translateY(-3px);
+    }
+.comentario-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+}
+
+.avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #6cb8dc;
+}
+
+
+/* Responsive (pantallas pequeñas) */
+@media (max-width: 900px) {
+    .comentarios-lista {
+        grid-template-columns: 1fr; /* 🔹 En móviles, una sola columna */
+    }
+
+    .comentario-card {
+        width: 100%;
+    }
+}
+
+/* Icono del usuario */
+.comentario-icono {
+    font-size: 2.5rem;
+    color: #3b82f6;
+}
+
+/* Texto del comentario */
+.comentario-info {
+    flex: 1;
+}
+
+    .comentario-info h4 {
+        font-size: 1.1rem;
+        color: #1c3c50;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .comentario-info p {
+        margin: 5px 0;
+        font-size: 0.95rem;
+        color: #333;
+    }
+
+/* Botón bloquear */
+.bloquear-btn {
+    background-color: #6cb8dc;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 25px;
+    cursor: pointer;
+    align-self: flex-end;
+    transition: all 0.2s ease;
+    font-size:0.82em;
+}
+
+    .bloquear-btn:hover {
+        background-color: #1c3c50;
+    }
+
+
+
+
+
+/* ======================
+   TITULO
+====================== */
+.titulo-pagina {
+    text-align: center;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #1c3c50;
+    text-transform: uppercase;
+    margin-top: 120px;
+    margin-bottom: 20px;
+    font-family: Montserrat, sans-serif;
+    color: #f9bb65;
+    text-shadow: 3px 3px #1e5778;
+    text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+    4px 3px 0px #1e5778;
+    
+}
+.paginacion-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    gap: 10px;
+    font-family: Montserrat, sans-serif;
+}
+
+.pagina-btn {
+    background-color: #6cb8dc;
+    color: #fff;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1em;
+    transition: all 0.2s ease-in-out;
+}
+
+    .pagina-btn:hover {
+        background-color: #1c3c50;
+    }
+
+    .pagina-btn:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+#pageIndicator {
+    font-family: Montserrat, sans-serif;
+    font-weight: 600;
+    color: #1c3c50;
+}

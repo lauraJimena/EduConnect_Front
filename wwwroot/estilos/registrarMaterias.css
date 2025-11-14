@@ -1,0 +1,194 @@
+﻿body{
+    font-family:Montserrat, sans-serif;
+}
+.completar-perfil-container {
+    margin-top: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0;
+    background: url('/img/FondoRanking.png') center; /* Fondo zigzag o sólido */
+    
+}
+.paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+    .paginacion button {
+        background-color: #fbc959;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    }
+
+        .paginacion button:hover:not(:disabled) {
+            background-color: #3f7594;
+            
+        }
+
+        .paginacion button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+#paginaActual {
+    font-weight: bold;
+    color: #555;
+}
+
+.completar-perfil-card {
+    background: #e3f1f2;
+    border-radius: 20px;
+    padding: 30px 40px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    width: 80%;
+    max-width: 850px;
+    position: relative;
+}
+
+    .completar-perfil-card h1 {
+        font-size: 35px;
+        text-align: center;
+        color: #fbc959;
+        text-shadow: 1.5px 1.5px 0 white;
+        margin-bottom: 10px;
+        text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+        3px 3px 0px #1e5778;
+    }
+
+.descripcion {
+    text-align: center;
+    color: #555;
+    margin-bottom: 25px;
+    font-size: 15px;
+}
+
+/* 🔍 Buscador y filtro */
+.buscador-filtro {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+    gap: 15px;
+}
+
+.buscador {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    background: white;
+    border-radius: 25px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+    .buscador input {
+        border: none;
+        padding: 10px 15px;
+        width: 100%;
+        outline: none;
+        font-size: 14px;
+        font-family: Montserrat, sans-serif;
+    
+    }
+
+    .buscador button {
+        background: transparent;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        color: #666;
+    }
+
+.filtro {
+    background: white;
+    border-radius: 15px;
+    padding: 10px 20px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+    .filtro select {
+        border: none;
+        outline: none;
+        font-size: 14px;
+        color: #555;
+        cursor: pointer;
+    }
+
+/* 📘 Lista de materias */
+.lista-materias {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.materia-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border: 2px solid transparent;
+}
+
+    /* Hover (solo efecto temporal) */
+    .materia-card:hover {
+        transform: translateY(-3px);
+        border-color: #fbc959;
+    }
+
+    /* Seleccionada (efecto persistente) */
+    .materia-card.selected {
+        background-color: #fef1cb;
+        border-color: #fbc959;
+        box-shadow: 0 0 10px rgba(251, 201, 89, 0.6);
+    }
+
+
+.materia-info h3 {
+    color: #2a2a2a;
+    font-size: 16px;
+    margin-bottom: 6px;
+}
+
+.materia-info p {
+    color: #555;
+    margin: 0;
+    font-size: 14px;
+}
+
+/* 🔹 Botón guardar */
+.btn-guardar {
+    background-color: #fbc959;
+    color: #444;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 40px;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;
+    margin: 30px auto 0;
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+    .btn-guardar:hover {
+        background-color: #ffd97d;
+    }
+
+.sin-materias {
+    text-align: center;
+    color: #777;
+    margin-top: 20px;
+}

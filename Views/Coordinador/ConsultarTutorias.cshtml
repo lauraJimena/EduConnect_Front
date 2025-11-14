@@ -1,0 +1,155 @@
+﻿@using EduConnect_Front.Dtos
+@model IEnumerable<TutoriaConsultaDto>
+
+@{
+    ViewData["Title"] = "Consultar Tutorías";
+    Layout = "_LayoutUsuario";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/consultarTutorias.css" />
+}
+
+<main class="contenedor-consultar">
+    <h1>CONSULTAR TUTORÍAS</h1>
+
+    <div class="contenedor-tabla-filtros">
+        <!-- 🔹 Tabla -->
+        <div class="tabla-tutorias">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre tutorado</th>
+                        <th>Nombre tutor</th>
+                        <th>Materia</th>
+                        <th>Carrera</th>
+                        <th>Semestre materia</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.NombreTutorado</td>
+                                <td>@item.NombreTutor</td>
+                                <td>@item.Materia</td>
+                                <td>@item.Carrera</td>
+                                <td>@item.SemestreMateria</td>
+                                <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                                <td>@item.Hora</td>
+                                <td>@item.Estado</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" style="text-align:center; color:#777;">No hay tutorías registradas</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 🔹 Panel lateral de filtros -->
+        <aside class="filtros">
+            <h2>FILTRAR POR:</h2>
+
+            <form method="get" asp-action="ConsultarTutorias" asp-controller="Coordinador">
+                <label for="carrera">CARRERA</label>
+                <input type="text" name="carrera" placeholder="Ingrese carrera..." />
+
+                <label for="semestre">SEMESTRE</label>
+                <select name="semestre">
+                    <option value="">Seleccione</option>
+                    @for (int i = 1; i <= 10; i++)
+                    {
+                        <option value="@i">@i</option>
+                    }
+                </select>
+
+                <label for="materia">MATERIA</label>
+                <input type="text" name="materia" placeholder="Ingrese materia..." />
+
+                <label for="ordenFecha">FECHA</label>
+                <select name="ordenFecha">
+                    <option value="">-- Ordenar por --</option>
+                    <option value="1">Más próximas</option>
+                    <option value="2">Más lejanas</option>
+                </select>
+
+                <h3>ESTADO:</h3>
+                <div class="filtros-estado">
+                    <label><input type="checkbox" name="idEstado" value="4" checked /> Pendiente</label>
+                    <label><input type="checkbox" name="idEstado" value="3" checked /> Aceptada</label>
+                    <label><input type="checkbox" name="idEstado" value="5" checked /> Rechazada</label>
+                    <label><input type="checkbox" name="idEstado" value="6" checked /> Finalizada</label>
+                </div>
+
+                <button type="submit" class="btn-filtrar">Aplicar filtros</button>
+                
+                <button type="button" class="btn-filtrar limpiar" id="btnLimpiar">Limpiar filtros</button>
+
+                <script>
+                    document.getElementById("btnLimpiar").addEventListener("click", function() {
+                        // Limpia los inputs y selects
+                        document.querySelectorAll(".filtros input, .filtros select").forEach(el => {
+                            if (el.type === "checkbox") el.checked = false;
+                            else el.value = "";
+                        });
+
+                        // Redirige al método sin filtros
+                        window.location.href = '/Coordinador/ConsultarTutorias';
+                    });
+                </script>
+            </form>
+        </aside>
+    </div>
+</main>
+@section Scripts {
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const filasPorPagina = 5; // 👉 Cambia la cantidad que quieras mostrar
+    const tabla = document.querySelector(".tabla-tutorias table tbody");
+    const filas = Array.from(tabla.querySelectorAll("tr"));
+    const totalFilas = filas.length;
+    const totalPaginas = Math.ceil(totalFilas / filasPorPagina);
+    const contenedorPaginacion = document.createElement("div");
+    contenedorPaginacion.className = "paginacion";
+
+    let paginaActual = 1;
+
+    function mostrarPagina(pagina) {
+        // Oculta todas las filas
+        filas.forEach((fila, i) => {
+            fila.style.display =
+                i >= (pagina - 1) * filasPorPagina && i < pagina * filasPorPagina
+                    ? ""
+                    : "none";
+        });
+
+        // Actualiza botones
+        contenedorPaginacion.innerHTML = "";
+        for (let i = 1; i <= totalPaginas; i++) {
+            const boton = document.createElement("button");
+            boton.textContent = i;
+            boton.className = "btn-pagina" + (i === pagina ? " activo" : "");
+            boton.onclick = () => mostrarPagina(i);
+            contenedorPaginacion.appendChild(boton);
+        }
+    }
+
+    // Insertar la paginación después de la tabla
+    const contenedorTabla = document.querySelector(".tabla-tutorias");
+    contenedorTabla.appendChild(contenedorPaginacion);
+
+    // Mostrar primera página al inicio
+    mostrarPagina(paginaActual);
+});
+</script>
+}

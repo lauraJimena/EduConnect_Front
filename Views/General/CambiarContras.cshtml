@@ -1,0 +1,89 @@
+﻿@using EduConnect_Front.Dtos
+@{
+    ViewData["Title"] = "Actualizar Contraseña";
+    var mostrarPopup = TempData["MostrarPopup"] != null && (bool)TempData["MostrarPopup"];
+}
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/actualizarContrasena.css" />
+}
+<div class="caja-general">
+<div class="container mt-5">
+    <h3>Actualizar Contraseña</h3>
+
+    <form asp-action="CambiarContrasena" method="post">
+        <div class="mb-3 position-relative">
+            <label for="nuevaPassword" class="form-label">Nueva Contraseña</label>
+            <div class="password-wrapper">
+                <input type="password"
+                       id="nuevaPassword"
+                       name="nuevaPassword"
+                       class="form-control"
+                       placeholder="Ingresa una nueva contraseña"
+                       required
+                       minlength="6" />
+                <span id="togglePassword" class="toggle-password">👁️</span>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success w-100">Guardar Contraseña</button>
+        </div>
+
+    </form>
+</div>
+<div class="caja-imagen">
+    <img src="~/img/PensarSolicitud.png" alt="Avatar del Tutor"/>
+</div>
+</div>
+<!-- Popups -->
+@if (TempData["MostrarPopup"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "advertencia",
+        Titulo = "Actualiza tu contraseña",
+        Mensaje = "Este usuario fue registrado por un administrador. Por seguridad, debes actualizar tu contraseña antes de continuar."
+    })
+}
+
+@if (TempData["ContrasActualizada"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "exito",
+        Titulo = "Contraseña actualizada con éxito",
+        Mensaje = TempData["Exito"] as string
+    })
+<script>
+    setTimeout(() => {
+        const popup = document.querySelector('.modal-fondo');
+        if (popup) popup.style.display = 'none';
+    }, 3000);
+</script>
+}
+
+@if (TempData["ErrorContras"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "error",
+        Titulo = "Error al actualizar la contraseña",
+        Mensaje = TempData["ErrorContras"] as string
+    })
+}
+<script>
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        const pwdInput = document.getElementById("nuevaPassword");
+        if (pwdInput.type === "password") {
+            pwdInput.type = "text";
+            this.textContent = "🙈"; // cambia el icono
+        } else {
+            pwdInput.type = "password";
+            this.textContent = "👁️"; // vuelve al ojo
+        }
+    });
+</script>
+
+
+
+

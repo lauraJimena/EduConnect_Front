@@ -1,0 +1,124 @@
+﻿@model List<EduConnect_Front.Dtos.HistorialTutoriaDto>
+
+@{
+    ViewData["Title"] = "Historial de Tutorías";
+    Layout = "_LayoutUsuario";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/historialTutor.css" />
+}
+
+<main class="historial-container">
+    <section class="encabezado">
+        <h1>HISTORIAL DE TUTORÍAS</h1>
+    </section>
+
+    <section class="contenido">
+        <!-- 🔹 Tabla principal -->
+        <div class="tabla-contenedor">
+            @{
+                // Configuración de paginación
+                int pageSize = 5; // Número de registros por página
+                int page = 1;
+
+                // Leer la página actual desde la URL
+                var queryPage = Context.Request.Query["page"].ToString();
+                if (!string.IsNullOrEmpty(queryPage) && int.TryParse(queryPage, out int p))
+                {
+                    page = p;
+                }
+
+                // Calcular total de registros y páginas
+                int totalRegistros = Model?.Count ?? 0;
+                int totalPages = (int)Math.Ceiling((double)totalRegistros / pageSize);
+
+                // Obtener los registros de la página actual
+                var registrosPaginados = Model?
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList() ?? new List<EduConnect_Front.Dtos.HistorialTutoriaDto>();
+            }
+
+            <table class="tabla-historial">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Materia</th>
+                        <th>Tutorado</th>
+                        <th>Estado</th>
+                        <th>Tema</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in registrosPaginados)
+
+                        {
+                            <tr>
+                                <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                                <td>@DateTime.Today.Add(item.Hora).ToString("hh:mm tt")</td>
+                                <td>@item.MateriaNombre</td>
+                                <td>@item.TutorNombreCompleto</td>
+                                <td>@item.EstadoNombre</td>
+                                <td>@item.Tema</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="sin-registros">No hay tutorías registradas.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (totalPages > 1)
+            {
+                <div class="paginacion">
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        if (i == page)
+                        {
+                            <span class="pagina pagina-actual">@i</span>
+                        }
+                        else
+                        {
+                            <a href="?page=@i" class="pagina">@i</a>
+                        }
+                    }
+                </div>
+            }
+
+        </div>
+
+        <!-- 🔹 Panel lateral de filtros -->
+        <aside class="panel-filtros">
+            <form asp-action="HistorialTutor" method="get" class="filtros-form">
+                <h3>FILTRAR POR ESTADO:</h3>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="idEstados" value="3" /> ACEPTADA</label>
+                    <label><input type="checkbox" name="idEstados" value="6" /> FINALIZADA</label>
+                    <label><input type="checkbox" name="idEstados" value="5" /> RECHAZADA</label>
+                </div>
+                <button type="submit" class="btn-filtrar">APLICAR FILTRO</button>
+            </form>
+        </aside>
+    </section>
+
+    <!-- 🔹 Popups -->
+    @if (TempData["Error"] != null)
+    {
+        @await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto
+        {
+            Tipo = "error",
+        Titulo = "Error al cargar historial",
+        Mensaje = TempData["Error"] as string
+        })
+        }
+
+    <a asp-controller="Tutor" asp-action="PanelTutor" class="btn-volver">VOLVER</a>
+</main>
+

@@ -1,0 +1,113 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@900&family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Quicksand:wght@300..700&display=swap');
+
+/* Fondo general */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Montserrat, sans-serif;
+    background: url('../img/FondoPerfil.png');
+    background-size: cover;
+}
+
+
+/* Contenedor principal */
+.administrador-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin-bottom: 40px;
+}
+
+/* Contenido */
+.contenido {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 80%;
+    gap: 0px;
+    
+}
+
+    /* Título */
+    .contenido h1 {
+        font-family: 'League Spartan', sans-serif;
+        font-size: 2.5em;
+        position: absolute;
+        top: 120px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-weight: bold;
+        color: #f9bb65;
+        text-shadow: 3px 3px #1e5778;
+        text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+        4px 3px 0px #1e5778;
+        font-family: Montserrat, sans-serif;
+    }
+
+/* Menú */
+.opciones {
+    background: rgba(192, 192, 192, 0.5);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 520px;
+    margin-top: 25%;
+    margin-left:20%;
+    margin-right:-60px;
+    align-items:center;
+  
+}
+.btn-opcion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #3f7594;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-align: left;
+    border: 2px solid rgba(12, 55, 105, 0.3);
+    box-shadow: 8px 10px white;
+    text-decoration:none;
+    width:380px;
+}
+
+    .btn-opcion:hover {
+        background: rgba(12, 55, 105, 0.8);
+        width: 400px;
+        color: white;
+
+    }
+
+    .btn-opcion img {
+        width: 40px;
+        height: 40px;
+    }
+
+
+        .opciones button img {
+            width: 52px;
+            height: auto;
+           
+        }
+
+
+/* Imagen personaje */
+.imagen-personaje img {
+    width: 700px;
+    margin-top: 30%;
+    height: auto;
+    
+    padding-left:0px;
+    margin-left:-8%;
+}

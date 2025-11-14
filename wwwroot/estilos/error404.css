@@ -1,0 +1,55 @@
+﻿body {
+    background: url('../img/FondoConsultarUsu.png') repeat;
+    font-family:Montserrat, sans-serif;
+   
+}
+.error-container {
+    text-align: center;
+    padding: 80px 20px;
+    background-color: #f7f9fc;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin-top: 110px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom:20px;
+}
+
+    .error-container h1 {
+        font-size: 100px;
+        color: #007bff;
+        margin-bottom: 0;
+        text-shadow: 3px 3px #1e5778;
+        text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+        4px 3px 0px #1e5778;
+    }
+
+    .error-container h2 {
+        font-size: 28px;
+        color: #333;
+        margin: 10px 0 20px 0;
+    }
+
+    .error-container p {
+        color: #555;
+        font-size: 18px;
+    }
+
+.btn-volver {
+    background-color: #62a8cc;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 6px 5px rgba(0,0,0,0.2);
+    margin-top: 10px;
+}
+
+    .btn-volver:hover {
+        background-color: #274a66;
+        transform: scale(1.05);
+        color: white;
+    }

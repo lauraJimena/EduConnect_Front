@@ -1,0 +1,110 @@
+﻿@model List<EduConnect_Front.Dtos.ComentarioTutorDto>
+
+@{
+    ViewData["Title"] = "Comentarios de Tutor";
+    Layout = "_LayoutUsuario";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/comentariosTutor.css" />
+}
+
+<main class="comentarios-container">
+    <h1>🗣️ Mis Comentarios</h1>
+
+    <section class="filtros">
+        <form asp-action="ComentariosTutorFiltrar" method="post">
+            @Html.AntiForgeryToken()
+            <label for="calificacion">Calificación:</label>
+            <select id="calificacion" name="calificacion">
+                <option value="">Todas</option>
+                <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                <option value="4">⭐⭐⭐⭐ (4)</option>
+                <option value="3">⭐⭐⭐ (3)</option>
+                <option value="2">⭐⭐ (2)</option>
+                <option value="1">⭐ (1)</option>
+            </select>
+
+            <label for="ordenFecha">Ordenar por:</label>
+            <select id="ordenFecha" name="ordenFecha">
+                <option value="1">Más recientes</option>
+                <option value="2">Más antiguos</option>
+            </select>
+
+            <button type="submit" class="btn-filtrar">🔍 Filtrar</button>
+            <a asp-action="ComentariosTutor" class="btn-limpiar">🔄 Limpiar</a>
+        </form>
+    </section>
+    @{
+        // Configuración de la paginación
+        int pageSize = 3;
+        int page = 1;
+
+        // Obtener el número de página desde la URL (querystring)
+        var queryPage = Context.Request.Query["page"].ToString();
+        if (!string.IsNullOrEmpty(queryPage) && int.TryParse(queryPage, out int p))
+        {
+            page = p;
+        }
+
+
+        // Calcular total de páginas
+        int totalComentarios = Model.Count;
+        int totalPages = (int)Math.Ceiling((double)totalComentarios / pageSize);
+
+        // Obtener los elementos de la página actual
+        var comentariosPaginados = Model
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToList();
+    }
+
+
+    <section class="lista-comentarios">
+        @if (comentariosPaginados.Any())
+        {
+            foreach (var c in comentariosPaginados)
+            {
+                <div class="comentario-card">
+                    <div class="comentario-header">
+                        <strong>@c.Usuario</strong>
+                        <span>@c.FechaFormateada</span>
+                    </div>
+                    <div class="comentario-texto">@c.Descripcion</div>
+                    <div class="comentario-calificacion">
+                        @for (int i = 0; i < c.Calificacion; i++)
+                        {
+                            <span class="estrella">⭐</span>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="sin-comentarios">No hay comentarios disponibles.</p>
+        }
+    </section>
+    @if (totalPages > 1)
+    {
+        <div class="paginacion">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                if (i == page)
+                {
+                    <!-- Página actual -->
+                    <span class="pagina pagina-actual">@i</span>
+                }
+                else
+                {
+                    <!-- Otras páginas -->
+                    <a href="?page=@i" class="pagina">@i</a>
+                }
+            }
+        </div>
+    }
+
+
+
+    <a asp-controller="Tutor" asp-action="PanelTutor" class="btn-volver">VOLVER</a>
+</main>

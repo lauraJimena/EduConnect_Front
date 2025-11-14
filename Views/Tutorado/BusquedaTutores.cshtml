@@ -1,0 +1,179 @@
+﻿@model List<EduConnect_Front.Dtos.ObtenerTutorDto>
+@using EduConnect_Front.Dtos
+@{
+    ViewData["Title"] = "Búsqueda de Tutores";
+    Layout = "_LayoutUsuario";
+    var filtros = ViewBag.Filtros as BuscarTutorDto ?? new BuscarTutorDto { Page = 1, PageSize = 4 };
+}
+@section Styles {
+   
+    <link rel="stylesheet" href="~/estilos/busquedaTutores.css">
+   
+}
+<main class="busqueda-container">
+    <!-- Cabecera -->
+    <section class="intro">
+        <div class="intro-img">
+            <img src="~/img/BusquedaIcono.png" alt="Ilustración búsqueda">
+        </div>
+        <div class="intro-texto">
+            <h1>🔎 BÚSQUEDA DE TUTORES</h1>
+            <p>
+                INICIA TU BÚSQUEDA DE TUTORES, PUEDES FILTRAR POR CARRERA, SEMESTRE Y/O MATERIA
+                EN LA QUE REQUIERES AYUDA.
+            </p>
+        </div>
+    </section>
+<section class="busqueda-filtros">
+    <form asp-controller="Tutorado" asp-action="BusquedaTutores" method="post" class="filtros-form">
+           
+        @Html.AntiForgeryToken()
+
+        <div class="barra-busqueda">
+            <input name="Nombre" type="text" placeholder="BUSCAR POR NOMBRE DE TUTORES" value="@filtros.Nombre" />
+            <button class="btn-buscar" type="submit">🔍</button>
+        </div>
+
+        <aside class="filtros">
+            <h3>FILTRAR POR:</h3>
+
+            <input name="CarreraNombre" type="text" placeholder="CARRERA (ej: Psicología)" value="@filtros.CarreraNombre" />
+            <select name="Semestre">
+                <option value="">SEMESTRE</option>
+                @for (int i = 1; i <= 12; i++)
+                {
+                    if (filtros.Semestre == i.ToString())
+                    {
+                        @:
+                        <option value="@i" selected>@i</option>
+                    }
+                    else
+                    {
+                        @:
+                        <option value="@i">@i</option>
+                    }
+                }
+            </select>
+
+
+            <input name="MateriaNombre" type="text" placeholder="MATERIA (ej: Programación)" value="@filtros.MateriaNombre" />
+
+            <select name="IdEstado">
+                <option value="">ESTADO</option>
+                @if (filtros.IdEstado == 1)
+                {
+                    @:
+                    <option value="1" selected>Activo</option>
+                }
+                else
+                {
+                    @:
+                    <option value="1">Activo</option>
+                }
+
+                @if (filtros.IdEstado == 2)
+                {
+                    @:
+                    <option value="2" selected>Inactivo</option>
+                }
+                else
+                {
+                    @:
+                    <option value="2">Inactivo</option>
+                }
+            </select>
+
+
+            <div class="caja-botones">
+            <button class="btn-ranking btn-aplicar" type="submit">APLICAR FILTRO</button><br />
+               
+                <a asp-controller="Tutorado"
+                   asp-action="RankingTutores"
+                   class="btn-ranking">
+                    VER RANKING DE TUTORES
+                </a>
+            </div>
+                
+
+        </aside>
+    </form>
+</section>
+
+<!-- Lista -->
+<section class="lista-tutores">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var t in Model)
+        {
+            <div class="tutor-card">
+                    <img src="~/img/avatars/@(t.Avatar ?? "avatar1.png")" alt="Avatar tutor" class="avatar-tutor" />
+
+                <div class="info-tutor">
+                    <p><b>NOMBRE:</b> @t.TutorNombreCompleto</p>
+                    <p><b>CARRERA:</b> @t.CarreraNombre</p>
+                    <p><b>SEMESTRE:</b> @t.Semestre</p>
+                    <p><b>MATERIA QUE DOMINA:</b> @t.MateriaNombre</p>
+                    <p><b>ESTADO:</b> @(t.IdEstado == 1 ? "Activo" : "Inactivo")</p>
+                    <div class="acciones">
+                        
+                            <a asp-controller="Tutorado" asp-action="PerfilTutor" asp-route-idTutor="@t.IdUsuario" class="btn-perfil">VER PERFIL</a>
+                        <a asp-controller="Tutorado"
+                           asp-action="FormSolicitudTutoria"
+                           asp-route-idTutor="@t.IdUsuario"
+                           asp-route-idMateria="@t.IdMateria"
+                           asp-route-nombreMateria="@t.MateriaNombre"
+                           class="btn-solicitar">
+                            SOLICITAR TUTORÍA
+                        </a>
+                    </div>
+                </div>
+            </div>
+         
+            <input name="MateriaNombre" type="hidden" value="@t.MateriaNombre" />
+        }
+           
+    }
+    else
+    {
+        <div class="sin-resultados">
+            <p>No hay tutores para mostrar. Ajusta tus filtros y vuelve a intentar.</p>
+                <img src="~/img/PensarSolicitud.png" alt="Sin resultados"><br />
+            <a asp-controller="Tutorado" asp-action="BusquedaTutores" asp-route-page="1" class="btn-volver-todos">🔄 Ver todos los tutores</a>
+        </div>
+    }
+</section>
+
+<!-- Paginación -->
+<div class="paginacion">
+    @if ((int)ViewBag.Page > 1)
+    {
+        <a asp-action="BusquedaTutores"
+           asp-route-page="@(ViewBag.Page - 1)"
+           asp-route-Nombre="@filtros.Nombre"
+           asp-route-CarreraNombre="@filtros.CarreraNombre"
+           asp-route-MateriaNombre="@filtros.MateriaNombre"
+           asp-route-Semestre="@filtros.Semestre"
+           asp-route-IdEstado="@(filtros.IdEstado)"
+           class="btn-paginacion">⬅️ Anterior</a>
+    }
+
+    <span>Página @ViewBag.Page</span>
+
+    @if (ViewBag.HasMore == true)
+    {
+        <a asp-action="BusquedaTutores"
+           asp-route-page="@(ViewBag.Page + 1)"
+           asp-route-Nombre="@filtros.Nombre"
+           asp-route-CarreraNombre="@filtros.CarreraNombre"
+           asp-route-MateriaNombre="@filtros.MateriaNombre"
+           asp-route-Semestre="@filtros.Semestre"
+           asp-route-IdEstado="@(filtros.IdEstado)"
+           class="btn-paginacion">Siguiente ➡️</a>
+    }
+    else
+    {
+        <button class="btn-paginacion deshabilitado" disabled>Sin más resultados ➡️</button>
+    }
+</div>
+    <a asp-controller="Tutorado" asp-action="PanelTutorado" class="btn-volver">VOLVER</a>
+</main>

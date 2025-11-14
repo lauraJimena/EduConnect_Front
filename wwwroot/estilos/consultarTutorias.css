@@ -1,0 +1,210 @@
+﻿/* 🎓 General */
+.contenedor-consultar {
+    font-family: 'Montserrat', sans-serif;
+    background: url('/img/FondoZig.png') center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    text-align: center;
+}
+    /* 🔹 Capa semitransparente encima del fondo */
+    .contenedor-consultar::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.25); /* blanco con opacidad */
+        z-index: 0;
+    }
+
+    /* 🔹 Asegura que el contenido quede arriba */
+    .contenedor-consultar > * {
+        position: relative;
+        z-index: 2;
+    }
+    .contenedor-consultar h1 {
+        margin-top: 80px;       
+        font-weight: 800;        
+        margin-bottom: 10px;
+        font-size: 2.3em;
+        color: #fbc959;
+        text-shadow: 3px 3px #1e5778;
+        text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+        4px 3px 0px #1e5778;
+        font-family: Montserrat, sans-serif;
+    }
+
+/* 🧩 Contenedor general de tabla + filtros */
+.contenedor-tabla-filtros {
+    display: flex;
+    justify-content: space-between;
+    background-color: #c3dfed;
+    border-radius: 25px;
+    padding: 25px;
+    max-width: 1500px;
+    margin: 0 auto;
+    gap: 20px;
+}
+
+/* 📋 Tabla */
+.tabla-tutorias {
+    flex: 3.8;
+    overflow-x: auto;
+}
+
+    .tabla-tutorias table {
+        width: 100%;
+        border-collapse: collapse;
+        
+        border-collapse: separate;
+        border-spacing: 2px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .tabla-tutorias th {
+        background-color: #f6b741;
+        color: white;
+        font-weight: 700;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .tabla-tutorias td {
+        background-color: #fff;
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+        font-size: 0.95em;
+    }
+
+    .tabla-tutorias tr:hover td {
+        background-color: #e8f6ff;
+    }
+
+/* 🎚️ Filtros */
+.filtros {
+    flex: 1;
+    height: 20%;
+    background: #fff;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    text-align: left;
+}
+
+    .filtros h2 {
+        font-weight: 800;
+        color: #444;
+        font-size: 1.1em;
+        margin-bottom: 15px;
+    }
+
+    .filtros label {
+        display: block;
+        font-weight: 700;
+        margin: 8px 0 4px 0;
+        color: #444;
+    }
+    .filtros h3 {
+        font-size: 0.9em;
+        font-weight: 700;
+        margin-top: 10px;
+        color: #444;
+    }
+
+    .filtros input[type="text"],
+    .filtros select {
+        width: 100%;
+        padding: 6px;
+        border-radius: 30px;
+        border: 1px solid #ccc;
+        font-size: 0.9em;
+    }
+
+        .filtros input[type="text"]:focus,
+        .filtros select:focus {
+            border-color: #a084e8;
+            outline: none;
+        }
+
+/* 🟩 Estado checkboxes */
+.filtros-estado {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+    .filtros-estado label {
+        font-weight: 500;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filtros-estado input[type="checkbox"] {
+        accent-color: #4aa3df;
+        width: 18px;
+        height: 18px;
+    }
+
+/* 🔘 Botón */
+.btn-filtrar {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    border: none;
+    border-radius: 30px;
+    background-color: #4aa3df;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .btn-filtrar:hover {
+        background-color: #337faa;
+    }
+    .btn-filtrar.limpiar {
+        border-radius: 30px;
+        background: #f0f0f0;
+        color: #444;
+        border: 2px solid #ccc;
+    }
+
+        .btn-filtrar.limpiar:hover {
+            background: #ddd;
+            color: #000;
+        }
+
+.paginacion {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.btn-pagina {
+    background: #fff;
+    border: 2px solid #4aa3df;
+    color: #4aa3df;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .btn-pagina:hover {
+        background: #4aa3df;
+        color: #fff;
+    }
+
+    .btn-pagina.activo {
+        background: #4aa3df;
+        color: #fff;
+    }

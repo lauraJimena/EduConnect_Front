@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EduConnect</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/estilos/layoutUsuario.css" />
+    <link rel="stylesheet" href="~/estilos/estilos.css">
+    <link rel="stylesheet" href="~/estilos/popup.css" />
+   @*  <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+          integrity="sha512-6uH8h9r0T2fUxDq8Pnl1v7yF8x5YtXxJZoLxDT0jITrbpbSYXQ0GQf8JfOC4A6hXj0+KkB8n7TQcQ9R+5smY3Q=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" /> *@
+@*     <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer" /> *@
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+          integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+    @RenderSection("Styles", required: false)
+</head>
+
+
+<body>
+    @{
+        var nombreUsuario = Context.Session.GetString("UsuarioNombre") ?? "Usuario";
+        var avatarUrl = Context.Session.GetString("AvatarUrl");
+    }
+
+    <header class="usuario-header">
+        <nav class="navbar">
+            <div class="logo">
+                <img src="~/img/Logo.png" alt="Logo EduConnect" class="logo-img" />
+            </div>
+
+            <!-- 🔹 Contenedor del usuario -->
+            
+        </nav>
+
+        <!-- 🔹 Inserta aquí el modal -->
+        @await Html.PartialAsync("_CerrarSesionModal")
+    </header>
+
+    <div class="usuario-content">
+        @RenderBody()
+        @{
+            var usuarioLogueado = Context.Session.GetInt32("IdUsu");
+        }
+
+        @if (usuarioLogueado != null)
+        {
+            <div class="boton-chat">
+                <img src="~/img/chat.png" alt="Logo chat" />
+            </div>
+            <div class="popup-chat" id="popupChat" data-id-usuario="@usuarioLogueado"></div>
+        }
+    </div>
+
+    <footer class="pie-pagina">
+        <div class="contenedor-footer">
+            <!-- Frase -->
+            <div class="frase-footer">
+                <span class="icono-comilla">❝</span>
+                <p>Aprendizaje que conecta, conocimiento que crece</p>
+            </div>
+
+            <!-- Correo -->
+            <div class="correo-footer">
+                <span class="icono-correo">✉</span>
+                <p>educonnect@gmail.com</p>
+            </div>
+
+            <!-- Logo y nombre -->
+            <div class="logo-footer">
+                <img src="~/img/Logo.png" alt="Logo EduConnect">
+
+            </div>
+        </div>
+    </footer>
+
+    @RenderSection("Scripts", required: false)
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--<script src="~/js/chat-popup.js">-->
+    <script src="/js/chat-popup.js"></script>
+</body>
+</html>

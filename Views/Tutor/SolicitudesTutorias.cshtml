@@ -1,0 +1,172 @@
+﻿@model List<EduConnect_Front.Dtos.SolicitudTutorDto>
+
+@{
+    ViewData["Title"] = "Solicitudes de Tutorías";
+    Layout = "_LayoutUsuario";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/solicitudesTutor.css" />
+}
+<!-- 🔹 Popup de ÉXITO -->
+<!-- 🔹 Popup de ÉXITO o RECHAZO -->
+@if (TempData["Exito"] != null)
+{
+    var mensaje = TempData["Exito"] as string ?? "";
+    var titulo = mensaje.Contains("rechazada", StringComparison.OrdinalIgnoreCase)
+        ? "Solicitud rechazada con éxito"
+        : "Solicitud aceptada con éxito";
+
+    @await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto
+    {
+        Tipo = "exito",
+        Titulo = titulo,
+        Mensaje = mensaje
+    })
+
+<script>
+    // 🔹 Desaparece el popup tras 3 segundos
+    setTimeout(() => {
+        const popup = document.querySelector('.modal-fondo');
+        if (popup) popup.style.display = 'none';
+    }, 3000);
+</script>
+}
+
+<!-- 🔹 Popup de ERROR -->
+@if (TempData["Error"] != null)
+{
+    @await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto
+    {
+        Tipo = "error",
+        Titulo = "Error al procesar la solicitud",
+        Mensaje = TempData["Error"] as string
+    })
+}
+
+<main class="solicitudes-container">
+    <section class="solicitudes-header">
+        <h1>SOLICITUDES DE TUTORÍAS</h1>
+    </section>
+
+    <section class="contenido-solicitudes">
+        <!-- 🔹 Lista de solicitudes -->
+        <div class="lista-solicitudes">
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var s in Model)
+                {
+                    <div class="solicitud-card">
+                        <div class="solicitud-info">
+                            <p><b>@s.Materia.ToUpper()</b></p>
+                            <p>Tutorado: <span>@s.NombreTutorado</span></p>
+                            <p>Fecha: <span>@s.Fecha.ToString("dd/MM/yyyy")</span></p>
+                            <p>Hora:
+                                <span>
+                                    @{
+                                        if (TimeSpan.TryParse(s.Hora, out var hora))
+                                        {
+                                            var horaFormateada = DateTime.Today.Add(hora).ToString("hh:mm tt");
+                                            @horaFormateada
+                                        }
+                                        else
+                                        {
+                                            @s.Hora
+                                        }
+                                    }
+                                </span>
+                            </p>
+                            <p>Modalidad: <span>@s.Modalidad</span></p>
+                            <p>Tema: <span>@s.Tema</span></p>
+                            <p>Comentario: <span>@s.Comentario</span></p>
+                            
+                        </div>
+                        
+                        <div class="acciones">
+                            <!-- Aceptar solicitud -->
+                            <form asp-action="AceptarSolicitud" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="idTutoria" value="@s.IdTutoria" />
+                                <button type="submit" class="btn-aceptar">✅ ACEPTAR</button>
+                            </form>
+
+                            <!-- Rechazar solicitud -->
+                            <form asp-action="RechazarSolicitud" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="idTutoria" value="@s.IdTutoria" />
+                                <button type="submit" class="btn-rechazar">❌ RECHAZAR</button>
+                            </form>
+                            
+                            
+                        </div>
+
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="sin-resultados">
+                    <p>No hay solicitudes para mostrar. Ajusta tus filtros y vuelve a intentar.</p>
+                    <img src="~/img/PensarSolicitud.png" alt="Avatar tutor">
+                    <!-- Botón para volver a cargar todos -->
+                    <form asp-controller="Tutor" asp-action="SolicitudesTutorias" method="get">
+                        <button type="submit" class="btn-volver-todos">🔄 Ver todos las solicitudes</button>
+                    </form>
+                </div>
+               
+            }
+        </div>
+ 
+       
+
+
+
+        <!-- 🔹 Panel lateral de filtros -->
+        <aside class="panel-filtros">
+            <form asp-action="SolicitudesTutoriasEnviar" method="post" class="filtros-form">
+                @Html.AntiForgeryToken()
+                <h3>FILTRAR POR:</h3>
+
+                <div class="campo-filtro">
+                    <label for="fecha">Modalidad sugerida</label>
+                    <select id="idModalidad" name="idModalidad">
+                        <option value="0">Todas</option>
+                        <option value="1">Presencial</option>
+                        <option value="2">Virtual</option>
+                        
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-filtrar">APLICAR</button>
+            </form>
+        </aside>
+    </section>
+    @if (ViewBag.TotalPaginas > 1)
+    {
+        <div class="paginacion">
+            @if (ViewBag.PaginaActual > 1)
+            {
+                <a asp-action="SolicitudesTutorias"
+                   asp-route-page="@(ViewBag.PaginaActual - 1)"
+                   asp-route-idMateria="@ViewBag.FiltroMateria"
+                   asp-route-idModalidad="@ViewBag.FiltroModalidad"
+                   class="btn-pagina">⬅ Anterior</a>
+            }
+
+            <span>Página @ViewBag.PaginaActual de @ViewBag.TotalPaginas</span>
+
+            @if (ViewBag.PaginaActual < ViewBag.TotalPaginas)
+            {
+                <a asp-action="SolicitudesTutorias"
+                   asp-route-page="@(ViewBag.PaginaActual + 1)"
+                   asp-route-idMateria="@ViewBag.FiltroMateria"
+                   asp-route-idModalidad="@ViewBag.FiltroModalidad"
+                   class="btn-pagina">Siguiente ➡</a>
+            }
+        </div>
+    }
+    <a asp-controller="Tutor" asp-action="PanelTutor" class="btn-volver">VOLVER</a>
+   
+</main>
+

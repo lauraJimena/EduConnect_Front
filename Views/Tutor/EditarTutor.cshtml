@@ -1,0 +1,174 @@
+﻿
+@using EduConnect_Front.Dtos
+@model EduConnect_Front.Dtos.EditarPerfilDto
+
+@{
+    ViewData["Title"] = "Editar Perfil";
+    Layout = "_LayoutUsuario";
+    var carreras = ViewBag.Carreras as List<CarreraDto>;
+    var tipoIdent = ViewBag.TipoIdent as List<TipoIdentDto>;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/editarTutorado.css">
+}
+
+@if (TempData["Success"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "exito",
+        Titulo = "Perfil actualizado con éxito",
+        Mensaje = TempData["Success"] as string
+    })
+<script>
+    // 🔹 Cierra el popup a los 3 segundos y redirige al Panel del Tutor
+    setTimeout(() => {
+        const popup = document.querySelector('.modal-fondo');
+        if (popup) popup.style.display = 'none';
+        window.location.href = '@Url.Action("PanelTutor", "Tutor")'; // 🔁 Redirige
+    }, 3000);
+</script>
+}
+
+@if (TempData["Error"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "error",
+        Titulo = "Error al actualizar el perfil",
+        Mensaje = TempData["Error"] as string
+    })
+}
+
+<main class="perfil-container">
+    <!-- PANEL IZQUIERDO -->
+
+
+    <section class="perfil-left">
+
+        <div class="avatar">
+            <!-- ✅ Si no tiene avatar guardado, se muestra avatar1.png -->
+            <img id="avatarSeleccionado"
+                 src="~/img/avatars/@(Model.Avatar ?? "avatar1.png")"
+                 alt="Avatar seleccionado">
+        </div>
+
+
+        <button class="nombre-tutorado">@Model.Nombre.ToUpper() @Model.Apellido.ToUpper()</button>
+        <!-- 🔹 Selección de avatares -->
+        <div class="avatar-selector">
+            <p>Elige tu avatar:</p>
+            <div class="avatar-opciones">
+                @for (int i = 1; i <= 12; i++)
+                {
+                    var avatarFile = $"avatar{i}.png";
+                    var isSelected = Model.Avatar == avatarFile ? "checked" : "";
+                    <label>
+                        <input type="radio" name="AvatarRadio" value="@avatarFile" @isSelected />
+                        <img src="~/img/avatars/@avatarFile" alt="Avatar @i" />
+                    </label>
+                }
+            </div>
+        </div>
+
+
+    </section>
+
+    <!-- PANEL DERECHO -->
+    <section class="perfil-right">
+        <form asp-action="EditarTutor" asp-controller="Tutor" method="post">
+            @Html.AntiForgeryToken()
+            <h1><img src="~/img/IconoEditar.png" alt="icono editar"> EDITAR PERFIL</h1>
+
+            <!-- 🔹 Campo oculto que lleva el valor del avatar -->
+            <input type="hidden" id="Avatar" name="Avatar" value="@Model.Avatar" />
+
+            <input type="hidden" asp-for="IdUsu" />
+
+            <div class="form-grid">
+                <div>
+                    <label>Nombre</label>
+                    <input asp-for="Nombre" type="text" placeholder="NOMBRES" required />
+                </div>
+
+                <div>
+                    <label>Apellido</label>
+                    <input asp-for="Apellido" type="text" placeholder="APELLIDOS" required />
+                </div>
+
+                <div>
+                    <label>Tipo de documento</label>
+                    <select asp-for="IdTipoIdent" required>
+                        <option value="">TIPO DE DOCUMENTO</option>
+                        @if (tipoIdent != null)
+                        {
+                            foreach (var t in tipoIdent)
+                            {
+                                <option value="@t.IdTipoIdent">@t.Nombre</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div>
+                    <label>Número de documento</label>
+                    <input asp-for="NumIdent" type="text" placeholder="NÚMERO DE DOCUMENTO" required />
+                </div>
+
+                <div>
+                    <label>Teléfono</label>
+                    <input asp-for="TelUsu" type="tel" placeholder="TELÉFONO" required />
+                </div>
+
+                <div>
+                    <label>Correo</label>
+                    <input asp-for="Correo" type="email" placeholder="CORREO" required />
+                </div>
+
+                <div>
+                    <label>Carrera</label>
+                    <select asp-for="IdCarrera" class="form-control" required>
+                        <option value="">CARRERA</option>
+                        @if (carreras != null)
+                        {
+                            foreach (var c in carreras)
+                            {
+                                <option value="@c.IdCarrera">@c.NombreCarrera</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div>
+                    <label>Semestre</label>
+                    <select asp-for="IdSemestre" class="form-select" required>
+                        <option value="">SEMESTRE</option>
+                        @for (int i = 1; i <= 10; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="botones-acciones">
+                <button type="submit" class="btn-guardar">GUARDAR</button><br /><br />
+                <a asp-controller="Tutor" asp-action="PanelTutor" class="btn-volver">VOLVER</a>
+            </div>
+        </form>
+    </section>
+
+</main>
+
+<!-- ✅ Script que actualiza la imagen y el campo hidden -->
+<script>
+    document.querySelectorAll("input[name='AvatarRadio']").forEach(radio => {
+        radio.addEventListener("change", function () {
+            const imgSrc = this.nextElementSibling.getAttribute("src");
+            const avatarValue = this.value;
+            document.getElementById("avatarSeleccionado").setAttribute("src", imgSrc);
+            document.getElementById("Avatar").value = avatarValue;
+        });
+    });
+</script>

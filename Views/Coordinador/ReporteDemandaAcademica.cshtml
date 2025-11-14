@@ -1,0 +1,80 @@
+﻿@model EduConnect_Front.Dtos.ReporteDemandaAcademicaDto
+@{
+    Layout = null; // ✅ Importante para evitar menús, solo el reporte
+}
+<html>
+<head>
+    <link rel="stylesheet" href="~/estilos/reporteDemandaAcademica.css" />
+
+</head>
+<body>
+    <header>
+        <img src="~/img/logo.png" alt="Logo EduConnect" />
+        <h2>Reporte de Demanda Académica</h2>
+        <p>Generado el @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</p>
+    </header>
+    
+
+    <h3>Top 5 materias con más tutorías</h3>
+    <table>
+        <thead><tr><th>Materia</th><th>Cantidad</th></tr></thead>
+        <tbody>
+            @foreach (var item in Model.TopMaterias)
+            {
+                <tr><td>@item.Nombre</td><td>@item.Cantidad</td></tr>
+            }
+        </tbody>
+    </table>
+
+    <h3>Top 5 carreras con más tutorías</h3>
+    <table>
+        <thead><tr><th>Carrera</th><th>Cantidad</th></tr></thead>
+        <tbody>
+            @foreach (var item in Model.TopCarreras)
+            {
+                <tr><td>@item.Nombre</td><td>@item.Cantidad</td></tr>
+            }
+        </tbody>
+    </table>
+
+    <h3>Distribución de tutorías por semestre</h3>
+    <table>
+        <thead><tr><th>Semestre</th><th>Cantidad</th></tr></thead>
+        <tbody>
+            @foreach (var item in Model.TutoríasPorSemestre)
+            {
+                <tr><td>@item.Nombre</td><td>@item.Cantidad</td></tr>
+            }
+        </tbody>
+    </table>
+
+    <h3>Horarios más solicitados</h3>
+    <table>
+        <thead><tr><th>Hora</th><th>Cantidad</th></tr></thead>
+        <tbody>
+            @foreach (var item in Model.HorariosPopulares)
+            {
+                <tr><td>@item.Nombre</td><td>@item.Cantidad</td></tr>
+            }
+        </tbody>
+    </table>
+    <footer class="pie-pagina">
+        <div class="contenedor-footer">
+            <!-- Frase y correo en la misma línea -->
+            <div class="frase-correo">
+                <div class="frase-footer">
+                    <span class="icono-comilla">❝</span>
+                    <p>Aprendizaje que conecta, conocimiento que crece</p>
+                </div>
+            </div>
+
+            <!-- Logo -->
+            <div class="logo-footer">
+                <img src="~/img/Logo.png" alt="Logo EduConnect" />
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+
+

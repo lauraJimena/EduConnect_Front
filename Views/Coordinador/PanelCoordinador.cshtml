@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Coordinador";
+    Layout = "_LayoutUsuario";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/panelCoordinador.css" />
+    <link rel="stylesheet" href="~/estilos/modalReportesCoord.css" />
+}
+<main class="coordinador-container">
+
+    <!-- CONTENIDO -->
+    <section class="contenido">
+        <h1>BIENVENIDO COORDINADOR</h1>
+
+        <div class="opciones">
+           @*  <button>
+                <img src="~/img/BloqueoComentario.png" alt="icono bloqueo">
+                BLOQUEAR COMENTARIOS
+            </button> *@
+            <a asp-controller="Coordinador" asp-action="ConsultarTutorias" class="btn-opcion">
+                <img src="~/img/ConsultarTutorias.png" alt="icono consultarTuto">
+                CONSULTAR TUTORÍAS
+            </a>
+            <a asp-controller="Coordinador" asp-action="ListaComentarios" class="btn-opcion">
+                <img src="~/img/BloqueoComentarios.png" alt="icono consultarTuto">
+                BLOQUEO COMENTARIOS
+            </a>
+            <button type="button" id="abrirModalReportes" class="btn-opcion">
+                <img src="~/img/GenerarReportes.png" alt="icono generarRepo">
+                GENERAR REPORTES
+            </button>
+
+            
+        </div>
+
+        <div class="imagen-personaje">
+            <img src="~/img/FondoCoordinador.png" alt="Ilustración administrador">
+        </div>
+    </section>
+</main>
+<!-- MODAL DE OPCIONES DE REPORTE -->
+<div id="modalReportes" class="modal-overlay">
+    <div class="modal-contenido">
+        <button id="cerrarModalReportes" class="btn-cerrar">&times;</button>
+        <h2>Seleccionar Reportes a Generar</h2>
+        <form id="formReportes">
+            <div class="checkbox-buttons">
+                <label class="checkbox-btn">
+                    <input type="checkbox" id="chkTutores" />
+                    <span><i class="fas fa-chalkboard-teacher"></i> Reporte Demanda Academica</span>
+                </label>
+
+                <label class="checkbox-btn">
+                    <input type="checkbox" id="chkTutorados" />
+                    <span><i class="fas fa-user-graduate"></i>Reporte Dese de Tutores</span>
+                </label>
+            </div>
+
+
+            <div class="botones-modal">
+                <button type="button" id="btnGenerar" class="btn-generar">Generar</button>
+                <button type="button" id="btnCancelar" class="btn-cancelar">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/modalReporteCoor.js"></script>
+}

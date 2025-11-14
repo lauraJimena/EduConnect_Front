@@ -33,4 +33,12 @@
     <None Include="wwwroot\img\Solicitud.png" />
   </ItemGroup>
 
+  <ItemGroup>
+   
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+   
+    <PackageReference Include="Rotativa.AspNetCore" Version="1.4.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,148 @@
+﻿@model List<EduConnect_Front.Dtos.RankingTutorDto>
+
+@{
+    ViewData["Title"] = "Ranking de Tutores";
+    Layout = "_LayoutUsuario";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/rankingTutores.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+}
+
+<main>
+    <!-- ====== TÍTULO ====== -->
+    <h1>RANKING DE TUTORES</h1>
+    <div class="caja-trofeo"><img src="~/img/Trofeo2.png" alt="Trofeo" class="trofeo" /></div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="top3">
+
+            @if (Model.Count >= 2)
+            {
+                <div class="top-card plata">
+                    <img src="~/img/avatars/@(Model[1].Avatar ?? "avatar1.png")" alt="Tutor 2" />
+                    <h3>
+                        @Model[1].NombreTutor<br>
+                        Promedio: @Model[1].PromedioCalificacion.ToString("0.0") ★
+                    </h3>
+                </div>
+            }
+
+            <div class="top-card oro">
+                <img src="~/img/avatars/@(Model[0].Avatar ?? "avatar1.png")" alt="Tutor 1" />
+                <h3>
+                    @Model[0].NombreTutor<br>
+                    Promedio: @Model[0].PromedioCalificacion.ToString("0.0") ★
+                </h3>
+            </div>
+
+            @if (Model.Count >= 3)
+            {
+                <div class="top-card bronce">
+                    <img src="~/img/avatars/@(Model[2].Avatar ?? "avatar1.png")" alt="Tutor 3" />
+                    <h3>
+                        @Model[2].NombreTutor<br>
+                        Promedio: @Model[2].PromedioCalificacion.ToString("0.0") ★
+                    </h3>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No hay tutores registrados en el ranking.</p>
+    }
+
+
+    <!-- ====== LISTADO GENERAL ====== -->
+    <div class="ranking-list">
+        @if (Model != null && Model.Any())
+        {
+            var pos = 1;
+            foreach (var t in Model)
+            {
+                <div class="caja-num-info">
+                    <div class="caja-numero">
+                        <img src="~/img/Numero@(pos > 3 ? 4 : pos).png" alt="Número @pos" class="numero@(pos)" />
+                    </div>
+                    <div class="ranking-item">
+                        <img src="~/img/avatars/@(t.Avatar ?? "avatar1.png")" alt="Tutor" class="avatar-ranking" />
+                        <div class="ranking-info">
+                            <p><strong>@t.NombreTutor</strong></p>
+                            <p>@t.Carrera</p>
+                            <p>Semestre: @t.Semestre</p>
+                            <p><b>Materias:</b> @t.Materias</p>
+
+                            <div class="estrellas-container" data-rating="@t.PromedioCalificacion.ToString(System.Globalization.CultureInfo.InvariantCulture)">
+                                <div class="estrellas"></div>
+                                <span class="promedio"></span>
+                            </div>
+                        </div>
+                        <div class="ranking-buttons">
+                            
+
+                            <a asp-controller="Tutorado" asp-action="PerfilTutor" asp-route-idTutor="@t.IdUsu" class="btn-perfil">VER PERFIL</a>
+                            <a asp-controller="Tutorado"
+                               asp-action="FormSolicitudTutoria"
+                               asp-route-idTutor="@t.IdUsu"
+                               asp-route-idMateria="@t.IdMateria"
+                               class="btn-solicitar">
+                                SOLICITAR TUTORÍA
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+                pos++;
+            }
+        }
+        else
+        {
+            <div class="sin-resultados">
+                <p>No hay tutores registrados en el ranking.</p>
+                <img src="~/img/PensarSolicitud.png" alt="Sin resultados" />
+            </div>
+        }
+    </div>
+
+    <div class="acciones-ranking">
+        <a asp-controller="Tutorado" asp-action="BusquedaTutores" class="btn-volver">Volver a la búsqueda</a>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            function mostrarEstrellas(contenedor) {
+                const ratingStr = contenedor.dataset.rating;
+                const rating = parseFloat(ratingStr.replace(',', '.')) || 0;
+                const estrellasDiv = contenedor.querySelector(".estrellas");
+                const promedioSpan = contenedor.querySelector(".promedio");
+
+                let html = "";
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= Math.floor(rating)) {
+                        html += '<i class="fas fa-star"></i>';
+                    } else if (i === Math.floor(rating) + 1) {
+                        const decimal = rating % 1;
+                        if (decimal >= 0.75) html += '<i class="fas fa-star"></i>';
+                        else if (decimal >= 0.25) html += '<i class="fas fa-star-half-alt"></i>';
+                        else html += '<i class="far fa-star"></i>';
+                    } else {
+                        html += '<i class="far fa-star"></i>';
+                    }
+                }
+
+                estrellasDiv.innerHTML = html;
+                promedioSpan.textContent = rating.toFixed(1) + " / 5";
+            }
+
+            document.querySelectorAll(".estrellas-container").forEach(mostrarEstrellas);
+        });
+    </script>
+
+
+</main>
+
+
+
+

@@ -1,0 +1,132 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@900&family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Quicksand:wght@300..700&display=swap');
+/* Reset general */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #fff4dd;
+}
+
+main {
+    display: flex;
+    min-height: 100vh;
+    width: 100vw;
+    margin-left: calc(50% - 50vw); 
+    margin-right: calc(50% - 50vw);
+    margin-bottom: 0;
+}
+
+.left {
+    flex: 0.8; 
+}
+
+
+.left {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5%;
+    background-color: #fff4dd;
+}
+
+    .left img {
+        max-width: 73%;
+        height: auto;
+    }
+
+.right {
+    flex: 0.9;
+}
+
+.right {
+    background: url('../img/FondoEditarUsuario.png') repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+
+    .right h1 {
+        align-self: center;
+        text-align: center;
+        margin-top: 68px;
+        margin-bottom:8px;
+        font-family: Montserrat, sans-serif;
+        font-size: 2.4em;
+        font-weight: bold;
+        text-shadow: 3.5px 2px 0 #133d6b;
+        color: #fbc959;
+    }
+
+
+/* Formulario */
+form {
+    font-family: Montserrat, sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 520px; /* ajusta el ancho del form */
+    margin: 0 auto; 
+    padding: 0 24px; 
+}
+
+    form input, form select {
+        font-family: Montserrat, sans-serif;
+        padding: 10px;
+        border: none;
+        border-radius: 35px;
+        outline: none;
+        font-size: 14px;
+        background: white;
+    }
+
+        form input:focus, form select:focus {
+            border: 3px solid #1e2a78; /* morado */
+            box-shadow: 7px 7px 13px rgba(30, 42, 120, 0.99); /* glow morado */
+        }
+
+.radio-label {
+    font-size: 15px;
+    font-weight: bold;
+    margin-top: 10px;
+    color: white;
+}
+
+label {
+    color: white;
+    font-size: 16.6px;
+}
+
+
+/* Botón */
+button {
+    margin-top: 15px;
+    padding: 12px 5px;
+    background-color: #7ec0e0;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: 1px solid white;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-bottom: -10px;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    box-shadow: 5px 7px #367172;
+}
+
+    button:hover {
+        background: rgba(30, 42, 120, 0.7);
+        box-shadow: 7px 7px 13px rgba(30, 42, 120, 0.99); /* glow morado */
+    }

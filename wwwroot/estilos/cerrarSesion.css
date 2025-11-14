@@ -1,0 +1,83 @@
+﻿/* 🔹 Contenedor del popup (flotante, no modal centrado) */
+.popup-cerrar-sesion {
+    position: absolute !important;
+    top: 90px; /* distancia desde el borde superior */
+    right: 40px; /* ajusta según el ancho del header */
+    z-index: 2000;
+    display: none;
+}
+
+/* 🔹 Caja del contenido */
+.popup-contenido {
+    background-color: #fff !important;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    padding: 20px !important;
+    width: 230px;
+    text-align: center;
+    position: relative;
+    animation: aparecer 0.25s ease-in-out;
+    border:none;
+}
+
+/* 🔹 Animación de aparición */
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.popup-contenido h3 {
+    color: #1c3c50 !important;
+    margin-bottom: 10px !important;
+    font-size: 1.1rem !important;
+    font-weight: bold !important;
+    text-shadow:none;
+}
+
+.popup-contenido p {
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.btn-cerrar {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #555;
+    margin-bottom:20px;
+}
+
+    .btn-cerrar:hover {
+        color: #000;
+    }
+
+.btn-cerrar-sesion {
+    background-color: #f9bb65;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 8px 18px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    text-shadow: 1px 1px 0px #ccc;
+    box-shadow:4px 4px #ccc;
+}
+
+    .btn-cerrar-sesion:hover {
+        background-color: #d48a0e;
+        transform: scale(1.05);
+    }

@@ -1,0 +1,118 @@
+﻿@model List<EduConnect_Front.Dtos.HistorialTutoriaDto>
+@using EduConnect_Front.Dtos
+@{
+    ViewData["Title"] = "Historial de Tutorías";
+    Layout = "_LayoutUsuario";
+    var usuario = ViewBag.Usuario as ObtenerUsuarioDto;
+    var estadosSeleccionados = Context.Request.Query["idsEstado"].ToList();
+
+}
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/HistorialTutorias.css" />
+}
+
+<main class="historial">
+    <div class="cabecera">
+        <h1>HISTORIAL DE TUTORÍAS</h1>
+    </div>
+
+    <section class="contenido">
+        <div class="tabla-wrapper">
+            <table class="tabla">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Materia</th>
+                        <th>Tutor</th>
+                        <th>Tema</th>
+                        <th>Modalidad</th>                       
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var r in Model)
+                        {
+                            <tr>
+                                <td>@r.Fecha</td>
+                                <td>@r.Hora</td>
+                                <td>@r.MateriaNombre</td>
+                                <td>@r.TutorNombreCompleto</td>
+                                <td>@r.Tema</td>
+                                <td>@r.ModalidadNombre</td>
+                                <td>@r.EstadoNombre</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding:18px;">
+                                No hay tutorías en tu historial.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <a asp-controller="Tutorado" asp-action="PanelTutorado" class="btn-volver">
+               VOLVER
+            </a>
+        </div>
+
+        <!-- 🔹 FILTROS DE ESTADO -->
+        <aside class="lateral">
+            <div class="ilustracion">
+                <img src="~/img/PensarHistorial.png" alt="Usuario">
+            </div>
+
+            <form method="get" asp-action="HistorialTutorias" asp-controller="Tutorado" class="filtros tarjeta">
+                <h3>FILTRAR POR ESTADO:</h3>
+
+                <input type="hidden" name="idTutorado" value="@Context.Session.GetInt32("IdUsuario")" />
+
+                <label class="chk">
+                    <input type="checkbox" name="idsEstado" value="3" @(estadosSeleccionados.Contains("3") ? "checked" : "") />
+                    <span class="tick"></span>
+                    <span class="texto">ACEPTADA</span>
+                </label>
+
+                <label class="chk">
+                    <input type="checkbox" name="idsEstado" value="6" @(estadosSeleccionados.Contains("6") ? "checked" : "") />
+                    <span class="tick"></span>
+                    <span class="texto">FINALIZADA</span>
+                </label>
+
+
+                <button type="submit" class="btn-aplicar">APLICAR</button>
+            </form>
+        </aside>
+    </section>
+
+    <button class="btn-flotante" title="Soporte">
+        <img src="~/img/chat-bubble.png" alt="Chat">
+    </button>
+
+    <!-- 🔹 Popup de error -->
+    @{
+        var error = ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage;
+    }
+    @await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto {
+    Tipo = "error",
+        Titulo = "No se pudo cargar el historial",
+        Mensaje = error
+        })
+
+    <script>
+        document.querySelector(".filtros").addEventListener("submit", function (e) {
+            // Asegurar que solo se envíen los checkboxes marcados
+            document.querySelectorAll("input[name='idsEstado']").forEach(chk => {
+                if (!chk.checked) chk.disabled = true;
+            });
+        });
+    </script>
+
+</main>
+
+

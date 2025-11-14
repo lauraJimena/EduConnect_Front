@@ -1,11 +1,12 @@
-﻿
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - EduConnect</title>
     <link rel="stylesheet" href="~/estilos/estilos.css">
+    <link rel="stylesheet" href="~/estilos/popup.css"/>
+
     @RenderSection("Styles", required: false)
 </head>
 <body>
@@ -19,8 +20,8 @@
                 
                 <li>@Html.ActionLink("INICIO", "Inicio", "Home", new { area = "" })</li>
                 <li>@Html.ActionLink("ACERCA DE", "Privacy", "Home", new { area = "" })</li>
-                <li>@Html.ActionLink("REGISTRO", "Registro", "Home", new { area = "" })</li>
-                <li>@Html.ActionLink("INICIAR SESIÓN", "IniciarSesion", "Home", new { area = "" }, new { @class = "btn-login" })</li>
+                <li>@Html.ActionLink("REGISTRO", "Registro", "General", new { area = "" })</li>
+                <li>@Html.ActionLink("INICIAR SESIÓN", "IniciarSesion", "General", new { area = "" }, new { @class = "btn-login" })</li>
 
             </ul>
         </nav>
@@ -28,6 +29,9 @@
 
     <main>
         @RenderBody()
+
+
+</div>
     </main>
 
     <footer class="pie-pagina">
@@ -54,5 +58,8 @@
 
 
     @await RenderSectionAsync("Scripts", required: false)
+
+
+
 </body>
 </html>

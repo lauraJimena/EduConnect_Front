@@ -1,0 +1,289 @@
+﻿
+.perfil-tutor-container {
+    display: flex;
+    gap: 20px;
+    padding: 30px;
+    background-color: #fbedd9;
+    min-height: 90vh;
+    font-family: Montserrat, sans-serif;
+}
+
+/* Panel izquierdo */
+.perfil-tutor-left {
+    margin-top:6%;
+    flex: 2;
+    background: url('../img/FondoEditar.png') repeat;
+    border-radius: 15px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px;
+}
+
+    .perfil-tutor-left .avatar-tutor img {
+        width: 260px;
+        height: auto;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #f3ca52;
+        background-color: white;
+        box-shadow: 6px 3px rgba(0,0,0,0.2);
+    }
+
+.nombre-tutor {
+    margin-top: 5px;
+    margin-bottom: 15px;
+    background-color: #f3ca52;
+    border: none;
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1.05em;
+    text-shadow: 2px 1px 3px rgba(0,0,0,0.4);
+    box-shadow: 5px 6px rgba(0,0,0,0.2);
+}
+/* === Paginación de comentarios === */
+.paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    gap: 10px;
+    margin-bottom:15px;
+}
+
+    .paginacion button {
+        background-color:#62a8cc;
+        color: #333;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .paginacion button:hover:not(:disabled) {
+            background-color: #3f7594;
+        }
+
+        .paginacion button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+#paginaActual {
+    font-weight: bold;
+    color: #444;
+}
+
+.perfil-tutor-left .info-tutor {
+    background-color: rgba(255,255,255,0.4);
+    padding: 10px 35px;
+    border-radius: 20px;
+    box-shadow: 5px 6px rgba(0,0,0,0.2);
+    width: 94%;
+    color: #444;
+}
+.perfil-tutor-left p {
+    margin: 5px 0;
+    color: #444;
+}
+
+/* Panel derecho */
+.perfil-tutor-right {
+    margin-top: 6%;
+    flex: 2.5;
+    background: url('../img/FondoRegistroUsuario.png') repeat;
+    border-radius: 15px;
+    padding: 40px 80px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+
+    .perfil-tutor-right h1 {
+        font-size: 35px;
+        font-weight:700;
+        color: #fbc959;
+        margin-bottom: 20px;
+        text-align: center;
+        text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, /* Sombra suave */
+        4px 3px 0px rgba(0,0,0,0.4);
+    }
+.comentario-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 🔹 Cabecera con nombre a la izquierda y fecha a la derecha */
+.comentario-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+    .comentario-header .usuario {
+        font-weight: 700;
+        color: #555;
+        margin: 0;
+    }
+
+    .comentario-header .fecha {
+        font-size: 0.9rem;
+        color: #777;
+        margin: 0;
+    }
+
+.texto {
+    color: #444;
+    margin-bottom: 10px;
+}
+
+.calificacion {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.contador {
+    color: black;
+}
+.estrellas {
+    display: inline-block;
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.valor {
+    font-weight: bold;
+    color: #555;
+}
+
+.acciones{
+    text-align:center;
+}
+.btn-valoracion {
+    display: inline-block;
+    margin-top: 0px;
+    background-color: #f3ca52;
+    font-size:1.05em;
+    color: white;
+    font-weight: 800;
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    text-shadow: 2px 1px 0px rgba(0,0,0,0.3);
+    box-shadow: 5px 6px rgba(0,0,0,0.2);
+    border:none;
+}
+
+    .btn-valoracion:hover {
+        background-color: #e8b844;
+        transform: scale(1.05);
+    }
+/* Fondo semitransparente del modal */
+#modalValoracion {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+    /* Contenedor blanco del modal */
+    #modalValoracion .modal {
+        background: #fff;
+        padding: 30px 40px;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+        max-width: 450px;
+        width: 90%;
+        height:auto;
+        animation: fadeIn 0.3s ease;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* Botón de cierre (la “X”) */
+    #modalValoracion .btn-cerrar-superior {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 22px;
+        color: #555;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+        #modalValoracion .btn-cerrar-superior:hover {
+            color: #000;
+        }
+
+    /* Inputs y botones dentro del modal */
+    #modalValoracion input[type="number"],
+    #modalValoracion textarea {
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 18px;
+        padding: 8px 10px;
+        font-family: inherit;
+      
+    }
+        #modalValoracion input[type="number"]:focus,
+        #modalValoracion textarea:focus {
+            border: 2px solid rgba(30, 42, 120, 0.7) !important; /* color del borde */
+            box-shadow: 0 0 10px rgba(30, 42, 120, 0.5) !important; /* brillo */
+            outline: none; /* quita el borde azul predeterminado */
+            transition: all 0.2s ease-in-out; /* animación suave */
+        }
+
+
+    #modalValoracion .modal-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+        #modalValoracion .modal-buttons .btn {
+            background-color: #f3ca52;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+            #modalValoracion .modal-buttons .btn:hover {
+                background-color: #e8b844;
+                
+            }
+
+/* Animación suave */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

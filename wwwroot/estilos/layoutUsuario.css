@@ -1,0 +1,149 @@
+﻿header {
+    position: absolute; /* o fixed si quieres que siga al hacer scroll */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* asegura que esté encima de todo */
+    padding: 10px;
+    color: #333;
+}
+/* --- NAVBAR --- */
+
+.navbar {
+    background: #7ec0e0; /* azul claro */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px; /* controla la altura total de la barra */
+    padding: 0 20px; /* espacio lateral */
+    z-index: 30;
+    border-radius: 25px;
+    box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.2);
+    font-family: 'League Spartan', sans-serif;
+    color: #333;
+    text-shadow: -1.5px -1.5px 0 white, /* arriba izquierda */
+    1.5px -1.5px 0 white, /* arriba derecha */
+    -1.5px 1.5px 0 white, /* abajo izquierda */
+    1.5px 1.5px 0 white, /* abajo derecha */
+    -1.5px 0px 0 white, /* izquierda */
+    1.5px 0px 0 white, /* derecha */
+    0px -1.5px 0 white, /* arriba */
+    0px 1.5px 0 white; /* abajo */
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    height: 100%; /* igual a la altura de la navbar */
+    color: #f4b400;
+}
+
+    .logo img {
+        object-fit: contain; /* mantiene proporción */
+        margin-top: 18px;
+        height: 130px;
+        display: block; /* elimina espacio fantasma de inline-img */
+    }
+
+.nombre-app {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #004a78;
+}
+
+.usuario-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nombre-usuario {
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    font-size: 20px;
+    color: white;
+    text-shadow: 2.5px 2.5px 2px rgba(0,0,0,0.2);
+    letter-spacing: 0.5px;
+    font-family: Montserrat, sans-serif;
+    text-shadow: -1px -1px 0 rgba(0,0,0,0.5), 1px -1px 0 rgba(0,0,0,0.5), -1px 1px 0 rgba(0,0,0,0.5), 1px 1px 0 rgba(0,0,0,0.5) /* Sombra suave */
+    
+}
+
+.avatar-usuario {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+
+    object-fit: cover;
+    box-shadow: 2px 2px rgba(0,0,0,0.1);
+    border: white solid 3px;
+    margin-right:10px;
+}
+.avatar-usuario:hover{
+    transform: scale(1.1)
+}
+/* Footer */
+.pie-pagina {
+    background-color: #7ec0e0; /* el azul de tu footer */
+    padding: 0px 30px;
+    color: #333;
+    border-radius: 0 0 25px 25px;
+}
+
+.contenedor-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* se acomoda en pantallas pequeñas */
+}
+
+/* Frase con comilla */
+.frase-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    color: #1c3c50;
+}
+
+    .frase-footer p {
+        text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
+        font-size: 1.2em;
+    }
+
+.icono-comilla {
+    font-size: 4rem;
+    color: #1c3c50;
+}
+
+/* Correo */
+.correo-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1c3c50;
+    font-weight: bold;
+}
+
+    .correo-footer p {
+        text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
+        font-size: 1.2em;
+        color: #1c3c50;
+    }
+
+.icono-correo {
+    font-size: 2.5rem;
+    margin-top:-20px;
+   
+}
+
+/* Logo y nombre */
+.logo-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .logo-footer img {
+        height: 170px;
+    }

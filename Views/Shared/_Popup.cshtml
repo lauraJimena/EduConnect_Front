@@ -1,0 +1,53 @@
+﻿@model EduConnect_Front.Dtos.PopupDto
+@{
+    var mostrar = !string.IsNullOrWhiteSpace(Model?.Mensaje);
+}
+
+@if (mostrar)
+{
+    <div class="modal-fondo is-open" aria-hidden="false" role="dialog" aria-modal="true">
+        <div class="modal-tarjeta">
+
+            <!-- Ícono dinámico según tipo -->
+            <div class="modal-icono">
+                @if (Model?.Tipo == "error")
+                {
+                    <svg class="icono-error" xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="rgba(255,0,0,0.6)" viewBox="0 0 24 24">
+                        <path d="M12 0C5.371 0 0 5.371 0 12s5.371 12 12 12 12-5.371 12-12S18.629 0 12 0zm5 16.59L16.59 17 12 12.41 7.41 17 7 16.59 11.59 12 7 7.41 7.41 7 12 11.59 16.59 7 17 7.41 12.41 12 17 16.59z" />
+                    </svg>
+                }
+                else if (Model?.Tipo == "exito")
+                {
+                    <svg class="icono-exito" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="12" fill="rgba(34,197,94,0.7)" /> <!-- círculo verde suave -->
+                        <path fill="#fff" d="M9.707 16.293l-3.707-3.707 1.414-1.414L9.707 13.465l7.879-7.879 1.414 1.414z" />
+                    </svg>
+                }
+                else
+                {
+                    <svg class="icono-info" xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="blue" viewBox="0 0 24 24">
+                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm1 17h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                    </svg>
+                }
+            </div>
+            <h3 class="modal-titulo">@Model?.Titulo</h3>
+            <p class="modal-mensaje">@Model?.Mensaje</p>
+            <div class="modal-acciones">
+                <button class="btn btn-principal" type="button"
+                        onclick="
+                const popup = this.closest('.modal-fondo');
+                popup.style.display='none';
+                    @if (TempData["RedirectToPanelTutor"] != null && (bool)TempData["RedirectToPanelTutor"])
+                    {
+                            @:window.location.href = '/Tutor/PanelTutor';
+                    }
+                    else if (TempData["RedirectToPanel"] != null && (bool)TempData["RedirectToPanel"])
+                    {
+                            @:window.location.href = '/Tutorado/PanelTutorado';
+                    } ">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+}

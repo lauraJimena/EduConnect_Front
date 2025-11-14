@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Página no encontrada";
+    Layout = "_LayoutError"; // o "_Layout", según tu estructura
+}
+@section Styles {
+
+<link rel="stylesheet" href="~/estilos/error404.css" />
+}
+<div class="error-container">
+    <h1>😕 Oops...</h1>
+    <h2>La página que buscas no existe</h2>
+    <p>
+        Puede que el enlace esté roto o que la página haya sido eliminada.<br />
+        Verifica la dirección o vuelve al inicio.
+    </p>
+
+    <a href="~/" class="btn-volver">🏠 Volver al inicio</a>
+</div>
+

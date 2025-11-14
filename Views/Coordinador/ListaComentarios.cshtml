@@ -1,0 +1,140 @@
+﻿@using EduConnect_Front.Dtos
+@model List<ListaComentariosDto>
+@{
+    ViewData["Title"] = "Comentarios";
+    Layout = "_LayoutUsuario";
+}
+@section Styles {
+  
+    <link rel="stylesheet" href="~/estilos/listaComentarios.css" />
+}
+
+<!-- 🔹 Popup de ÉXITO -->
+@if (TempData["MensajeExito"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "exito",
+        Titulo = "Comentario inactivado",
+        Mensaje = TempData["MensajeExito"] as string
+    })
+}
+
+<!-- 🔹 Popup de ERROR -->
+@if (TempData["MensajeError"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "error",
+        Titulo = "Error al inactivar comentario",
+        Mensaje = TempData["MensajeError"] as string
+    })
+}
+
+<h1 class="titulo-pagina">Bloquear Comentarios</h1>
+
+<div class="bloquear-comentarios-container">
+
+    <!-- Lista de comentarios -->
+    <div class="comentarios-lista">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var comentario in Model)
+            {
+                <div class="comentario-card">
+                    <div class="comentario-icono">
+                        @if (!string.IsNullOrEmpty(comentario.AvatarTutorado))
+                        {
+                            <img src="/img/avatars/@Url.Content(comentario.AvatarTutorado)" alt="Avatar de @comentario.Tutorado" class="avatar-img" />
+                        }
+                        else
+                        {
+                            <img src="~/img/avatars/avatar1.png" alt="Avatar por defecto" class="avatar-img" />
+                        }
+                    </div>
+
+
+                    <div class="comentario-info">
+                        <h4>TUTORADO: @comentario.Tutorado</h4>
+                        <p><strong>Tutor:</strong> @comentario.Tutor</p>
+                        <p>@comentario.Texto</p>
+                        <p style="color:#6b7280;">
+                            @comentario.Fecha.ToString("dd/MM/yyyy HH:mm")
+                        </p>
+                    </div>
+
+                    <form asp-action="InactivarComentario" method="post">
+                        <input type="hidden" name="idComentario" value="@comentario.IdComentario" />
+                        @if (comentario.IdEstado == 1)
+                        {
+                            <button type="submit" class="bloquear-btn">INACTIVAR</button>
+                        }
+                        else
+                        {
+                            <button type="button" class="bloquear-btn" disabled style="background-color: #ccc;">
+                                INACTIVO
+                            </button>
+                        }
+                    </form>
+                </div>
+            }
+        }
+        else
+        {
+            <p style="color:#1c3c50;">No hay comentarios para mostrar.</p>
+        }
+    </div>
+    
+
+
+
+
+</div>
+<!-- Controles de paginación -->
+<div class="paginacion-container">
+    <button id="prevPage" class="pagina-btn">« Anterior</button>
+    <span id="pageIndicator">Página 1</span>
+    <button id="nextPage" class="pagina-btn">Siguiente »</button>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const comentarios = document.querySelectorAll(".comentario-card");
+        const itemsPorPagina = 6; // 🔹 cantidad de comentarios por página
+        let paginaActual = 1;
+
+        const totalPaginas = Math.ceil(comentarios.length / itemsPorPagina);
+        const pageIndicator = document.getElementById("pageIndicator");
+        const btnPrev = document.getElementById("prevPage");
+        const btnNext = document.getElementById("nextPage");
+
+        function mostrarPagina(pagina) {
+            const inicio = (pagina - 1) * itemsPorPagina;
+            const fin = inicio + itemsPorPagina;
+
+            comentarios.forEach((card, index) => {
+                card.style.display = (index >= inicio && index < fin) ? "flex" : "none";
+            });
+
+            pageIndicator.textContent = `Página ${pagina} de ${totalPaginas}`;
+            btnPrev.disabled = pagina === 1;
+            btnNext.disabled = pagina === totalPaginas;
+        }
+
+        btnPrev.addEventListener("click", () => {
+            if (paginaActual > 1) {
+                paginaActual--;
+                mostrarPagina(paginaActual);
+            }
+        });
+
+        btnNext.addEventListener("click", () => {
+            if (paginaActual < totalPaginas) {
+                paginaActual++;
+                mostrarPagina(paginaActual);
+            }
+        });
+
+        // Mostrar la primera página al cargar
+        mostrarPagina(paginaActual);
+    });
+</script>
