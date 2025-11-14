@@ -1,6 +1,6 @@
 ﻿/* 🔹 Contenedor del popup (flotante, no modal centrado) */
 .popup-cerrar-sesion {
-    position: absolute;
+    position: absolute !important;
     top: 90px; /* distancia desde el borde superior */
     right: 40px; /* ajusta según el ancho del header */
     z-index: 2000;
@@ -9,14 +9,15 @@
 
 /* 🔹 Caja del contenido */
 .popup-contenido {
-    background-color: #fff;
+    background-color: #fff !important;
     border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    padding: 20px !important;
     width: 230px;
     text-align: center;
     position: relative;
     animation: aparecer 0.25s ease-in-out;
+    border:none;
 }
 
 /* 🔹 Animación de aparición */
@@ -33,10 +34,11 @@
 }
 
 .popup-contenido h3 {
-    color: #1c3c50;
-    margin-bottom: 10px;
-    font-size: 1.1rem;
-    font-weight: bold;
+    color: #1c3c50 !important;
+    margin-bottom: 10px !important;
+    font-size: 1.1rem !important;
+    font-weight: bold !important;
+    text-shadow:none;
 }
 
 .popup-contenido p {
@@ -54,6 +56,7 @@
     font-size: 1rem;
     cursor: pointer;
     color: #555;
+    margin-bottom:20px;
 }
 
     .btn-cerrar:hover {

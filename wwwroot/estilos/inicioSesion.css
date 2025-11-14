@@ -42,7 +42,7 @@ main {
 
 .right {
 
-    background: url('../img/FondoInicioSesion.png') repeat ;
+    background: url('../img/FondoInicioSesion.png') repeat;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -62,6 +62,45 @@ main {
         text-shadow: 3.5px 2px 2px black, 3.5px 2px 2px black, 3.5px 2px 0 black, 1.5px 0 0 black;
         color: #fbc959;
     }
+
+.texto-olvidaste{
+    text-align:right;
+    margin-top:-15px;
+    font-size:12.5px;
+   
+    margin-bottom:-20px;
+   
+}
+    .texto-olvidaste a {
+        text-decoration: none;
+        color: white;
+    }
+        .texto-olvidaste a:hover {
+            
+            text-decoration: underline; /* Subrayado al hacer hover */
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+            font-weight:700;
+            text-decoration:none;
+        }
+.texto-normal {
+    text-align: center;
+    font-size: 12.5px;
+    color: white;
+   
+}
+.link-registro {
+    color: white;
+    text-decoration: none; /* Sin subrayado por defecto */    
+    margin-left: 5px; /* Espacio entre el texto y el enlace */
+   
+}
+
+    .link-registro:hover {
+        color: rgba(30, 42, 120, 0.99); /* Azul más oscuro al pasar el mouse */
+        text-decoration: underline; /* Subrayado al hacer hover */
+        text-shadow:1px 1px 5px rgba(0,0,0,0.3)
+    }
+
 
 /* Formulario */
 form {

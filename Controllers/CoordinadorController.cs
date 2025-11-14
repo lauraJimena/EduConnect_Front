@@ -8,6 +8,7 @@ namespace EduConnect_Front.Controllers
 {
     public class CoordinadorController : Controller
     {
+        private const string TempDataErrorKey = "Error";
         private readonly CoordinadorService _coordinadorService = new CoordinadorService();
         // GET: CoordinadorController
         public ActionResult PanelCoordinador()
@@ -19,12 +20,23 @@ namespace EduConnect_Front.Controllers
         public async Task<IActionResult> ConsultarTutorias(
     string? carrera, int? semestre, string? materia, int? idEstado, int? ordenFecha)
         {
+            if (!ModelState.IsValid)
+            {
+                TempData[TempDataErrorKey] = "Los filtros de búsqueda no son válidos.";
+                return RedirectToAction("PanelCoordinador", "Coordinador");
+            }
             var token = HttpContext.Session.GetString("Token");
 
             if (string.IsNullOrEmpty(token))
             {
-                TempData["Error"] = "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.";
+                TempData[TempDataErrorKey] = "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.";
                 return RedirectToAction("IniciarSesion", "General");
+            }
+
+            if (semestre.HasValue && (semestre < 1 || semestre > 10))
+            {
+                TempData[TempDataErrorKey] = "El semestre ingresado no es válido.";
+                return RedirectToAction("ConsultarTutorias");
             }
 
             try
@@ -42,7 +54,7 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Error al consultar tutorías: {ex.Message}";
+                TempData[TempDataErrorKey] = $"Error al consultar tutorías: {ex.Message}";
                 return View(new List<TutoriaConsultaDto>());
             }
         }
@@ -54,7 +66,7 @@ namespace EduConnect_Front.Controllers
 
             if (reporte == null)
             {
-                TempData["Error"] = "No hay datos para generar el PDF.";
+                TempData[TempDataErrorKey] = "No hay datos para generar el PDF.";
                 return RedirectToAction("PanelCoordinador");
             }
 
@@ -75,7 +87,7 @@ namespace EduConnect_Front.Controllers
             var (totales, desempeno) = await _coordinadorService.ObtenerReporteCombinadoAsync(token);
 
             if (totales == null || desempeno == null)
-                return View("Error", "No se pudo generar el reporte.");
+                return RedirectToAction("HandleError", "Error", new { statusCode = 404 });
 
             var modelo = new
             {
@@ -108,6 +120,12 @@ namespace EduConnect_Front.Controllers
         [HttpPost]
         public async Task<IActionResult> InactivarComentario(int idComentario)
         {
+
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(idComentario);
+            }
             try
             {
                 var token = HttpContext.Session.GetString("Token"); // si usas sesión JWT

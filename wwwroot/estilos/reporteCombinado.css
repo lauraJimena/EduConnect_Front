@@ -67,6 +67,12 @@ h3 {
         font-weight: bold;
         margin: 0;
     }
+.descripcion {
+    font-size: 14px;
+    color: #444;
+    margin: 0 0 15px 0;
+    text-align: justify;
+}
 
 
 table {

@@ -46,7 +46,7 @@
             <input asp-for="Correo" type="email" placeholder="CORREO" required />
 
             @* CARRERA: si es ID, usa number o un <select> si ya tienes catálogo *@
-            <select asp-for="IdCarrera" class="form-control" required>
+            <select asp-for="IdCarrera" required>
                 <option value="">CARRERA</option>
                 @if (carreras != null)
                 {
@@ -65,6 +65,10 @@
                 <option>4</option>
                 <option>5</option>
                 <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+                <option>10</option>
             </select>
 
             <input asp-for="ContrasUsu" type="password" placeholder="CONTRASEÑA" required />
@@ -91,3 +95,17 @@ Tipo = "error",
     Titulo = "No se pudo registrar",
     Mensaje = ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage
 })
+<script>
+    // Validar que solo se ingresen números en ambos campos
+    const numIdentInput = document.querySelector('input[name="NumIdent"]');
+    const telInput = document.querySelector('input[name="TelUsu"]');
+
+    function soloNumeros(input) {
+        input.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, ''); // elimina todo lo que no sea número
+        });
+    }
+
+    soloNumeros(numIdentInput);
+    soloNumeros(telInput);
+</script>

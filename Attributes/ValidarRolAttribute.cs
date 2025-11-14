@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
+
+
 public class ValidarRolAttribute : Attribute, IAuthorizationFilter
 {
     private readonly int[] _rolesPermitidos;

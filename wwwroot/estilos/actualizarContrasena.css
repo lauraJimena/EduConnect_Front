@@ -1,0 +1,127 @@
+﻿/* === Estilos generales de la vista === */
+body {
+    background-color: #f5f6fa;
+    font-family: Montserrat, sans-serif;
+    background-image: url('../img/FondoZigAzul.png') repeat;
+}
+.caja-general{
+    display:flex;
+    margin-top:45px;
+}
+.container {
+    max-width: 500px;
+    margin-top: 145px;
+    margin-bottom: 100px;
+    margin-left: 320px;
+    margin-right: 0;
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 40px 45px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    flex:1;
+}
+
+h3 {
+    text-align: center;
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+label {
+    font-weight: 500;
+    color: #333;
+}
+
+/* === Campo de contraseña con icono dentro === */
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+    .password-wrapper input {
+        width: 100%;
+        margin-top:15px;
+        padding: 10px 45px 10px 12px; /* espacio a la derecha para el icono 👁️ */
+        border: 1px solid #ccc;
+        border-radius: 30px;
+        font-size: 15px;
+        transition: border-color 0.3s ease;
+        font-family: Montserrat, sans-serif;
+    }
+
+        .password-wrapper input:focus {
+            border: solid 2px rgba(30, 42, 120, 0.7);
+            
+            outline: none;
+        }
+
+/* === Icono del ojo === */
+.toggle-password {
+    position: absolute;
+    right: 14px; /* separa el icono del borde derecho */
+    top: 60%; /* centra verticalmente */
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.3rem;
+    color: #888;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+    .toggle-password:hover {
+        color: #28a745;
+    }
+
+/* === Botón === */
+.btn-success {
+    background-color: #fbc959;
+    border: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 20px;
+    width: 190px;
+    border-radius: 30px;
+    font-size: 15px;
+    box-shadow: 5px 7px #ccc;
+}
+
+    .btn-success:hover {
+        background-color: rgba(30, 42, 120, 0.7);
+        transform: scale(1.02);
+        color: white;
+    }
+
+.text-center {
+    text-align: center;
+}
+
+/* === Popups (ya usados en tu sistema) === */
+.alert {
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+}
+.caja-imagen img{
+    
+    width:400px;
+    margin-top:60px;
+   margin-right:250px;
+   margin-left:-60px;
+  
+
+    
+}
+
+/* === Animaciones suaves === */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

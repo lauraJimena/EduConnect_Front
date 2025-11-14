@@ -14,6 +14,7 @@ namespace EduConnect_Fronted_prueba.Pages
 
         public void OnGet()
         {
+            _logger.LogInformation("La página de registro fue cargada correctamente.");
         }
     }
 

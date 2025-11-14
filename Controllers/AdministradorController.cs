@@ -11,6 +11,8 @@ namespace EduConnect_Front.Controllers
 {
     public class AdministradorController : Controller
     {
+        private const string ConsultarUsuariosAction = "ConsultarUsuarios";
+        private const string ControladorAdministrador = "Administrador";
         private readonly TutoradoService _tutoradoService = new TutoradoService();
         private readonly AdministradorService _administradorService = new AdministradorService();
         private readonly GeneralService _generalService = new GeneralService();
@@ -18,18 +20,25 @@ namespace EduConnect_Front.Controllers
         
         [HttpGet]
         [ValidarRol(3)]
-        public IActionResult RegistrarUsuarios()
+        public async Task<IActionResult> RegistrarUsuariosAsync()
         {
+
             // Estado 1 por defecto (activo)
             var model = new CrearUsuarioDto { IdEstado = 1 };
+            var carreras = await _administradorService.ObtenerCarrerasAsync();
+            ViewBag.Carreras = carreras;
             return View(model);
         }
 
         [HttpPost]
         [ValidarRol(3)]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegistrarUsuarios(CrearUsuarioDto dto, CancellationToken ct)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(dto);
+            }
             var token = dto.Token ?? string.Empty;
             token=HttpContext.Session.GetString("Token");
             var (ok, msg) = await _administradorService.RegistrarUsuario(dto,token,ct);
@@ -38,11 +47,13 @@ namespace EduConnect_Front.Controllers
             {
                 TempData["AdminRegisterOk"] = msg; // para popup de éxito
                 
-                return RedirectToAction("PanelAdministrador", "Administrador");
+                return RedirectToAction("PanelAdministrador", ControladorAdministrador);
             }
 
             // Deja los datos en pantalla y muestra el error en popup
             ModelState.AddModelError(string.Empty, msg);
+            var carreras = await _administradorService.ObtenerCarrerasAsync();
+            ViewBag.Carreras = carreras;
             return View(dto);
         }
 
@@ -76,8 +87,6 @@ namespace EduConnect_Front.Controllers
                 return View(usuario);
 
 
-
-
             }
         }
 
@@ -86,6 +95,16 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(3)]
         public async Task<IActionResult> EditarUsuario(int id)
         {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Solicitud no válida.";
+                return RedirectToAction(ConsultarUsuariosAction, ControladorAdministrador);
+            }
+            if (id <= 0)
+            {
+                TempData["Error"] = "Identificador de usuario no válido.";
+                return RedirectToAction(ConsultarUsuariosAction, ControladorAdministrador);
+            }
             try
             {
                 var token = HttpContext.Session.GetString("Token");
@@ -101,7 +120,7 @@ namespace EduConnect_Front.Controllers
                 if (!ok || usuario == null)
                 {
                     TempData["Error"] = msg ?? "Usuario no encontrado.";
-                    return RedirectToAction("ConsultarUsuarios");
+                    return RedirectToAction(ConsultarUsuariosAction);
                 }
 
                 var tipoIdent = await new GeneralService().ObtenerTipoIdentAsync();
@@ -125,6 +144,11 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(3)]
         public async Task<IActionResult> EditarUsuario(ActualizarUsuarioDto perfil)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(perfil);
+            }
             try
             {
                 var token = HttpContext.Session.GetString("Token");
@@ -163,11 +187,15 @@ namespace EduConnect_Front.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> EliminarUsuario(int idUsuario,CancellationToken ct) { 
+        public async Task<IActionResult> EliminarUsuario(int idUsuario,CancellationToken ct) {
 
-
-              var token = HttpContext.Session.GetString("Token");
-        if (string.IsNullOrEmpty(token))
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View(idUsuario);
+            }
+            var token = HttpContext.Session.GetString("Token");
+            if (string.IsNullOrEmpty(token))
             {
                 TempData["Error"] = "No se encontró token de sesión. Inicia sesión nuevamente.";
                 return RedirectToAction("IniciarSesion", "General");
@@ -183,8 +211,14 @@ namespace EduConnect_Front.Controllers
 
         [HttpGet]
         [ValidarRol(3)]
-        public async Task<IActionResult> ConsultarUsuarios(int? idRol, int? idEstado, string? numIdent)
+        public async Task<IActionResult> ConsultarUsuarios(int? idRol, int? idEstado, string? numIdent, int pagina = 1)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                return View();
+            }
+            const int TAMANO_PAGINA = 8;
             var token = HttpContext.Session.GetString("Token");
             if (string.IsNullOrEmpty(token))
             {
@@ -199,9 +233,26 @@ namespace EduConnect_Front.Controllers
                 TempData["Error"] = msg;
                 return View(new List<ListadoUsuariosDto>());
             }
+            // 🔹 Calcular total de páginas
+            var totalUsuarios = usuarios.Count();
+            var totalPaginas = (int)Math.Ceiling((double)totalUsuarios / TAMANO_PAGINA);
 
-           
-            return View(usuarios);
+            // 🔹 Paginación con LINQ
+            var usuariosPaginados = usuarios
+                .Skip((pagina - 1) * TAMANO_PAGINA)
+                .Take(TAMANO_PAGINA)
+                .ToList();
+
+            // 🔹 Enviar datos a la vista
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = totalPaginas;
+            ViewBag.FiltroRol = idRol;
+            ViewBag.FiltroEstado = idEstado;
+            ViewBag.FiltroNumIdent = numIdent;
+
+            return View(usuariosPaginados);
+
+            
         }
 
     
@@ -217,7 +268,7 @@ namespace EduConnect_Front.Controllers
             if (!ok || reporte == null || !reporte.Any())
             {
                 TempData["Error"] = msg ?? "No hay datos para el reporte.";
-                return RedirectToAction("PanelAdministrador", "Administrador"); // redirige al panel de control
+                return RedirectToAction("PanelAdministrador", ControladorAdministrador); // redirige al panel de control
             }
 
             //Generar PDF 
@@ -246,7 +297,7 @@ namespace EduConnect_Front.Controllers
             if (reporte == null || !reporte.Any())
             {
                 TempData["Error"] = "No hay datos para generar el reporte.";
-                return RedirectToAction("PanelAdministrador", "Administrador");
+                return RedirectToAction("PanelAdministrador", ControladorAdministrador);
             }
             
             return new ViewAsPdf("ReporteTutoradosPdf", reporte)

@@ -1,0 +1,57 @@
+﻿@using EduConnect_Front.Dtos
+@model EduConnect_Front.Dtos.RestablecerContrasenaDto
+@{
+    ViewData["Title"] = "Restablecer Contraseña";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/estilos/recuperarContrasena.css" />
+}
+<div class="container mt-5">
+    <h3>Restablecer Contraseña</h3>
+
+    <form asp-action="RestablecerContrasena" method="post">
+        <input type="hidden" name="Token" value="@Context.Request.Query["token"]" />
+
+        <div class="mb-3">
+            <label for="NuevaPassword" class="form-label">Nueva Contraseña</label>
+            <input type="password" id="NuevaPassword" name="NuevaPassword" class="form-control" required minlength="7" />
+            <span id="togglePassword" class="toggle-password">
+                👁️
+            </span>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">Guardar Nueva Contraseña</button>
+    </form>
+</div>
+
+@if (TempData["Exito"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "exito",
+        Titulo = "Contraseña actualizada",
+        Mensaje = TempData["Exito"] as string
+    })
+}
+
+@if (TempData["Error"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "error",
+        Titulo = "Error",
+        Mensaje = TempData["Error"] as string
+    })
+}
+<script>
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        const pwdInput = document.getElementById("NuevaPassword");
+        if (pwdInput.type === "password") {
+            pwdInput.type = "text";
+            this.textContent = "🙈"; // cambia el icono
+        } else {
+            pwdInput.type = "password";
+            this.textContent = "👁️"; // vuelve al ojo
+        }
+    });
+</script>

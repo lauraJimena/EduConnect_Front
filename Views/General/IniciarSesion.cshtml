@@ -26,9 +26,24 @@
                 <span id="togglePassword" class="toggle-password">
                     👁️
                 </span>
+               
             </div>
+            <p class="texto-olvidaste">
+               
+                <a asp-controller="General" asp-action="OlvidarContrasena" class="enlace-recuperar">¿OLVIDASTE TU CONTRASEÑA?</a>
+            </p>
 
             <button type="submit">INICIAR SESIÓN</button>
+            <div class="caja-registro">
+                <p class="texto-normal">
+                    ¿NO TIENES UNA CUENTA?
+                    <a asp-controller="General" asp-action="Registro" class="link-registro">
+                        <strong>REGÍSTRATE</strong>
+                    </a>
+                </p>
+
+               
+            </div>
         </form>
     </section>
 </main>
@@ -60,7 +75,16 @@
         Mensaje = TempData["RegisterSuccess"] as string
     })
 }
-
+<!-- Popup de REGISTRO EXITOSO -->
+@if (TempData["ContrasActualizada"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "exito",
+        Titulo = "Actualización exitosa",
+        Mensaje = "Contraseña Actualizada correctamente"
+    })
+}
 
 <!--Popup de ERROR -->
 @{
@@ -88,3 +112,12 @@
         }
     });
 </script>
+<script>
+    const numIdentInput = document.querySelector('input[name="NumIdent"]');
+
+    numIdentInput.addEventListener('input', function (e) {
+        // Reemplaza todo lo que no sea número
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+</script>
+
