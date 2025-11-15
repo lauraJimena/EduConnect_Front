@@ -8,28 +8,16 @@
     <link rel="stylesheet" href="~/estilos/layoutUsuario.css" />
     <link rel="stylesheet" href="~/estilos/estilos.css">
     <link rel="stylesheet" href="~/estilos/popup.css" />
-   @*  <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-          integrity="sha512-6uH8h9r0T2fUxDq8Pnl1v7yF8x5YtXxJZoLxDT0jITrbpbSYXQ0GQf8JfOC4A6hXj0+KkB8n7TQcQ9R+5smY3Q=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" /> *@
-@*     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-          crossorigin="anonymous" referrerpolicy="no-referrer" /> *@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
           integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw=="
           crossorigin="anonymous" referrerpolicy="no-referrer" />
+    @await RenderSectionAsync("Styles", required: false)
 
-
-    @RenderSection("Styles", required: false)
 </head>
 
 
 <body>
-    @{
-        var nombreUsuario = Context.Session.GetString("UsuarioNombre") ?? "Usuario";
-        var avatarUrl = Context.Session.GetString("AvatarUrl");
-    }
 
     <header class="usuario-header">
         <nav class="navbar">
@@ -82,9 +70,12 @@
         </div>
     </footer>
 
-    @RenderSection("Scripts", required: false)
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!--<script src="~/js/chat-popup.js">-->
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+jEIB6U6HotE5T7V6czS4fF9pwPIYO/V+B95Ofk="
+            crossorigin="anonymous"></script>
+
     <script src="/js/chat-popup.js"></script>
 </body>
 </html>

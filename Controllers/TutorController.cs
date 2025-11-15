@@ -13,23 +13,12 @@ namespace EduConnect_Front.Controllers
         private readonly GeneralService _generalService = new GeneralService();
         private readonly TutorService _tutorService;
         private readonly AdministradorService _administradorService = new AdministradorService();
-
+        public const string SessionExpiredMessage = "Sesión expirada. Inicia sesión nuevamente.";
+        public const string Error = "Errror";
         public TutorController(TutorService tutorService)
         {
             _tutorService = tutorService;
         }
-        //[HttpGet]
-        //public IActionResult PanelTutor()
-        //{
-        //    var usuario = HttpContext.Session.GetObject<ObtenerUsuarioDto>("Usuario");
-        //    if (usuario == null)
-        //    {
-        //        // No hay sesión -> volver a iniciar sesión
-        //        return RedirectToAction("IniciarSesion", "General");
-        //    }
-
-        //    return View(usuario); // Pasa el DTO completo a la vista
-        //}
         [HttpGet]
         [ValidarRol(2)]
         public async Task<IActionResult> PanelTutor()
@@ -41,14 +30,14 @@ namespace EduConnect_Front.Controllers
 
                 if (string.IsNullOrEmpty(token))
                 {
-                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    TempData[Error] = SessionExpiredMessage;
                     return RedirectToAction("IniciarSesion", "General");
                 }              
                 var idUsuario = HttpContext.Session.GetInt32("IdUsu");
 
                 if (idUsuario == null)
                 {
-                    TempData["Error"] = "No se encontró información del usuario actual.";
+                    TempData[Error] = "No se encontró información del usuario actual.";
                     return RedirectToAction("IniciarSesion", "General");
                 }
                 //Volver a consultar al backend por los datos actualizados
@@ -56,7 +45,7 @@ namespace EduConnect_Front.Controllers
 
                 if (usuario == null)
                 {
-                    TempData["Error"] = "No se pudo cargar el perfil del tutorado.";
+                    TempData[Error] = "No se pudo cargar el perfil del tutorado.";
                     return RedirectToAction("IniciarSesion", "General");
                 }
 
@@ -64,7 +53,7 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                TempData[Error] = ex.Message;
                 return RedirectToAction("IniciarSesion", "General");
             }
 
@@ -76,7 +65,7 @@ namespace EduConnect_Front.Controllers
         {
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Solicitud no válida.";
+                TempData[Error] = "Solicitud no válida.";
                 return RedirectToAction(AccionSolicitudesTutorias);
             }
 
@@ -85,7 +74,7 @@ namespace EduConnect_Front.Controllers
             if (pageSize < 1 || pageSize > 50) pageSize = 10;
             if (idMateria < 0 || idModalidad < 0)
             {
-                TempData["Error"] = "Filtros inválidos.";
+                TempData[Error] = "Filtros inválidos.";
                 return RedirectToAction(AccionSolicitudesTutorias);
             }
 
@@ -94,7 +83,7 @@ namespace EduConnect_Front.Controllers
 
             if (idTutor == 0 || string.IsNullOrEmpty(token))
             {
-                TempData["Error"] = "No se encontró la sesión del usuario.";
+                TempData[Error] = "No se encontró la sesión del usuario.";
                 return RedirectToAction("IniciarSesion", "General");
             }
 
@@ -103,7 +92,7 @@ namespace EduConnect_Front.Controllers
 
             if (!ok || solicitudes == null)
             {
-                TempData["Error"] = msg;
+                TempData[Error] = msg;
                 return View(new List<SolicitudTutorDto>());
             }
 
@@ -155,7 +144,7 @@ namespace EduConnect_Front.Controllers
 
             if (!ok)
             {
-                TempData["Error"] = msg;
+                TempData[Error] = msg;
                 return RedirectToAction(AccionSolicitudesTutorias);
             }
 
@@ -177,7 +166,7 @@ namespace EduConnect_Front.Controllers
 
             if (!ok)
             {
-                TempData["Error"] = msg;
+                TempData[Error] = msg;
                 return RedirectToAction(AccionSolicitudesTutorias);
             }
 
@@ -200,7 +189,7 @@ namespace EduConnect_Front.Controllers
 
             if (!ok)
             {
-                TempData["Error"] = msg;
+                TempData[Error] = msg;
                 return View(new List<HistorialTutoriaDto>());
             }
 
@@ -220,7 +209,7 @@ namespace EduConnect_Front.Controllers
 
                 if (string.IsNullOrEmpty(token))
                 {
-                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    TempData[Error] = "Sesión expirada. Inicia sesión nuevamente.";
                     return RedirectToAction("IniciarSesion", "General");
                 }
 
@@ -229,7 +218,7 @@ namespace EduConnect_Front.Controllers
 
                 if (modelo == null)
                 {
-                    TempData["Error"] = "Usuario no encontrado.";
+                    TempData[Error] = "Usuario no encontrado.";
                     return RedirectToAction("ConsultarUsuarios");
                 }
                
@@ -243,7 +232,7 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                TempData[Error] = ex.Message;
                 return RedirectToAction("ConsultarUsuarios");
             }
         }
@@ -264,7 +253,7 @@ namespace EduConnect_Front.Controllers
 
                 if (string.IsNullOrEmpty(token))
                 {
-                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    TempData[Error] = SessionExpiredMessage;
                     return RedirectToAction("IniciarSesion", "General");
                 }
                 var mensaje = await _tutorService.ActualizarPerfilTutorAsync(perfil, token);
@@ -281,7 +270,7 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                TempData[Error] = ex.Message;
                 return RedirectToAction("EditarTutor");
             }
         }
@@ -295,7 +284,7 @@ namespace EduConnect_Front.Controllers
 
             if (string.IsNullOrEmpty(token) || idTutor == null)
             {
-                TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                TempData[Error] = SessionExpiredMessage;
                 return RedirectToAction("IniciarSesion", "General");
             }
 
@@ -303,7 +292,7 @@ namespace EduConnect_Front.Controllers
 
             if (!ok)
             {
-                TempData["Error"] = msg;
+                TempData[Error] = msg;
                 return RedirectToAction("PanelTutor", "Tutor");
             }
 
@@ -326,13 +315,13 @@ namespace EduConnect_Front.Controllers
 
             if (string.IsNullOrEmpty(token) || idTutor == null)
             {
-                TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                TempData[Error] = SessionExpiredMessage;
                 return RedirectToAction("IniciarSesion", "General");
             }
 
             if (MateriasSeleccionadas == null || MateriasSeleccionadas.Length == 0)
             {
-                TempData["Error"] = "Debes seleccionar al menos una materia.";
+                TempData[Error] = "Debes seleccionar al menos una materia.";
                 return RedirectToAction("RegistrarMaterias");
             }
 
@@ -350,7 +339,7 @@ namespace EduConnect_Front.Controllers
 
             if (idTutor == 0 || string.IsNullOrEmpty(token))
             {
-                TempData["Error"] = "Sesión no válida.";
+                TempData[Error] = "Sesión no válida.";
                 return RedirectToAction("IniciarSesion", "General");
             }
 
@@ -358,7 +347,7 @@ namespace EduConnect_Front.Controllers
 
             if (!ok)
             {
-                TempData["Error"] = msg;
+                TempData[Error] = msg;
                 return View(new List<ComentarioTutorDto>());
             }
 
@@ -382,7 +371,7 @@ namespace EduConnect_Front.Controllers
 
             if (!ok)
             {
-                TempData["Error"] = msg;
+                TempData[Error] = msg;
                 return View("ComentariosTutor", new List<ComentarioTutorDto>());
             }
 
