@@ -141,7 +141,7 @@ Cada usuario autenticado accede únicamente a las vistas y funcionalidades corre
 El sistema redirige automáticamente a los usuarios no autorizados hacia una vista de “Acceso denegado”.
 - Restricción de orígenes: Configuración CORS que únicamente permite el acceso desde el dominio oficial (https://localhost:7270).
 - Validación de entrada: Se realiza sanitización y validación de datos en formularios y vistas.
-- 
+
 <b>Autoría</b>
 - Laura Jimena Herreño Rubiano
 - Andrés Mateo Morales Gonzalez
