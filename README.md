@@ -67,14 +67,14 @@ La aplicación se comunica con la API mediante **servicios HTTP** autenticados p
 
 ## <b>Configuración inicial</b>
 
-<h3>1️Clonado del repositorio</h3>
+<h3>Clonado del repositorio</h3>
 
 ```bash
 git clone https://github.com/lauraJimena/EduConnect_Front.git
 cd EduConnect_Front
 ```
 
-<h3>2️Configuración del archivo <code>appsettings.json</code></h3>
+<h3>Configuración del archivo <code>appsettings.json</code></h3>
 
 En este archivo se define la URL base del backend y otros parámetros de conexión:
 ```json
