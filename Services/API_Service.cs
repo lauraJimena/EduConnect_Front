@@ -13,7 +13,7 @@ namespace EduConnect_Front.Services
     {
         private const string AuthScheme = "Bearer";
         private readonly HttpClient _httpClient;
-        private const string baseUrl = "https://localhost:7003/";
+        private const string baseUrl = "http://localhost:85";
         private static readonly JsonSerializerOptions _jsonOptions =
     new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
