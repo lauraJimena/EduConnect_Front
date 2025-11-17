@@ -13,33 +13,7 @@
     <link rel="stylesheet" href="~/estilos/editarTutorado.css">
 }
 
-@if (TempData["Success"] != null)
-{
-    @await Html.PartialAsync("_Popup", new PopupDto
-    {
-        Tipo = "exito",
-        Titulo = "Perfil actualizado con éxito",
-        Mensaje = TempData["Success"] as string
-    })
-<script>
-    // 🔹 Cierra el popup a los 3 segundos y redirige al Panel del Tutor
-    setTimeout(() => {
-        const popup = document.querySelector('.modal-fondo');
-        if (popup) popup.style.display = 'none';
-        window.location.href = '@Url.Action("PanelTutor", "Tutor")'; // 🔁 Redirige
-    }, 3000);
-</script>
-}
 
-@if (TempData["Error"] != null)
-{
-    @await Html.PartialAsync("_Popup", new PopupDto
-    {
-        Tipo = "error",
-        Titulo = "Error al actualizar el perfil",
-        Mensaje = TempData["Error"] as string
-    })
-}
 
 <main class="perfil-container">
     <!-- PANEL IZQUIERDO -->
@@ -160,7 +134,33 @@
     </section>
 
 </main>
+@if (TempData["Success"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "exito",
+        Titulo = "Perfil actualizado con éxito",
+        Mensaje = TempData["Success"] as string
+    })
+<script>
+    // 🔹 Cierra el popup a los 3 segundos y redirige al Panel del Tutor
+    setTimeout(() => {
+        const popup = document.querySelector('.modal-fondo');
+        if (popup) popup.style.display = 'none';
+        window.location.href = '@Url.Action("PanelTutor", "Tutor")'; // 🔁 Redirige
+    }, 3000);
+</script>
+}
 
+@if (TempData["Error"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "error",
+        Titulo = "Error al actualizar el perfil",
+        Mensaje = TempData["Error"] as string
+    })
+}
 <!-- ✅ Script que actualiza la imagen y el campo hidden -->
 <script>
     document.querySelectorAll("input[name='AvatarRadio']").forEach(radio => {

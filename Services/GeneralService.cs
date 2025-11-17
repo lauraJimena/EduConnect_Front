@@ -11,10 +11,14 @@ namespace EduConnect_Front.Services
             _apiService = new API_Service();
         }
 
-        public async Task<(bool Success, string Message)> RegistrarUsuario(CrearUsuarioDto usuario, string token, CancellationToken ct = default)
+        public async Task<(bool Success, string Message, int idUsu)> RegistrarUsuario(CrearUsuarioDto usuario,CancellationToken ct = default)
         {
             // aquí validaciones
-            return await _apiService.RegistrarUsuarioAsync(usuario, token,ct);
+            return await _apiService.RegistrarUsuarioAsync(usuario,ct);
+        }
+        public async Task<bool> EnviarCorreoBienvenidaAsync(int idUsu)
+        {
+            return await _apiService.EnviarCorreoBienvenidaAsync(idUsu);
         }
         public async Task<(bool Ok, string Msg, RespuestaInicioSesionDto? Usuario)> IniciarSesion(IniciarSesionDto dto, CancellationToken ct = default)
         {
