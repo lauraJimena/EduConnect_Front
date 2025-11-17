@@ -11,8 +11,12 @@ namespace EduConnect_Front.Services
 {
     public class API_Service
     {
+        private const string AuthScheme = "Bearer";
         private readonly HttpClient _httpClient;
         private const string baseUrl = "https://localhost:7003/";
+        private static readonly JsonSerializerOptions _jsonOptions =
+    new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
 
         public API_Service()
         {
@@ -22,51 +26,74 @@ namespace EduConnect_Front.Services
                 Timeout = TimeSpan.FromSeconds(30)
             };
         }
-        public async Task<(bool Success, string Message)> RegistrarUsuarioAsync(CrearUsuarioDto usuario, string token, CancellationToken ct = default)
+        public async Task<(bool ok, string msg, int idUsu)> RegistrarUsuarioAsync(
+    CrearUsuarioDto usuario,
+    CancellationToken ct = default)
         {
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                   new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme);
 
                 using var resp = await _httpClient.PostAsJsonAsync("General/RegistrarUsuario", usuario, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
-                if (resp.IsSuccessStatusCode)
-                    return (true, string.IsNullOrWhiteSpace(body) ? "Usuario registrado con éxito" : body);
+                // Deserializar respuesta JSON
+                var data = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(body);
+                if (data == null)
+                {
+                    return (
+                        ok: false,
+                        msg: "Respuesta inválida del servidor.",
+                        idUsu: 0
+                    );
+                }
 
-                // Manejo genérico de error 
-                var msg = string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body;
-                return (false, msg);
+                if (resp.IsSuccessStatusCode)
+                {
+                    return (
+                        ok: (bool)data.ok,
+                        msg: (string)data.msg,
+                        idUsu: (int)data.idUsu
+                    );
+                }
+
+                // Si hubo error en el back
+                return (
+                    ok: false,
+                    msg: (string)(data?.msg ?? "Error desconocido"),
+                    idUsu: 0
+                );
             }
             catch (HttpRequestException ex)
             {
-                return (false, $"No se pudo conectar con la API: {ex.Message}");
+                return (false, $"No se pudo conectar con la API: {ex.Message}", 0);
             }
             catch (TaskCanceledException)
             {
-                return (false, "La solicitud a la API expiró (timeout).");
+                
+                return (false, ApiMensajesService.Timeout, 0);
             }
             catch (Exception ex)
             {
-                return (false, $"Error inesperado: {ex.Message}");
+                return (false, $"Error inesperado: {ex.Message}", 0);
             }
         }
+
         public async Task<(bool Ok, string Msg, List<SolicitudTutorDto>? Solicitudes)>
     ObtenerSolicitudesTutoriasAsync(FiltroSolicitudesTutorDto filtro, string token, CancellationToken ct = default)
         {
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 using var resp = await _httpClient.PostAsJsonAsync("Tutor/SolicitudesTutorias", filtro, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
                 if (resp.IsSuccessStatusCode)
                 {
-                    var lista = JsonSerializer.Deserialize<List<SolicitudTutorDto>>(body,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    var lista = JsonSerializer.Deserialize<List<SolicitudTutorDto>>(body, _jsonOptions);
 
                     return (true, "Solicitudes obtenidas correctamente", lista);
                 }
@@ -142,7 +169,7 @@ namespace EduConnect_Front.Services
             }
             catch (TaskCanceledException)
             {
-                return (false, "La solicitud de inicio de sesión expiró (timeout).", null);
+                return (false, ApiMensajesService.Timeout, null);
             }
             catch (Exception ex)
             {
@@ -154,7 +181,7 @@ namespace EduConnect_Front.Services
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 using var resp = await _httpClient.PostAsJsonAsync("General/ActualizarPassword", dto, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
@@ -212,8 +239,7 @@ namespace EduConnect_Front.Services
                 if (resp.IsSuccessStatusCode)
                 {
                     var data = JsonSerializer.Deserialize<List<HistorialTutoriaDto>>(
-                        body,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        body, _jsonOptions);
                     return (true, "OK", data ?? new List<HistorialTutoriaDto>());
                 }
 
@@ -236,7 +262,7 @@ namespace EduConnect_Front.Services
             {
                 // 🔹 Agregar encabezado de autorización con el token JWT
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 // 🔹 Construimos la URL con los filtros dinámicos
                 var queryParams = new List<string>();
@@ -257,7 +283,7 @@ namespace EduConnect_Front.Services
                 {
                     var usuarios = System.Text.Json.JsonSerializer.Deserialize<List<ListadoUsuariosDto>>(
                         body,
-                        new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                        _jsonOptions
                     );
                     return (true, "Usuarios obtenidos correctamente", usuarios);
                 }
@@ -274,7 +300,7 @@ namespace EduConnect_Front.Services
             }
             catch (TaskCanceledException)
             {
-                return (false, "La solicitud a la API expiró (timeout).", null);
+                return (false, ApiMensajesService.Timeout, null);
             }
             catch (Exception ex)
             {
@@ -287,7 +313,7 @@ namespace EduConnect_Front.Services
             {
                 // Configurar el token JWT
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 // Hacer la petición POST
                 var response = await _httpClient.PostAsJsonAsync("Tutorado/BuscarTutor", filtros);
@@ -318,7 +344,7 @@ namespace EduConnect_Front.Services
             {
                 // Configurar el token JWT
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 using var resp = await _httpClient.PostAsJsonAsync("Administrador/RegistrarUsuario", dto, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
@@ -339,7 +365,7 @@ namespace EduConnect_Front.Services
             }
             catch (TaskCanceledException)
             {
-                return (false, "La solicitud a la API expiró (timeout).");
+                return (false, ApiMensajesService.Timeout);
             }
             catch (Exception ex)
             {
@@ -352,7 +378,7 @@ namespace EduConnect_Front.Services
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
+                    new AuthenticationHeaderValue(AuthScheme, token);
 
                 var response = await _httpClient.GetAsync($"Administrador/ObtenerUsuarioPorId/{id}");
                 var body = await response.Content.ReadAsStringAsync();
@@ -384,7 +410,7 @@ namespace EduConnect_Front.Services
             try
             {
                 // Agregar token en el encabezado de la solicitud
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 using var resp = await _httpClient.GetAsync($"Administrador/ObtenerUsuarioPorId/{idUsuario}", ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
@@ -393,7 +419,7 @@ namespace EduConnect_Front.Services
                 {
                     var usuario = JsonSerializer.Deserialize<ObtenerUsuarioDto>(
                         body,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        _jsonOptions);
 
                     return (true, "Usuario obtenido correctamente", usuario);
                 }
@@ -420,7 +446,7 @@ namespace EduConnect_Front.Services
             {
                 
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
               
                 using var resp = await _httpClient.PutAsJsonAsync("Administrador/ActualizarUsuario", dto, ct);
@@ -448,7 +474,7 @@ namespace EduConnect_Front.Services
             }
             catch (TaskCanceledException)
             {
-                return (false, "La solicitud a la API expiró (timeout).");
+                return (false, ApiMensajesService.Timeout);
             }
             catch (Exception ex)
             {
@@ -459,7 +485,7 @@ namespace EduConnect_Front.Services
         {
             // Agregar encabezado de autorización Bearer
             _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
             // Hacer la llamada PUT
             var response = await _httpClient.PutAsJsonAsync("Tutorado/ActualizarPerfil", perfil);
@@ -479,7 +505,7 @@ namespace EduConnect_Front.Services
         {
             // Agregar encabezado de autorización Bearer
             _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
             // Hacer la llamada PUT
             var response = await _httpClient.PutAsJsonAsync("Tutor/ActualizarPerfil", perfil);
@@ -530,7 +556,7 @@ namespace EduConnect_Front.Services
             }
             catch (TaskCanceledException)
             {
-                return (false, "La solicitud a la API expiró (timeout).");
+                return (false, ApiMensajesService.Timeout);
             }
             catch (Exception ex)
             {
@@ -548,7 +574,7 @@ namespace EduConnect_Front.Services
                     return (false, "Token de autenticación inválido o no encontrado.");
 
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 using var resp = await _httpClient.DeleteAsync($"Administrador/EliminarUsuario/{idUsuario}", ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
@@ -574,7 +600,7 @@ namespace EduConnect_Front.Services
             }
             catch (TaskCanceledException)
             {
-                return (false, "La solicitud a la API expiró (timeout).");
+                return (false, ApiMensajesService.Timeout);
             }
             catch (Exception ex)
             {
@@ -597,7 +623,7 @@ namespace EduConnect_Front.Services
                     return (false, "Token de autenticación inválido o no encontrado.", null);
 
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 
                 var url = $"Tutorado/{idTutorado}/historial";
@@ -616,7 +642,7 @@ namespace EduConnect_Front.Services
                 {
                     var datos = JsonSerializer.Deserialize<List<HistorialTutoriaDto>>(
                         body,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                        _jsonOptions
                     );
 
                     return (true, "Historial obtenido correctamente", datos ?? new());
@@ -635,7 +661,7 @@ namespace EduConnect_Front.Services
             }
             catch (TaskCanceledException)
             {
-                return (false, "La solicitud de historial expiró (timeout).", null);
+                return (false, ApiMensajesService.Timeout, null);
             }
             catch (Exception ex)
             {
@@ -678,7 +704,7 @@ namespace EduConnect_Front.Services
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 using var resp = await _httpClient.PostAsJsonAsync("Tutorado/SolicitudesTutorias", filtro, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
@@ -687,7 +713,7 @@ namespace EduConnect_Front.Services
                 {
                     var solicitudes = JsonSerializer.Deserialize<List<SolicitudTutoriaDto>>(
                         body,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                        _jsonOptions
                     );
                     return solicitudes ?? new List<SolicitudTutoriaDto>();
                 }
@@ -704,7 +730,7 @@ namespace EduConnect_Front.Services
             }
             catch (TaskCanceledException)
             {
-                throw new Exception("La solicitud de tutorías tardó demasiado (timeout).");
+                throw new TimeoutException(ApiMensajesService.Timeout);
             }
         }
 
@@ -718,7 +744,7 @@ namespace EduConnect_Front.Services
             {
                 
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 using var resp = await _httpClient.PostAsJsonAsync("Tutorado/CrearSolicitudTutoria", solicitud, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
@@ -751,7 +777,7 @@ namespace EduConnect_Front.Services
                 {
                     // Intentar deserializar el JSON de error
                     var error = JsonSerializer.Deserialize<Dictionary<string, string>>(body,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        _jsonOptions);
 
                     mensajeError = error != null && error.ContainsKey("mensaje")
                         ? error["mensaje"]
@@ -775,7 +801,7 @@ namespace EduConnect_Front.Services
             }
             catch (TaskCanceledException)
             {
-                return (false, "⏰ La solicitud a la API expiró (timeout).", 0);
+                return (false, ApiMensajesService.Timeout, 0);
             }
             catch (Exception ex)
             {
@@ -791,7 +817,7 @@ namespace EduConnect_Front.Services
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 var request = new ActualizarEstadoSolicitudDto { IdTutoria = idTutoria };
 
@@ -820,7 +846,7 @@ namespace EduConnect_Front.Services
             {
                 
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 var request = new ActualizarEstadoSolicitudDto { IdTutoria = idTutoria };
 
@@ -856,7 +882,7 @@ namespace EduConnect_Front.Services
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                
                 string url = $"Tutor/{idTutor}/historial/";
@@ -876,7 +902,7 @@ namespace EduConnect_Front.Services
 
                 var datos = JsonSerializer.Deserialize<List<HistorialTutoriaDto>>(
                     body,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    _jsonOptions
                 );
 
                 return (true, "Historial obtenido correctamente", datos ?? new List<HistorialTutoriaDto>());
@@ -897,7 +923,7 @@ namespace EduConnect_Front.Services
             {
                 
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 using var response = await _httpClient.PutAsJsonAsync("Tutor/ActualizarPerfil", perfil, ct);
                 var body = await response.Content.ReadAsStringAsync(ct);
@@ -932,7 +958,7 @@ namespace EduConnect_Front.Services
             {
                
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 
                 var queryParams = new List<string>();
@@ -953,7 +979,7 @@ namespace EduConnect_Front.Services
                 {
                     var usuarios = System.Text.Json.JsonSerializer.Deserialize<List<ListadoUsuariosDto>>(
                         body,
-                        new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                        _jsonOptions
                     );
                     return (true, "Usuarios obtenidos correctamente", usuarios);
                 }
@@ -970,7 +996,7 @@ namespace EduConnect_Front.Services
             }
             catch (TaskCanceledException)
             {
-                return (false, "La solicitud a la API expiró (timeout).", null);
+                return (false, ApiMensajesService.Timeout, null);
             }
             catch (Exception ex)
             {
@@ -982,7 +1008,7 @@ namespace EduConnect_Front.Services
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthScheme, token);
                 var response = await _httpClient.GetAsync("Tutorado/RankingTutores");
 
                 if (!response.IsSuccessStatusCode)
@@ -1009,7 +1035,7 @@ namespace EduConnect_Front.Services
             try
             {
                 using var request = new HttpRequestMessage(HttpMethod.Get, $"Tutorado/PerfilTutor/{idTutor}");
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                request.Headers.Authorization = new AuthenticationHeaderValue(AuthScheme, token);
 
                 using var response = await _httpClient.SendAsync(request);
                 var body = await response.Content.ReadAsStringAsync();
@@ -1040,7 +1066,7 @@ namespace EduConnect_Front.Services
         public async Task<ObtenerUsuarioDto?> ObtenerTutoradoPorIdAsync(int idUsuario, string token)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"Tutorado/ObtenerTutoradoPorId/{idUsuario}");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Authorization = new AuthenticationHeaderValue(AuthScheme, token);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             using var response = await _httpClient.SendAsync(request);
@@ -1059,7 +1085,7 @@ namespace EduConnect_Front.Services
         public async Task<string> ActualizarPerfilTutorado(EditarPerfilDto perfil, string token)
         {
             _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+                new AuthenticationHeaderValue(AuthScheme, token);
 
             var response = await _httpClient.PutAsJsonAsync("Tutorado/ActualizarPerfil", perfil);
 
@@ -1073,7 +1099,7 @@ namespace EduConnect_Front.Services
         public async Task<ObtenerUsuarioDto?> ObtenerTutorPorIdAsync(int idUsuario, string token)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"Tutor/ObtenerTutorPorId/{idUsuario}");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Authorization = new AuthenticationHeaderValue(AuthScheme, token);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             using var response = await _httpClient.SendAsync(request);
@@ -1092,7 +1118,7 @@ namespace EduConnect_Front.Services
         public async Task<IEnumerable<ComentarioTutorInfoDto>> ObtenerComentariosPorTutorAsync(int idTutor, string token)
         {
             _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+                new AuthenticationHeaderValue(AuthScheme, token);
 
             var request = new { idTutor = idTutor };
 
@@ -1104,30 +1130,11 @@ namespace EduConnect_Front.Services
             var error = await response.Content.ReadAsStringAsync();
             throw new Exception($"Error al obtener comentarios: {error}");
         }
-        //CREAR COMENTARIO 
-        //public async Task<int> CrearComentarioAsync(CrearComentarioDto comentario, string token)
-        //{
-        //    _httpClient.DefaultRequestHeaders.Authorization =
-        //        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-        //    var response = await _httpClient.PostAsJsonAsync("Tutorado/CrearComentario", comentario);
-
-        //    if (response.IsSuccessStatusCode)
-        //    {
-        //        // El backend devuelve { mensaje = "Comentario creado correctamente." }
-        //        var resultado = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-        //        return resultado?["mensaje"] ?? "Comentario creado correctamente.";
-        //    }
-        //    else
-        //    {
-        //        var error = await response.Content.ReadAsStringAsync();
-        //        throw new Exception($"Error al crear el comentario: {error}");
-        //    }
-        //}
         public async Task<int> CrearComentarioAsync(CrearComentarioDto comentario, string token)
         {
             _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
             var response = await _httpClient.PostAsJsonAsync("Tutorado/CrearComentario", comentario);
 
@@ -1153,7 +1160,7 @@ namespace EduConnect_Front.Services
             try
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, $"Tutor/ValidarMaterias/{idTutor}");
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                request.Headers.Authorization = new AuthenticationHeaderValue(AuthScheme, token);
 
                 using var response = await _httpClient.SendAsync(request);
                 var body = await response.Content.ReadAsStringAsync();
@@ -1181,7 +1188,7 @@ namespace EduConnect_Front.Services
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
+                    new AuthenticationHeaderValue(AuthScheme, token);
 
                 var response = await _httpClient.GetAsync($"Tutor/MateriasPorTutor/{idTutor}");
                 var body = await response.Content.ReadAsStringAsync();
@@ -1205,7 +1212,7 @@ namespace EduConnect_Front.Services
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
+                    new AuthenticationHeaderValue(AuthScheme, token);
 
                 var body = new { IdTutor = idTutor, Materias = materias };
                 var json = JsonSerializer.Serialize(body);
@@ -1232,7 +1239,7 @@ namespace EduConnect_Front.Services
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 using var resp = await _httpClient.GetAsync($"Chats/ObtenerChatsPorUsuario?usuarioId={idUsuario}", ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
@@ -1242,7 +1249,7 @@ namespace EduConnect_Front.Services
                 {
 
                     var chats = JsonSerializer.Deserialize<List<ObtenerChatDto>>(body,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        _jsonOptions);
 
                     return chats ?? new List<ObtenerChatDto>();
                 }
@@ -1266,7 +1273,7 @@ namespace EduConnect_Front.Services
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
                 using var resp = await _httpClient.GetAsync($"Chats/ObtenerMensajes?chatId={idChat}", ct);
                 var body = await resp.Content.ReadAsStringAsync(ct); 
                 if (resp.IsSuccessStatusCode)
@@ -1281,9 +1288,10 @@ namespace EduConnect_Front.Services
                 throw new Exception("ObtenerMensajesAsync -> " + ex.ToString());
             } 
             catch (TaskCanceledException) 
-            { 
-                throw new Exception("La solicitud de mensajes tardó demasiado (timeout).");
-            } 
+            {
+                throw new TimeoutException(ApiMensajesService.Timeout);
+
+            }
         }
 
         // Enviar / Crear Mensaje
@@ -1292,7 +1300,7 @@ namespace EduConnect_Front.Services
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 Console.WriteLine("[API_Service] POST Chats/CrearMensaje -> " +
                                   $"Chat:{mensaje.IdChat} Emisor:{mensaje.IdEmisor}");
@@ -1318,7 +1326,7 @@ namespace EduConnect_Front.Services
             }
             catch (TaskCanceledException)
             {
-                return (false, "La solicitud a la API expiró (timeout).");
+                return (false, ApiMensajesService.Timeout);
             }
             catch (Exception ex)
             {
@@ -1330,17 +1338,14 @@ namespace EduConnect_Front.Services
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 using var response = await _httpClient.GetAsync("Administrador/ReporteTutores", ct);
                 var body = await response.Content.ReadAsStringAsync(ct);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var data = JsonSerializer.Deserialize<List<ReporteTutorDto>>(body, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
+                    var data = JsonSerializer.Deserialize<List<ReporteTutorDto>>(body, _jsonOptions);
 
                     return (true, "Reporte obtenido correctamente", data ?? new List<ReporteTutorDto>());
                 }
@@ -1365,17 +1370,14 @@ namespace EduConnect_Front.Services
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 using var response = await _httpClient.GetAsync("Administrador/ReporteTutoradosActivos", ct);
                 var body = await response.Content.ReadAsStringAsync(ct);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var lista = JsonSerializer.Deserialize<List<ReporteTutoradoDto>>(body, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
+                    var lista = JsonSerializer.Deserialize<List<ReporteTutoradoDto>>(body, _jsonOptions);
                     return lista ?? new List<ReporteTutoradoDto>();
                 }
 
@@ -1390,7 +1392,7 @@ namespace EduConnect_Front.Services
         public async Task<bool> EnviarConfirmacionTutoriaAsync(string token, int idTutoria)
         {
             _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+                new AuthenticationHeaderValue(AuthScheme, token);
 
             var response = await _httpClient.PostAsync($"Tutorado/EnviarConfirmacionTutoria?idTutoria={idTutoria}", null);
 
@@ -1403,25 +1405,37 @@ namespace EduConnect_Front.Services
         public async Task<bool> EnviarCorreoCalificacionBajaAsync(string token, int idComentario)
         {
             _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+                new AuthenticationHeaderValue(AuthScheme, token);
 
-            // ✅ Usa query string en lugar de ruta
             var response = await _httpClient.PostAsync($"Tutorado/EnviarCalificacionBaja?idComentario={idComentario}", null);
 
             if (response.IsSuccessStatusCode)
                 return true;
 
             var error = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Error al enviar el correo: {error}");
+            throw new HttpRequestException($"Error al enviar el correo: {error}");
+
         }
 
+        public async Task<bool> EnviarCorreoBienvenidaAsync(int idUsu)
+        {
+            var url = $"General/EnviarBienvenida?idUsu={idUsu}";
+
+            var response = await _httpClient.PostAsync(url, null);
+
+            if (response.IsSuccessStatusCode)
+                return true;
+
+            var error = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"Error al enviar el correo: {error}");
+        }
 
         public async Task<List<TutoriaConsultaDto>> ConsultarTutoriasCoordAsync(
              string? carrera, int? semestre, string? materia, int? idEstado, int? ordenFecha, string token, CancellationToken ct = default)
         {
             
             _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
             
             var url = "Coordinador/ConsultarTutorias?";
@@ -1441,7 +1455,7 @@ namespace EduConnect_Front.Services
                     throw new Exception($"Error al consultar tutorías: {body}");
 
                 var tutorias = JsonSerializer.Deserialize<List<TutoriaConsultaDto>>(body,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    _jsonOptions);
 
                 return tutorias ?? new List<TutoriaConsultaDto>();
             }
@@ -1453,16 +1467,13 @@ namespace EduConnect_Front.Services
         public async Task<ReporteDemandaAcademicaDto?> ObtenerReporteDemandaAcademicaAsync(string token)
         {
             _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
             var resp = await _httpClient.GetAsync("Coordinador/ReporteDemandaAcademica");
             if (!resp.IsSuccessStatusCode) return null;
 
             var body = await resp.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<ReporteDemandaAcademicaDto>(body, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            return JsonSerializer.Deserialize<ReporteDemandaAcademicaDto>(body, _jsonOptions);
         }
         public async Task<(ReporteGestionAdministrativaDto? Totales, List<ReporteDesempenoTutorDto>? Desempeno)>
             ObtenerReporteCombinadoAsync(string token)
@@ -1470,7 +1481,7 @@ namespace EduConnect_Front.Services
             try
             {
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 var resp = await _httpClient.GetAsync("Coordinador/ReporteCombinado");
 
@@ -1501,7 +1512,7 @@ namespace EduConnect_Front.Services
             {
                 // 🔹 Autenticación con el token JWT
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
                 // 🔹 Envía el filtro como JSON con POST
                 var response = await _httpClient.PostAsJsonAsync("Tutor/Comentarios", filtro);
@@ -1531,7 +1542,7 @@ namespace EduConnect_Front.Services
         {
             // Agregar encabezado de autorización
             _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+                new AuthenticationHeaderValue(AuthScheme, token);
 
             // Realizar la llamada PUT
             var response = await _httpClient.PutAsync($"Coordinador/InactivarComentario/{idComentario}", null);
@@ -1550,7 +1561,7 @@ namespace EduConnect_Front.Services
         public async Task<List<ListaComentariosDto>> ObtenerComentariosAsync(string token)
         {
             _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
             var response = await _httpClient.GetAsync("Coordinador/Comentarios");
 
@@ -1598,7 +1609,7 @@ namespace EduConnect_Front.Services
                 {
                     var anon = new { mensaje = "" };
                     var parsed = System.Text.Json.JsonSerializer.Deserialize(body, anon.GetType(),
-                        new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        _jsonOptions);
                     msg = (string)parsed?.GetType().GetProperty("mensaje")?.GetValue(parsed) ?? body;
                 }
                 catch { /* si no es JSON, se deja body tal cual */ }
@@ -1614,7 +1625,7 @@ namespace EduConnect_Front.Services
             }
             catch (TaskCanceledException)
             {
-                return (false, "La solicitud expiró (timeout).");
+                return (false, ApiMensajesService.Timeout);
             }
             catch (Exception ex)
             {
