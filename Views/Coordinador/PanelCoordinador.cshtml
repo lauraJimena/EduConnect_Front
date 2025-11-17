@@ -39,23 +39,26 @@
     </section>
 </main>
 <!-- MODAL DE OPCIONES DE REPORTE -->
-<div id="modalReportes" class="modal-overlay">
+<div id="modalReportes"
+     class="modal-overlay"
+     data-url-tutores="/Coordinador/ReporteDemandaAcademicaPdf"
+     data-url-tutorados="/Coordinador/ReporteCombinadoPdf">
     <div class="modal-contenido">
         <button id="cerrarModalReportes" class="btn-cerrar">&times;</button>
         <h2>Seleccionar Reportes a Generar</h2>
+
         <form id="formReportes">
             <div class="checkbox-buttons">
                 <label class="checkbox-btn">
                     <input type="checkbox" id="chkTutores" />
-                    <span><i class="fas fa-chalkboard-teacher"></i> Reporte Demanda Academica</span>
+                    <span><i class="fas fa-chalkboard-teacher"></i> Reporte Demanda Académica</span>
                 </label>
 
                 <label class="checkbox-btn">
                     <input type="checkbox" id="chkTutorados" />
-                    <span><i class="fas fa-user-graduate"></i>Reporte Dese de Tutores</span>
+                    <span><i class="fas fa-user-graduate"></i> Reporte de Desempeño de Tutores</span>
                 </label>
             </div>
-
 
             <div class="botones-modal">
                 <button type="button" id="btnGenerar" class="btn-generar">Generar</button>
@@ -64,6 +67,7 @@
         </form>
     </div>
 </div>
+
 @section Scripts {
-    <script src="~/js/modalReporteCoor.js"></script>
+    <script src="~/js/modalReportes.js"></script>
 }

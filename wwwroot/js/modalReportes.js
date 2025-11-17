@@ -5,6 +5,10 @@
     const btnCancelar = document.getElementById("btnCancelar");
     const btnGenerar = document.getElementById("btnGenerar");
 
+    const urlTutores = modal.dataset.urlTutores;
+    const urlTutorados = modal.dataset.urlTutorados;
+
+
     // === Abrir modal ===
     btnAbrir.addEventListener("click", () => {
         modal.style.display = "flex";
@@ -32,15 +36,9 @@
             return;
         }
 
-        // URLs de los controladores
-        const urlTutores = '/Administrador/ReporteTutoresPdf';
-        const urlTutorados = '/Administrador/ReporteTutoradosPdf';
-
-        // Abrir los PDFs seleccionados
         if (chkTutores) window.open(urlTutores, '_blank');
         if (chkTutorados) window.open(urlTutorados, '_blank');
 
-        // Cerrar modal
         modal.style.display = "none";
     });
 });

@@ -35,35 +35,54 @@ namespace EduConnect_Front.Controllers
             ViewBag.Carreras = carreras;
             return View(new CrearUsuarioDto());
         }
+        private async Task CargarCombosRegistro()
+        {
+            var administradorService = new AdministradorService();
 
+            ViewBag.Carreras = await administradorService.ObtenerCarrerasAsync();
+            ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
+        }
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> Registro(CrearUsuarioDto dto, string token, CancellationToken ct)
+        public async Task<IActionResult> Registro(CrearUsuarioDto dto, CancellationToken ct)
         {
 
             if (!ModelState.IsValid)
             {
-                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                TempData["ErrorRegistro"] = "Hay errores en el formulario. Revise los campos.";
+                await CargarCombosRegistro();
                 return View(dto);
             }
-            var (ok, msg) = await _generalService.RegistrarUsuario(dto, token, ct);
+
+            var (ok, msg, idUsu) = await _generalService.RegistrarUsuario(dto, ct);
 
             if (ok)
             {
+                await BienvenidaAsync(idUsu);
                 TempData["RegisterSuccess"] = msg;
                 return RedirectToAction("IniciarSesion", "General");
             }
 
-            // Mostrar el texto que vino del back (p.ej. "Error interno: …")
-            ModelState.AddModelError(string.Empty, msg);
-            // Cargar carreras para el dropdown
-            AdministradorService _administradorService = new AdministradorService();
-            var carreras = await _administradorService.ObtenerCarrerasAsync();
+            ModelState.AddModelError("", msg);
+            TempData["ErrorRegistro"] = msg;                 // ❗ Para mostrar popup también
 
-            var tipoIdent = await _generalService.ObtenerTipoIdentAsync();
-            ViewBag.TipoIdent = tipoIdent;
-            ViewBag.Carreras = carreras;
+            await CargarCombosRegistro();
             return View(dto);
+        }
+
+        private async Task BienvenidaAsync(int idUsu)
+        {
+            try
+            {
+                bool correoEnviado = await _generalService.EnviarCorreoBienvenidaAsync(idUsu);
+                TempData["Info"] = correoEnviado
+                    ? "Se ha notificado al tutor sobre tu experiencia."
+                    : "No se pudo notificar al tutor en este momento.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Info"] = "Hubo un error al notificar al tutor: " + ex.Message;
+            }
         }
         [HttpPost]
         public async Task<IActionResult> IniciarSesion(IniciarSesionDto dto, CancellationToken ct)

@@ -28,7 +28,14 @@
         Titulo = "Correo enviado correctamente",
         Mensaje = TempData["Exito"] as string
     })
+
+<script>
+    setTimeout(function() {
+        window.location.href = "/General/IniciarSesion";
+    }, 2000); // redirige en 2 segundos
+</script>
 }
+
 
 @if (TempData["Error"] != null)
 {
