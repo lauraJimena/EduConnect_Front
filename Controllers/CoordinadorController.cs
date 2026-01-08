@@ -10,15 +10,40 @@ namespace EduConnect_Front.Controllers
     {
         private const string TempDataErrorKey = "Error";
         private readonly CoordinadorService _coordinadorService = new CoordinadorService();
+        public const string SessionExpiredMessage = "SessionExpiredMessage";
+        public const string SesionExpirada = "Sesión expirada. Inicia sesión nuevamente.";
         // GET: CoordinadorController
         public ActionResult PanelCoordinador()
         {
-            return View();
+            try
+            {
+                var token = HttpContext.Session.GetString("Token");
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                return View();
+            }catch(Exception ex)
+            {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("PanelCoordinador");
+            }
+                
+            
+
         }
         [HttpGet]
         [ValidarRol(4)] // Solo el coordinador puede entrar
         public async Task<IActionResult> ConsultarTutorias(
-    string? carrera, int? semestre, string? materia, int? idEstado, int? ordenFecha)
+        string? carrera, int? semestre, string? materia, int? idEstado, int? ordenFecha)
         {
             if (!ModelState.IsValid)
             {
@@ -54,6 +79,11 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
                 TempData[TempDataErrorKey] = $"Error al consultar tutorías: {ex.Message}";
                 return View(new List<TutoriaConsultaDto>());
             }
@@ -113,6 +143,11 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
                 ViewBag.Error = ex.Message;
                 return View(new List<ComentarioTutorInfoDto>());
             }
@@ -134,6 +169,11 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
                 TempData["MensajeError"] = ex.Message;
             }
 

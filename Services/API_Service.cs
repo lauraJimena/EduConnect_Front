@@ -13,7 +13,8 @@ namespace EduConnect_Front.Services
     {
         private const string AuthScheme = "Bearer";
         private readonly HttpClient _httpClient;
-        private const string baseUrl = "http://localhost:85";
+        //private const string baseUrl = "http://localhost:85";
+        private const string baseUrl = "https://localhost:7003";
         private static readonly JsonSerializerOptions _jsonOptions =
     new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
@@ -26,6 +27,20 @@ namespace EduConnect_Front.Services
                 Timeout = TimeSpan.FromSeconds(30)
             };
         }
+        private async Task<HttpResponseMessage> EnviarRequest(Func<Task<HttpResponseMessage>> request)
+        {
+            var resp = await request();
+
+            // Detectar token vencido
+            if (resp.StatusCode == System.Net.HttpStatusCode.Unauthorized &&
+                resp.Headers.Contains("Token-Expired-Time"))
+            {
+                throw new Exception("TOKEN_EXPIRED");
+            }
+
+            return resp;
+        }
+
         public async Task<(bool ok, string msg, int idUsu)> RegistrarUsuarioAsync(
     CrearUsuarioDto usuario,
     CancellationToken ct = default)
@@ -38,6 +53,7 @@ namespace EduConnect_Front.Services
                 using var resp = await _httpClient.PostAsJsonAsync("General/RegistrarUsuario", usuario, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
+                
                 // Deserializar respuesta JSON
                 var data = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(body);
                 if (data == null)
@@ -67,6 +83,7 @@ namespace EduConnect_Front.Services
             }
             catch (HttpRequestException ex)
             {
+
                 return (false, $"No se pudo conectar con la API: {ex.Message}", 0);
             }
             catch (TaskCanceledException)
@@ -76,6 +93,7 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+             
                 return (false, $"Error inesperado: {ex.Message}", 0);
             }
         }
@@ -90,6 +108,13 @@ namespace EduConnect_Front.Services
 
                 using var resp = await _httpClient.PostAsJsonAsync("Tutor/SolicitudesTutorias", filtro, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
+
+                // Detectar token expirado ANTES de procesar nada
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                    resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (resp.IsSuccessStatusCode)
                 {
@@ -106,7 +131,9 @@ namespace EduConnect_Front.Services
                 return (false, $"No se pudo conectar con la API: {ex.Message}", null);
             }
             catch (Exception ex)
-            {
+            {               
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}", null);
             }
         }
@@ -122,6 +149,7 @@ namespace EduConnect_Front.Services
                 using var resp = await _httpClient.PostAsJsonAsync("General/IniciarSesión", dto, ct);
 
                 var body = await resp.Content.ReadAsStringAsync(ct);
+
 
                 // 🔹 Si el cuerpo está vacío
                 if (string.IsNullOrWhiteSpace(body))
@@ -173,7 +201,9 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                
                 return (false, $"Error inesperado: {ex.Message}", null);
+                
             }
         }
         public async Task<(bool Ok, string Msg)> ActualizarPasswordAsync(ActualizarPasswordDto dto, string token, CancellationToken ct = default)
@@ -185,6 +215,12 @@ namespace EduConnect_Front.Services
 
                 using var resp = await _httpClient.PostAsJsonAsync("General/ActualizarPassword", dto, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
+                // Detectar token expirado ANTES de procesar nada
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                    resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 // 🔹 Intentar extraer el campo "mensaje" si el cuerpo es JSON
                 string mensaje = body;
@@ -220,6 +256,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}");
             }
         }
@@ -235,7 +273,12 @@ namespace EduConnect_Front.Services
                 var url = $"Tutorado/{idTutorado}/historial";
                 using var resp = await _httpClient.GetAsync(url, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
-
+                // Detectar token expirado ANTES de procesar nada
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                    resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
                 if (resp.IsSuccessStatusCode)
                 {
                     var data = JsonSerializer.Deserialize<List<HistorialTutoriaDto>>(
@@ -247,8 +290,11 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"No se pudo conectar con la API: {ex.Message}", null);
             }
+
         }
         // CONSULTAR USUARIOS ADMIN 
         public async Task<(bool Ok, string Msg, List<ListadoUsuariosDto>? Usuarios)> ObtenerUsuariosAsync(
@@ -277,6 +323,11 @@ namespace EduConnect_Front.Services
                 // 🔹 Hacemos la petición
                 using var resp = await _httpClient.GetAsync(url, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                   resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 // ✅ Éxito
                 if (resp.IsSuccessStatusCode)
@@ -304,6 +355,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}", null);
             }
         }
@@ -317,6 +370,12 @@ namespace EduConnect_Front.Services
 
                 // Hacer la petición POST
                 var response = await _httpClient.PostAsJsonAsync("Tutorado/BuscarTutor", filtros);
+                
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                 response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -333,44 +392,75 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
+
                 throw new Exception($"Error inesperado al obtener tutores: {ex.Message}");
             }
         }
 
         //REGISTRAR USUARIO ADMIN
-        public async Task<(bool Ok, string Msg)> RegistrarUsuarioAdminAsync(CrearUsuarioDto dto, string token, CancellationToken ct = default)
+        public async Task<(bool ok, string msg, int idUsu)> RegistrarUsuarioAdminAsync(CrearUsuarioDto dto, string token, CancellationToken ct = default)
         {
             try
             {
-                // Configurar el token JWT
                 _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
+            new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
+                
 
                 using var resp = await _httpClient.PostAsJsonAsync("Administrador/RegistrarUsuario", dto, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
+                
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                 resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
+
+                var data = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(body);
+                if (data == null)
+                {
+                    return (
+                        ok: false,
+                        msg: "Respuesta inválida del servidor.",
+                        idUsu: 0
+                    );
+                }
 
                 if (resp.IsSuccessStatusCode)
                 {
-                    //API devuelve "Usuario registrado con éxito" o texto similar
-                    var msgOk = string.IsNullOrWhiteSpace(body) ? "Usuario registrado con éxito" : body;
-                    return (true, msgOk);
+                    return (
+                        ok: (bool)data.ok,
+                        msg: (string)data.msg,
+                        idUsu: (int)data.idUsu
+                    );
                 }
 
-                var msgErr = string.IsNullOrWhiteSpace(body) ? $"Error {(int)resp.StatusCode}" : body;
-                return (false, msgErr);
+                // Si hubo error en el back
+                return (
+                    ok: false,
+                    msg: (string)(data?.msg ?? "Error desconocido"),
+                    idUsu: 0
+                );
             }
+
             catch (HttpRequestException ex)
             {
-                return (false, $"No se pudo conectar con la API: {ex.Message}");
+                return (false, $"No se pudo conectar con la API: {ex.Message}", 0);
             }
             catch (TaskCanceledException)
             {
-                return (false, ApiMensajesService.Timeout);
+
+                return (false, ApiMensajesService.Timeout, 0);
             }
             catch (Exception ex)
             {
-                return (false, $"Error inesperado: {ex.Message}");
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
+
+                return (false, $"Error inesperado: {ex.Message}", 0);
             }
+            
         }
         // OBTENER USUARIO POR ID
         public async Task<(bool Ok, string? Msg, ActualizarUsuarioDto? Usuario)> ObtenerUsuarioPorIdPerfil(int id, string token)
@@ -382,6 +472,12 @@ namespace EduConnect_Front.Services
 
                 var response = await _httpClient.GetAsync($"Administrador/ObtenerUsuarioPorId/{id}");
                 var body = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                 response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -398,6 +494,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error al obtener usuario: {ex.Message}", null);
             }
         }
@@ -414,6 +512,12 @@ namespace EduConnect_Front.Services
 
                 using var resp = await _httpClient.GetAsync($"Administrador/ObtenerUsuarioPorId/{idUsuario}", ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (resp.IsSuccessStatusCode)
                 {
@@ -432,6 +536,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}", null);
             }
         }
@@ -452,7 +558,12 @@ namespace EduConnect_Front.Services
                 using var resp = await _httpClient.PutAsJsonAsync("Administrador/ActualizarUsuario", dto, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
-               
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
+
                 if (resp.IsSuccessStatusCode)
                 {
                     var msgOk = string.IsNullOrWhiteSpace(body)
@@ -478,47 +589,80 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}");
             }
         }
         public async Task<string> ActualizarPerfilAsync(EditarPerfilDto perfil, string token)
         {
-            // Agregar encabezado de autorización Bearer
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
-
-            // Hacer la llamada PUT
-            var response = await _httpClient.PutAsJsonAsync("Tutorado/ActualizarPerfil", perfil);
-
-            // Manejo de respuesta
-            if (response.IsSuccessStatusCode)
+            try
             {
-                return await response.Content.ReadAsStringAsync(); // devuelve "Perfil actualizado con éxito"
+                // Agregar encabezado de autorización Bearer
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
+
+                // Hacer la llamada PUT
+                var response = await _httpClient.PutAsJsonAsync("Tutorado/ActualizarPerfil", perfil);
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                   response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
+
+                // Manejo de respuesta
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync(); // devuelve "Perfil actualizado con éxito"
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Error al actualizar perfil: {error}");
+                }
+
             }
-            else
+            catch (Exception ex)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Error al actualizar perfil: {error}");
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
+                throw new Exception($"Error inesperado: {ex.Message}");
             }
-        }
+}
         public async Task<string> ActualizarPerfilTutor(EditarPerfilDto perfil, string token)
         {
-            // Agregar encabezado de autorización Bearer
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
-
-            // Hacer la llamada PUT
-            var response = await _httpClient.PutAsJsonAsync("Tutor/ActualizarPerfil", perfil);
-
-            // Manejo de respuesta
-            if (response.IsSuccessStatusCode)
+            try
             {
-                return await response.Content.ReadAsStringAsync(); // devuelve "Perfil actualizado con éxito"
+                // Agregar encabezado de autorización Bearer
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
+
+                // Hacer la llamada PUT
+                var response = await _httpClient.PutAsJsonAsync("Tutor/ActualizarPerfil", perfil);
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                      response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
+
+                // Manejo de respuesta
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync(); // devuelve "Perfil actualizado con éxito"
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Error al actualizar perfil: {error}");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Error al actualizar perfil: {error}");
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
+                throw new Exception($"Error inesperado: {ex.Message}");
             }
         }
 
@@ -530,10 +674,15 @@ namespace EduConnect_Front.Services
             try
             {
 
-
                 // Enviar la solicitud PUT al endpoint
                 using var resp = await _httpClient.PutAsJsonAsync("Tutorado/ActualizarPerfil", dto, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                  resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (resp.IsSuccessStatusCode)
                 {
@@ -560,6 +709,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}");
             }
         }
@@ -578,6 +729,12 @@ namespace EduConnect_Front.Services
 
                 using var resp = await _httpClient.DeleteAsync($"Administrador/EliminarUsuario/{idUsuario}", ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                 resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (resp.IsSuccessStatusCode)
                 {
@@ -604,6 +761,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}");
             }
         }
@@ -637,7 +796,12 @@ namespace EduConnect_Front.Services
                 using var resp = await _httpClient.GetAsync(url, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
-                
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                 resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
+
                 if (resp.IsSuccessStatusCode)
                 {
                     var datos = JsonSerializer.Deserialize<List<HistorialTutoriaDto>>(
@@ -665,6 +829,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}", null);
             }
         }
@@ -709,6 +875,12 @@ namespace EduConnect_Front.Services
                 using var resp = await _httpClient.PostAsJsonAsync("Tutorado/SolicitudesTutorias", filtro, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
+
                 if (resp.IsSuccessStatusCode)
                 {
                     var solicitudes = JsonSerializer.Deserialize<List<SolicitudTutoriaDto>>(
@@ -732,6 +904,13 @@ namespace EduConnect_Front.Services
             {
                 throw new TimeoutException(ApiMensajesService.Timeout);
             }
+        
+            catch (Exception ex)
+            {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
+                throw new Exception($"Error inesperado: {ex.Message}");
+            }
         }
 
         //CREAR SOLICITUD TUTORIA
@@ -748,6 +927,12 @@ namespace EduConnect_Front.Services
 
                 using var resp = await _httpClient.PostAsJsonAsync("Tutorado/CrearSolicitudTutoria", solicitud, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+               resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (resp.IsSuccessStatusCode)
                 {
@@ -769,7 +954,6 @@ namespace EduConnect_Front.Services
                     return (true, "Solicitud creada correctamente", 0);
                 }
 
-
                 // ⚠️ Manejo de errores de la API (400, 401, 500, etc.)
                 string mensajeError;
 
@@ -788,8 +972,6 @@ namespace EduConnect_Front.Services
                     // Si no se puede deserializar, usar el texto plano
                     mensajeError = body;
                 }
-
-
                 if (resp.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     mensajeError = "Tu sesión ha expirado o el token no es válido. Por favor, inicia sesión nuevamente.";
 
@@ -805,9 +987,9 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"⚠️ Error inesperado: {ex.Message}", 0);
-
-
             }
 
         }
@@ -824,6 +1006,12 @@ namespace EduConnect_Front.Services
                 using var resp = await _httpClient.PutAsJsonAsync("Tutor/AceptarSolicitudTutoria", request, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
+
                 if (resp.IsSuccessStatusCode)
                     return (true, string.IsNullOrWhiteSpace(body) ? "Solicitud aceptada correctamente" : body);
 
@@ -836,6 +1024,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}");
             }
         }
@@ -854,6 +1044,12 @@ namespace EduConnect_Front.Services
                 using var resp = await _httpClient.PutAsJsonAsync("Tutor/RechazarSolicitudTutoria", request, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
+
                 if (resp.IsSuccessStatusCode)
                     return (true, string.IsNullOrWhiteSpace(body) ? "Solicitud rechazada correctamente" : body);
 
@@ -869,6 +1065,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if(ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}");
             }
         }
@@ -895,6 +1093,12 @@ namespace EduConnect_Front.Services
                 using var resp = await _httpClient.GetAsync(url, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
+
                 if (!resp.IsSuccessStatusCode)
                 {
                     return (false, $"Error al obtener historial: {body}", null);
@@ -913,6 +1117,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}", null);
             }
         }
@@ -927,6 +1133,12 @@ namespace EduConnect_Front.Services
 
                 using var response = await _httpClient.PutAsJsonAsync("Tutor/ActualizarPerfil", perfil, ct);
                 var body = await response.Content.ReadAsStringAsync(ct);
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (response.IsSuccessStatusCode)
                     return (true, string.IsNullOrWhiteSpace(body) ? "Perfil actualizado con éxito" : body);
@@ -943,6 +1155,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}");
             }
         }
@@ -974,7 +1188,11 @@ namespace EduConnect_Front.Services
                 using var resp = await _httpClient.GetAsync(url, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
-            
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
                 if (resp.IsSuccessStatusCode)
                 {
                     var usuarios = System.Text.Json.JsonSerializer.Deserialize<List<ListadoUsuariosDto>>(
@@ -1000,6 +1218,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}", null);
             }
         }
@@ -1010,6 +1230,12 @@ namespace EduConnect_Front.Services
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthScheme, token);
                 var response = await _httpClient.GetAsync("Tutorado/RankingTutores");
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -1026,6 +1252,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}", null);
             }
         }
@@ -1039,6 +1267,12 @@ namespace EduConnect_Front.Services
 
                 using var response = await _httpClient.SendAsync(request);
                 var body = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -1059,27 +1293,45 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}", null);
             }
         }
         // OBTENER TUTORADO POR ID
         public async Task<ObtenerUsuarioDto?> ObtenerTutoradoPorIdAsync(int idUsuario, string token)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"Tutorado/ObtenerTutoradoPorId/{idUsuario}");
-            request.Headers.Authorization = new AuthenticationHeaderValue(AuthScheme, token);
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            try
+            {
+          
+                var request = new HttpRequestMessage(HttpMethod.Get, $"Tutorado/ObtenerTutoradoPorId/{idUsuario}");
+                request.Headers.Authorization = new AuthenticationHeaderValue(AuthScheme, token);
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            using var response = await _httpClient.SendAsync(request);
-            var body = await response.Content.ReadAsStringAsync();
+                using var response = await _httpClient.SendAsync(request);
+                var body = await response.Content.ReadAsStringAsync();
 
-            if (response.StatusCode == HttpStatusCode.NotFound)
-                return null;
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                   response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
-            if (!response.IsSuccessStatusCode)
-                throw new Exception($"Error al obtener tutorado: {body}");
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                    return null;
 
-            var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            return JsonSerializer.Deserialize<ObtenerUsuarioDto>(body, opts);
+                if (!response.IsSuccessStatusCode)
+                    throw new Exception($"Error al obtener tutorado: {body}");
+
+                var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<ObtenerUsuarioDto>(body, opts);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "TOKEN_EXPIRED")
+                        throw; // se manejará en el controlador
+                throw new Exception($"Error inesperado: {ex.Message}");
+            }
         }
         // ACTUALIZAR PERFIL TUTORADO
         public async Task<string> ActualizarPerfilTutorado(EditarPerfilDto perfil, string token)
@@ -1117,27 +1369,49 @@ namespace EduConnect_Front.Services
         // OBTENER COMENTARIOS POR TUTOR
         public async Task<IEnumerable<ComentarioTutorInfoDto>> ObtenerComentariosPorTutorAsync(int idTutor, string token)
         {
+            try
+            {
+
+            
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(AuthScheme, token);
 
             var request = new { idTutor = idTutor };
 
             var response = await _httpClient.PostAsJsonAsync("Tutorado/ComentariosTutor", request);
-
+            if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                   response.Headers.Contains("Token-Expired-Time"))
+            {
+                throw new Exception("TOKEN_EXPIRED");
+            }
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<IEnumerable<ComentarioTutorInfoDto>>();
 
             var error = await response.Content.ReadAsStringAsync();
             throw new Exception($"Error al obtener comentarios: {error}");
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
+                throw new Exception($"Error inesperado: {ex.Message}");
+            }
+
         }
 
         public async Task<int> CrearComentarioAsync(CrearComentarioDto comentario, string token)
         {
+            try
+            {
             _httpClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
 
             var response = await _httpClient.PostAsJsonAsync("Tutorado/CrearComentario", comentario);
-
+            if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                   response.Headers.Contains("Token-Expired-Time"))
+            {
+                throw new Exception("TOKEN_EXPIRED");
+            }
             if (response.IsSuccessStatusCode)
             {
                 // 🔹 Tu backend devuelve un objeto con el idComentario generado
@@ -1153,6 +1427,13 @@ namespace EduConnect_Front.Services
                 var error = await response.Content.ReadAsStringAsync();
                 throw new Exception($"Error al crear el comentario: {error}");
             }
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
+                throw new Exception($"Error inesperado: {ex.Message}");
+            }
         }
 
         public async Task<(bool Ok, bool TieneMaterias, string Msg)> ValidarMateriasTutorAsync(int idTutor, string token)
@@ -1164,6 +1445,12 @@ namespace EduConnect_Front.Services
 
                 using var response = await _httpClient.SendAsync(request);
                 var body = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                  response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -1180,6 +1467,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, false, "Error de conexión: " + ex.Message);
             }
         }
@@ -1193,6 +1482,12 @@ namespace EduConnect_Front.Services
                 var response = await _httpClient.GetAsync($"Tutor/MateriasPorTutor/{idTutor}");
                 var body = await response.Content.ReadAsStringAsync();
 
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                  response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
+
                 if (!response.IsSuccessStatusCode)
                     return (false, $"Error {(int)response.StatusCode}: {body}", null);
 
@@ -1203,6 +1498,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, "Error de conexión con la API: " + ex.Message, null);
             }
         }
@@ -1215,11 +1512,18 @@ namespace EduConnect_Front.Services
                     new AuthenticationHeaderValue(AuthScheme, token);
 
                 var body = new { IdTutor = idTutor, Materias = materias };
+              
                 var json = JsonSerializer.Serialize(body);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var response = await _httpClient.PostAsync("Tutor/RegistrarMaterias", content);
                 var bodyResp = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (response.IsSuccessStatusCode)
                     return (true, "Materias registradas correctamente");
@@ -1228,10 +1532,11 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, "Error al conectar con la API: " + ex.Message);
             }
         }
-
 
         public async Task<List<ObtenerChatDto>> ObtenerChatsAsync(int idUsuario, string token, CancellationToken ct = default)
         {
@@ -1244,6 +1549,11 @@ namespace EduConnect_Front.Services
                 using var resp = await _httpClient.GetAsync($"Chats/ObtenerChatsPorUsuario?usuarioId={idUsuario}", ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (resp.IsSuccessStatusCode)
                 {
@@ -1258,11 +1568,12 @@ namespace EduConnect_Front.Services
                     ? $"Error HTTP {(int)resp.StatusCode}"
                     : body;
 
-
                 throw new Exception(msgError);
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 Console.WriteLine(" 🔴 EXCEPCIÓN en ObtenerChatsAsync -> " + ex.Message);
                 throw; // deja que el controlador lo capture
             }
@@ -1275,7 +1586,14 @@ namespace EduConnect_Front.Services
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
                 using var resp = await _httpClient.GetAsync($"Chats/ObtenerMensajes?chatId={idChat}", ct);
-                var body = await resp.Content.ReadAsStringAsync(ct); 
+                var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
+
                 if (resp.IsSuccessStatusCode)
                 { 
                     var mensajes = JsonSerializer.Deserialize<List<ObtenerMensajeDto>>(body, new JsonSerializerOptions 
@@ -1289,8 +1607,14 @@ namespace EduConnect_Front.Services
             } 
             catch (TaskCanceledException) 
             {
+               
                 throw new TimeoutException(ApiMensajesService.Timeout);
-
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
+                throw new TimeoutException(ApiMensajesService.Timeout);
             }
         }
 
@@ -1307,6 +1631,12 @@ namespace EduConnect_Front.Services
 
                 using var resp = await _httpClient.PostAsJsonAsync("Chats/CrearMensaje", mensaje, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
+
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (resp.IsSuccessStatusCode)
                 {
@@ -1330,6 +1660,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado en EnviarMensajeAsync: {ex.Message}");
             }
         }
@@ -1342,6 +1674,12 @@ namespace EduConnect_Front.Services
 
                 using var response = await _httpClient.GetAsync("Administrador/ReporteTutores", ct);
                 var body = await response.Content.ReadAsStringAsync(ct);
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -1362,6 +1700,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 return (false, $"Error inesperado: {ex.Message}", new List<ReporteTutorDto>());
             }
         }
@@ -1375,6 +1715,12 @@ namespace EduConnect_Front.Services
                 using var response = await _httpClient.GetAsync("Administrador/ReporteTutoradosActivos", ct);
                 var body = await response.Content.ReadAsStringAsync(ct);
 
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
+
                 if (response.IsSuccessStatusCode)
                 {
                     var lista = JsonSerializer.Deserialize<List<ReporteTutoradoDto>>(body, _jsonOptions);
@@ -1385,6 +1731,9 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
+
                 throw new Exception("Error al obtener el reporte de tutorados activos: " + ex.Message);
             }
         }
@@ -1451,6 +1800,12 @@ namespace EduConnect_Front.Services
                 using var resp = await _httpClient.GetAsync(url, ct);
                 var body = await resp.Content.ReadAsStringAsync(ct);
 
+                if (resp.StatusCode == HttpStatusCode.Unauthorized &&
+                resp.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
+
                 if (!resp.IsSuccessStatusCode)
                     throw new Exception($"Error al consultar tutorías: {body}");
 
@@ -1461,6 +1816,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 throw new Exception("Error al obtener tutorías desde la API: " + ex.Message);
             }
         }
@@ -1517,6 +1874,11 @@ namespace EduConnect_Front.Services
                 // 🔹 Envía el filtro como JSON con POST
                 var response = await _httpClient.PostAsJsonAsync("Tutor/Comentarios", filtro);
 
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
                 if (!response.IsSuccessStatusCode)
                 {
                     Console.WriteLine($"❌ Error HTTP {response.StatusCode} al obtener comentarios del tutor");
@@ -1534,6 +1896,8 @@ namespace EduConnect_Front.Services
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
                 Console.WriteLine($"⚠️ Error en ObtenerComentariosTutorAsync: {ex.Message}");
                 return null;
             }
@@ -1560,20 +1924,35 @@ namespace EduConnect_Front.Services
         }
         public async Task<List<ListaComentariosDto>> ObtenerComentariosAsync(string token)
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
-
-            var response = await _httpClient.GetAsync("Coordinador/Comentarios");
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var lista = await response.Content.ReadFromJsonAsync <List <ListaComentariosDto>>();
-                return lista ?? new List<ListaComentariosDto>();
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue(AuthScheme, token);
+
+                var response = await _httpClient.GetAsync("Coordinador/Comentarios");
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
+                   response.Headers.Contains("Token-Expired-Time"))
+                {
+                    throw new Exception("TOKEN_EXPIRED");
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var lista = await response.Content.ReadFromJsonAsync<List<ListaComentariosDto>>();
+                    return lista ?? new List<ListaComentariosDto>();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Error al obtener comentarios: {error}");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Error al obtener comentarios: {error}");
+                if (ex.Message == "TOKEN_EXPIRED")
+                    throw; // se manejará en el controlador
+                throw new Exception("Error al obtener tutorías desde la API: " + ex.Message);
             }
 
         }

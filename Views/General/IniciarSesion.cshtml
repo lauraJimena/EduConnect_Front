@@ -85,6 +85,22 @@
         Mensaje = "Contraseña Actualizada correctamente"
     })
 }
+@if (TempData["SessionExpiredMessage"] != null)
+{
+    @await Html.PartialAsync("_Popup", new PopupDto
+    {
+        Tipo = "error",
+        Titulo = "Sesión expirada",
+        Mensaje = TempData["SessionExpiredMessage"] as string
+    })
+
+<script>
+    setTimeout(() => {
+        const popup = document.querySelector('.modal-fondo');
+        if (popup) popup.style.display = 'none';
+    }, 3500);
+</script>
+}
 
 <!--Popup de ERROR -->
 @{

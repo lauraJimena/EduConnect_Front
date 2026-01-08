@@ -3,6 +3,7 @@ using EduConnect_Front.Services;
 using EduConnect_Front.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
 
 namespace EduConnect_Front.Controllers
 {
@@ -11,13 +12,14 @@ namespace EduConnect_Front.Controllers
         private readonly TutoradoService _tutoradoService = new TutoradoService();
         private readonly AdministradorService _administradorService = new AdministradorService();
         private readonly GeneralService _generalService = new GeneralService();
+        public const string SessionExpiredMessage = "SessionExpiredMessage";
+        public const string SesionExpirada = "Sesión expirada. Inicia sesión nuevamente.";
 
         // GET: TutoradoController
         [HttpGet]
         [ValidarRol(1)]
         public async Task<IActionResult> PanelTutorado()
-        {
-            
+        {           
             try
             {
                 var token = HttpContext.Session.GetString("Token");
@@ -49,17 +51,23 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
                 TempData["Error"] = ex.Message;
-                return RedirectToAction("IniciarSesion", "General");
+                return RedirectToAction("PanelTutorado", "Tutorado");
             }
 
         }
-
 
         [HttpGet]
         [ValidarRol(1)]
         public async Task<IActionResult> HistorialTutorias([FromQuery] List<int>? idsEstado)
         {
+            try
+            {         
             if (!ModelState.IsValid)
             {
                 // Si los datos no son válidos, volvemos a mostrar la vista con los errores
@@ -87,6 +95,18 @@ namespace EduConnect_Front.Controllers
             }
 
             return View(datos ?? new List<HistorialTutoriaDto>());
+            }
+            catch(Exception ex)
+            {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("HistorialTutorias");
+
+            }
         }
 
         // GET: /Tutorado/BusquedaTutores
@@ -101,46 +121,58 @@ namespace EduConnect_Front.Controllers
             string Semestre = "",
             int? IdEstado = null)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
-                return View();
+                if (!ModelState.IsValid)
+                {
+                    // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                    return View();
+                }
+                var token = HttpContext.Session.GetString("Token");
+                if (string.IsNullOrEmpty(token))
+                {
+                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                var filtros = new BuscarTutorDto
+                {
+                    Page = page < 1 ? 1 : page,
+                    PageSize = 4, // mostramos 4
+                    Nombre = (Nombre ?? "").Trim(),
+                    CarreraNombre = (CarreraNombre ?? "").Trim(),
+                    MateriaNombre = (MateriaNombre ?? "").Trim(),
+                    Semestre = (Semestre ?? "").Trim(),
+                    IdEstado = IdEstado
+
+                };
+
+                // Ideal: el backend devuelve PageSize+1 (5) para detectar "siguiente"
+                var (ok, msg, tutores) = await _tutoradoService.BuscarTutoresAsync(filtros, token);
+                if (!ok)
+                {
+                    ModelState.AddModelError(string.Empty, msg ?? "No se pudieron obtener tutores.");
+                    tutores = new List<ObtenerTutorDto>();
+                }
+
+                bool hasMore = tutores.Count > filtros.PageSize;
+                var tutoresMostrados = tutores.Take(filtros.PageSize).ToList();
+
+                ViewBag.Page = filtros.Page;
+                ViewBag.HasMore = hasMore;
+                ViewBag.Filtros = filtros;
+
+                return View(tutoresMostrados);
+
+            }catch(Exception ex){
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("BusquedaTutores", "Tutorado");
             }
-            var token = HttpContext.Session.GetString("Token");
-            if (string.IsNullOrEmpty(token))
-            {
-                TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
-                return RedirectToAction("IniciarSesion", "General");
-            }
-
-            var filtros = new BuscarTutorDto
-            {
-                Page = page < 1 ? 1 : page,
-                PageSize = 4, // mostramos 4
-                Nombre = (Nombre ?? "").Trim(),
-                CarreraNombre = (CarreraNombre ?? "").Trim(),
-                MateriaNombre = (MateriaNombre ?? "").Trim(),
-                Semestre = (Semestre ?? "").Trim(),
-                IdEstado = IdEstado
-               
-            };
-
-            // Ideal: el backend devuelve PageSize+1 (5) para detectar "siguiente"
-            var (ok, msg, tutores) = await _tutoradoService.BuscarTutoresAsync(filtros, token);
-            if (!ok)
-            {
-                ModelState.AddModelError(string.Empty, msg ?? "No se pudieron obtener tutores.");
-                tutores = new List<ObtenerTutorDto>();
-            }
-
-            bool hasMore = tutores.Count > filtros.PageSize;
-            var tutoresMostrados = tutores.Take(filtros.PageSize).ToList();
-
-            ViewBag.Page = filtros.Page;
-            ViewBag.HasMore = hasMore;
-            ViewBag.Filtros = filtros;
-
-            return View(tutoresMostrados);
 
         }
 
@@ -149,28 +181,41 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(1)]
         public IActionResult BusquedaTutores(BuscarTutorDto filtros)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
-                return View(filtros);
-            }
-            var token = HttpContext.Session.GetString("Token");
-            if (string.IsNullOrEmpty(token))
-            {
-                TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
-                return RedirectToAction("IniciarSesion", "General");
-            }
+                if (!ModelState.IsValid)
+                {
+                    // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                    return View(filtros);
+                }
+                var token = HttpContext.Session.GetString("Token");
+                if (string.IsNullOrEmpty(token))
+                {
+                    TempData["Error"] = "Sesión expirada. Inicia sesión nuevamente.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
 
-            // Normaliza y fuerza la página 1 al aplicar filtros
-            return RedirectToAction(nameof(BusquedaTutores), new
+                // Normaliza y fuerza la página 1 al aplicar filtros
+                return RedirectToAction(nameof(BusquedaTutores), new
+                {
+                    page = 1,
+                    Nombre = filtros?.Nombre?.Trim() ?? "",
+                    CarreraNombre = filtros?.CarreraNombre?.Trim() ?? "",
+                    MateriaNombre = filtros?.MateriaNombre?.Trim() ?? "",
+                    Semestre = filtros?.Semestre?.Trim() ?? "",
+                    IdEstado = filtros?.IdEstado
+                });
+            }
+            catch(Exception ex)
             {
-                page = 1,
-                Nombre = filtros?.Nombre?.Trim() ?? "",
-                CarreraNombre = filtros?.CarreraNombre?.Trim() ?? "",
-                MateriaNombre = filtros?.MateriaNombre?.Trim() ?? "",
-                Semestre = filtros?.Semestre?.Trim() ?? "",
-                IdEstado = filtros?.IdEstado
-            });
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("BusquedaTutores", "Tutorado");
+            }
         }
      
         [HttpGet]
@@ -206,6 +251,11 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
                 TempData["Error"] = ex.Message;
                 return RedirectToAction("PanelTutorado");
             }
@@ -247,6 +297,11 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
                 TempData["Error"] = ex.Message;
                 ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
                 ViewBag.Carreras = await _administradorService.ObtenerCarrerasAsync();
@@ -259,27 +314,41 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(1)]
         public async Task<ActionResult> SolicitudesTutoriasAsync()
         {
-
-            var token = HttpContext.Session.GetString("Token");
-            var idTutorado = HttpContext.Session.GetInt32("IdUsu");
-
-            if (string.IsNullOrEmpty(token) || idTutorado == null)
-                return RedirectToAction("IniciarSesion", "General");
-
-            var filtro = new FiltroSolicitudesDto
+            try
             {
-                IdTutorado = idTutorado.Value,
-                Estados = new List<int> { 3, 4, 5 }
-            };
 
-            var solicitudes = await _tutoradoService.ObtenerSolicitudesTutoriasAsync(filtro, token);
-            return View(solicitudes);
+                var token = HttpContext.Session.GetString("Token");
+                var idTutorado = HttpContext.Session.GetInt32("IdUsu");
+
+                if (string.IsNullOrEmpty(token) || idTutorado == null)
+                    return RedirectToAction("IniciarSesion", "General");
+
+                var filtro = new FiltroSolicitudesDto
+                {
+                    IdTutorado = idTutorado.Value,
+                    Estados = new List<int> { 3, 4, 5 }
+                };
+
+                var solicitudes = await _tutoradoService.ObtenerSolicitudesTutoriasAsync(filtro, token);
+                return View(solicitudes);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("PanelTutorado");
+            }
 
         }
         [HttpPost]
         [ValidarRol(1)]
         public async Task<IActionResult> SolicitudesTutorias(FiltroSolicitudesDto filtro, CancellationToken ct)
         {
+
             if (!ModelState.IsValid)
             {
                 // Si los datos no son válidos, volvemos a mostrar la vista con los errores
@@ -309,6 +378,11 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
                 TempData["Error"] = ex.Message;
                 return RedirectToAction("PanelTutorado");
             }
@@ -318,6 +392,8 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(1)]
         public async Task<IActionResult> FormSolicitudTutoria(SolicitudTutoriaRespuestaDto modelo)
         {
+            try
+            {
             if (!ModelState.IsValid)
             {
                 // Si los datos no son válidos, volvemos a mostrar la vista con los errores
@@ -354,11 +430,24 @@ namespace EduConnect_Front.Controllers
 
             TempData["Error"] = message;
             return View("FormSolicitudTutoria", modelo);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("PanelTutorado");
+            }
         }
         [HttpGet]
         [ValidarRol(1)]
         public IActionResult FormSolicitudTutoria(int idTutor, int idMateria, string nombreMateria)
         {
+            try
+            {
             if (!ModelState.IsValid)
             {
                 // Si los datos no son válidos, volvemos a mostrar la vista con los errores
@@ -378,6 +467,17 @@ namespace EduConnect_Front.Controllers
             };
 
             return View("FormSolicitudTutoria", modelo);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("PanelTutorado");
+            }
         }
 
         //RANKING DE TUTORES
@@ -407,6 +507,11 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
                 TempData["Error"] = "Error inesperado: " + ex.Message;
                 return View(new List<RankingTutorDto>());
             }
@@ -436,6 +541,11 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
                 TempData["Error"] = "Error al cargar el perfil del tutor: " + ex.Message;
                 return RedirectToAction("BusquedaTutores");
             }
@@ -501,6 +611,11 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
                 TempData["Error"] = "Error al crear el comentario: " + ex.Message;
             }
 

@@ -47,6 +47,7 @@ namespace EduConnect_Front.Controllers
         public async Task<IActionResult> Registro(CrearUsuarioDto dto, CancellationToken ct)
         {
 
+
             if (!ModelState.IsValid)
             {
                 TempData["ErrorRegistro"] = "Hay errores en el formulario. Revise los campos.";
@@ -221,6 +222,7 @@ namespace EduConnect_Front.Controllers
         [HttpGet]
         public IActionResult RestablecerContrasena(string token)
         {
+
             if (string.IsNullOrEmpty(token))
                 return RedirectToAction("OlvidarContrasena", "General");
 

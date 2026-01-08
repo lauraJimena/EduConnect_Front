@@ -22,50 +22,97 @@ namespace EduConnect_Front.Controllers
         private readonly TutoradoService _tutoradoService = new TutoradoService();
         private readonly AdministradorService _administradorService = new AdministradorService();
         private readonly GeneralService _generalService = new GeneralService();
+        public const string SessionExpiredMessage = "SessionExpiredMessage";
+        public const string SesionExpirada = "Sesión expirada. Inicia sesión nuevamente.";
 
 
         [HttpGet]
         [ValidarRol(3)]
         public async Task<IActionResult> RegistrarUsuariosAsync()
         {
+            try
+            {
 
-            // Estado 1 por defecto (activo)
-            var model = new CrearUsuarioDto { IdEstado = 1 };
-            var carreras = await _administradorService.ObtenerCarrerasAsync();
-            ViewBag.Carreras = carreras;
-            return View(model);
+                // Estado 1 por defecto (activo)
+                var model = new CrearUsuarioDto { IdEstado = 1 };
+                var carreras = await _administradorService.ObtenerCarrerasAsync();
+                ViewBag.Carreras = carreras;
+                return View(model);
+            }catch(Exception ex)
+            {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("PanelAdministrador");
+            }
         }
+        private async Task BienvenidaAsync(int idUsu)
+        {
+            try
+            {
+                bool correoEnviado = await _generalService.EnviarCorreoBienvenidaAsync(idUsu);
+                TempData["Info"] = correoEnviado
+                    ? "Se ha notificado al tutor sobre tu experiencia."
+                    : "No se pudo notificar al tutor en este momento.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Info"] = "Hubo un error al notificar al tutor: " + ex.Message;
+            }
+        }
+        private async Task CargarCombosRegistro()
+        {
+            var administradorService = new AdministradorService();
 
+            ViewBag.Carreras = await administradorService.ObtenerCarrerasAsync();
+            ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
+        }
         [HttpPost]
         [ValidarRol(3)]
         public async Task<IActionResult> RegistrarUsuarios(CrearUsuarioDto dto, CancellationToken ct)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                var token = HttpContext.Session.GetString(Token);
+                if (!ModelState.IsValid)
+                {
+                    TempData["ErrorRegistroAdm"] = "Hay errores en el formulario. Revise los campos.";
+                    await CargarCombosRegistro();
+                    return View(dto);
+                }          
+                var (ok, msg, idUsu) = await _administradorService.RegistrarUsuario(dto, token, ct);
+
+                if (ok)
+                {
+                    await BienvenidaAsync(idUsu);
+                    TempData["AdminRegisterOk"] = msg; // para popup de éxito
+                    return RedirectToAction("PanelAdministrador", ControladorAdministrador);
+                }
+
+                ModelState.AddModelError("", msg);
+                TempData["ErrorRegistroAdm"] = msg;                 
+                await CargarCombosRegistro();
                 return View(dto);
             }
-
-            var token = HttpContext.Session.GetString(Token);
-            var (ok, msg) = await _administradorService.RegistrarUsuario(dto, token, ct);
-
-            if (ok)
+            catch (Exception ex)
             {
-                TempData["AdminRegisterOk"] = msg; // para popup de éxito
-
-                return RedirectToAction("PanelAdministrador", ControladorAdministrador);
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("PanelAdministrador");
             }
-
-            // Deja los datos en pantalla y muestra el error en popup
-            ModelState.AddModelError(string.Empty, msg);
-            var carreras = await _administradorService.ObtenerCarrerasAsync();
-            ViewBag.Carreras = carreras;
-            return View(dto);
         }
 
         [ValidarRol(3)]
         public async Task<IActionResult> PanelAdministrador()
         {
+            try
             {
                 var token = HttpContext.Session.GetString(Token);
 
@@ -91,8 +138,16 @@ namespace EduConnect_Front.Controllers
                 }
 
                 return View(usuario);
-
-
+            }
+            catch(Exception ex)
+            {
+               if (ex.Message == "TOKEN_EXPIRED")
+               {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+               }
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("PanelAdministrador");
             }
         }
 
@@ -135,11 +190,16 @@ namespace EduConnect_Front.Controllers
                 ViewBag.TipoIdent = tipoIdent;
                 ViewBag.Carreras = carreras;
 
-                // ✅ No tocar TempData aquí
+                
                 return View(usuario);
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
                 TempData[Error] = ex.Message;
                 return RedirectToAction("ConsultarUsuarios");
             }
@@ -184,6 +244,11 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
                 TempData[Error] = ex.Message;
                 ViewBag.TipoIdent = await _generalService.ObtenerTipoIdentAsync();
                 ViewBag.Carreras = await _administradorService.ObtenerCarrerasAsync();
@@ -219,47 +284,60 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(3)]
         public async Task<IActionResult> ConsultarUsuarios(int? idRol, int? idEstado, string? numIdent, int pagina = 1)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
-                return View();
+                if (!ModelState.IsValid)
+                {
+                    // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                    return View();
+                }
+                const int TAMANO_PAGINA = 8;
+                var token = HttpContext.Session.GetString(Token);
+                if (string.IsNullOrEmpty(token))
+                {
+                    TempData[Error] = "No se encontró token de sesión. Inicia sesión nuevamente.";
+                    return RedirectToAction(IniciarSesion, General);
+                }
+
+                var (ok, msg, usuarios) = await _administradorService.ObtenerUsuariosAsync(token, idRol, idEstado, numIdent);
+
+                if (!ok)
+                {
+                    TempData[Error] = msg;
+                    return View(new List<ListadoUsuariosDto>());
+                }
+                // 🔹 Calcular total de páginas
+                var totalUsuarios = usuarios?.Count ?? 0;
+
+                var totalPaginas = (int)Math.Ceiling((double)totalUsuarios / TAMANO_PAGINA);
+
+                var usuariosPaginados = (usuarios ?? Enumerable.Empty<ListadoUsuariosDto>())
+                .Skip((pagina - 1) * TAMANO_PAGINA)
+                .Take(TAMANO_PAGINA)
+                .ToList();
+
+
+                // 🔹 Enviar datos a la vista
+                ViewBag.PaginaActual = pagina;
+                ViewBag.TotalPaginas = totalPaginas;
+                ViewBag.FiltroRol = idRol;
+                ViewBag.FiltroEstado = idEstado;
+                ViewBag.FiltroNumIdent = numIdent;
+
+                return View(usuariosPaginados);
             }
-            const int TAMANO_PAGINA = 8;
-            var token = HttpContext.Session.GetString(Token);
-            if (string.IsNullOrEmpty(token))
+            catch (Exception ex)
             {
-                TempData[Error] = "No se encontró token de sesión. Inicia sesión nuevamente.";
-                return RedirectToAction(IniciarSesion, General);
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("PanelAdministrador");
             }
 
-            var (ok, msg, usuarios) = await _administradorService.ObtenerUsuariosAsync(token, idRol, idEstado, numIdent);
 
-            if (!ok)
-            {
-                TempData[Error] = msg;
-                return View(new List<ListadoUsuariosDto>());
-            }
-            // 🔹 Calcular total de páginas
-            var totalUsuarios = usuarios?.Count ?? 0;
-
-            var totalPaginas = (int)Math.Ceiling((double)totalUsuarios / TAMANO_PAGINA);
-
-            var usuariosPaginados = (usuarios ?? Enumerable.Empty<ListadoUsuariosDto>())
-            .Skip((pagina - 1) * TAMANO_PAGINA)
-            .Take(TAMANO_PAGINA)
-            .ToList();
-
-
-            // 🔹 Enviar datos a la vista
-            ViewBag.PaginaActual = pagina;
-            ViewBag.TotalPaginas = totalPaginas;
-            ViewBag.FiltroRol = idRol;
-            ViewBag.FiltroEstado = idEstado;
-            ViewBag.FiltroNumIdent = numIdent;
-
-            return View(usuariosPaginados);
-
-            
         }
 
     
