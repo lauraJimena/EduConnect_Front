@@ -6,7 +6,7 @@ namespace EduConnect_Front.Services
     {
         private readonly API_Service _api = new API_Service();
 
-        public async Task<(bool Ok, string Msg)> RegistrarUsuario(CrearUsuarioDto dto, string token, CancellationToken ct = default)
+        public async Task<(bool Success, string Message, int idUsu)> RegistrarUsuario(CrearUsuarioDto dto, string token, CancellationToken ct = default)
         {
             return await _api.RegistrarUsuarioAdminAsync(dto, token, ct);
         }

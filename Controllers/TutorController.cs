@@ -3,6 +3,7 @@ using EduConnect_Front.Services;
 using EduConnect_Front.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Linq.Expressions;
 
 namespace EduConnect_Front.Controllers
 {
@@ -13,8 +14,9 @@ namespace EduConnect_Front.Controllers
         private readonly GeneralService _generalService = new GeneralService();
         private readonly TutorService _tutorService;
         private readonly AdministradorService _administradorService = new AdministradorService();
-        public const string SessionExpiredMessage = "Sesión expirada. Inicia sesión nuevamente.";
-        public const string Error = "Errror";
+        public const string SessionExpiredMessage = "SessionExpiredMessage";
+        public const string SesionExpirada = "Sesión expirada. Inicia sesión nuevamente.";
+        public const string Error = "Error";
         public TutorController(TutorService tutorService)
         {
             _tutorService = tutorService;
@@ -53,6 +55,12 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
+               
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
                 TempData[Error] = ex.Message;
                 return RedirectToAction("IniciarSesion", "General");
             }
@@ -63,55 +71,71 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(2)]
         public async Task<IActionResult> SolicitudesTutorias(int page = 1, int pageSize = 4, int idMateria = 0, int idModalidad = 0)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                TempData[Error] = "Solicitud no válida.";
-                return RedirectToAction(AccionSolicitudesTutorias);
+
+                if (!ModelState.IsValid)
+                {
+                    TempData[Error] = "Solicitud no válida.";
+                    return RedirectToAction(AccionSolicitudesTutorias);
+                }
+
+                // ModelState.IsValid no aplica en este método: no se recibe un modelo complejo, solo parámetros simples de filtro/paginación.
+                if (page < 1) page = 1;
+                if (pageSize < 1 || pageSize > 50) pageSize = 10;
+                if (idMateria < 0 || idModalidad < 0)
+                {
+                    TempData[Error] = "Filtros inválidos.";
+                    return RedirectToAction(AccionSolicitudesTutorias);
+                }
+
+                var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
+                var token = HttpContext.Session.GetString("Token");
+
+                if (idTutor == 0 || string.IsNullOrEmpty(token))
+                {
+                    TempData[Error] = "No se encontró la sesión del usuario.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                // 🔹 Llamada al servicio (con filtros si los hay)
+                var (ok, msg, solicitudes) = await _tutorService.ObtenerSolicitudesTutoriasAsync(idTutor, idMateria, idModalidad, token);
+
+                if (!ok || solicitudes == null)
+                {
+                    TempData[Error] = msg;
+                    return View(new List<SolicitudTutorDto>());
+                }
+
+                // 🔹 Paginación
+                int totalRegistros = solicitudes.Count;
+                int totalPaginas = (int)Math.Ceiling(totalRegistros / (double)pageSize);
+
+                var solicitudesPaginadas = solicitudes
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                // 🔹 Guardamos datos en ViewBag para conservar filtros al paginar
+                ViewBag.PaginaActual = page;
+                ViewBag.TotalPaginas = totalPaginas;
+                ViewBag.FiltroMateria = idMateria;
+                ViewBag.FiltroModalidad = idModalidad;
+
+                return View(solicitudesPaginadas);
+
             }
-
-            // ModelState.IsValid no aplica en este método: no se recibe un modelo complejo, solo parámetros simples de filtro/paginación.
-            if (page < 1) page = 1;
-            if (pageSize < 1 || pageSize > 50) pageSize = 10;
-            if (idMateria < 0 || idModalidad < 0)
+            catch (Exception ex)
             {
-                TempData[Error] = "Filtros inválidos.";
-                return RedirectToAction(AccionSolicitudesTutorias);
-            }
-
-            var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
-            var token = HttpContext.Session.GetString("Token");
-
-            if (idTutor == 0 || string.IsNullOrEmpty(token))
-            {
-                TempData[Error] = "No se encontró la sesión del usuario.";
+                // 🚨 Si el token expiró, el servicio te lanza TOKEN_EXPIRED
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                TempData[Error] = ex.Message;
                 return RedirectToAction("IniciarSesion", "General");
             }
-
-            // 🔹 Llamada al servicio (con filtros si los hay)
-            var (ok, msg, solicitudes) = await _tutorService.ObtenerSolicitudesTutoriasAsync(idTutor, idMateria, idModalidad, token);
-
-            if (!ok || solicitudes == null)
-            {
-                TempData[Error] = msg;
-                return View(new List<SolicitudTutorDto>());
-            }
-
-            // 🔹 Paginación
-            int totalRegistros = solicitudes.Count;
-            int totalPaginas = (int)Math.Ceiling(totalRegistros / (double)pageSize);
-
-            var solicitudesPaginadas = solicitudes
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            // 🔹 Guardamos datos en ViewBag para conservar filtros al paginar
-            ViewBag.PaginaActual = page;
-            ViewBag.TotalPaginas = totalPaginas;
-            ViewBag.FiltroMateria = idMateria;
-            ViewBag.FiltroModalidad = idModalidad;
-
-            return View(solicitudesPaginadas);
         }
         #pragma warning restore S5122
 
@@ -120,6 +144,7 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(2)]
         public IActionResult SolicitudesTutoriasEnviar(int idMateria, int idModalidad)
         {
+            
             if (!ModelState.IsValid)
             {
                 // Si los datos no son válidos, volvemos a mostrar la vista con los errores
@@ -134,22 +159,37 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(2)]
         public async Task<IActionResult> AceptarSolicitud(int idTutoria)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
-                return View(idTutoria);
-            }
-            var token = HttpContext.Session.GetString("Token");
-            var (ok, msg) = await _tutorService.AceptarSolicitudTutoriaAsync(idTutoria, token);
 
-            if (!ok)
-            {
-                TempData[Error] = msg;
+                if (!ModelState.IsValid)
+                {
+                    // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                    return View(idTutoria);
+                }
+                var token = HttpContext.Session.GetString("Token");
+                var (ok, msg) = await _tutorService.AceptarSolicitudTutoriaAsync(idTutoria, token);
+
+                if (!ok)
+                {
+                    TempData[Error] = msg;
+                    return RedirectToAction(AccionSolicitudesTutorias);
+                }
+
+                TempData["Exito"] = msg;
                 return RedirectToAction(AccionSolicitudesTutorias);
             }
-
-            TempData["Exito"] = msg;
-            return RedirectToAction(AccionSolicitudesTutorias);
+            catch (Exception ex)
+            {
+                
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                TempData[Error] = ex.Message;
+                            return RedirectToAction("IniciarSesion", "General");
+            }
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -177,24 +217,37 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(2)]
         public async Task<IActionResult> HistorialTutor(List<int>? idEstados)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
-                return View();
+                if (!ModelState.IsValid)
+                {
+                    // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                    return View();
+                }
+                var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
+                var token = HttpContext.Session.GetString("Token");
+
+                var (ok, msg, historial) = await _tutorService.ObtenerHistorialTutorAsync(idTutor, idEstados, token);
+
+                if (!ok)
+                {
+                    TempData[Error] = msg;
+                    return View(new List<HistorialTutoriaDto>());
+                }
+
+                TempData["Success"] = msg;
+                return View(historial);
             }
-            var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
-            var token = HttpContext.Session.GetString("Token");
-
-            var (ok, msg, historial) = await _tutorService.ObtenerHistorialTutorAsync(idTutor, idEstados, token);
-
-            if (!ok)
+            catch (Exception ex)
             {
-                TempData[Error] = msg;
-                return View(new List<HistorialTutoriaDto>());
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                TempData[Error] = ex.Message;
+                return RedirectToAction("HistorialTutor");
             }
-
-            TempData["Success"] = msg;
-            return View(historial);
         }
         [HttpGet]
         [ValidarRol(2)]
@@ -232,6 +285,11 @@ namespace EduConnect_Front.Controllers
             }
             catch (Exception ex)
             {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
                 TempData[Error] = ex.Message;
                 return RedirectToAction("ConsultarUsuarios");
             }
@@ -263,14 +321,20 @@ namespace EduConnect_Front.Controllers
                 HttpContext.Session.SetString("AvatarUrl", perfil.Avatar);
                 HttpContext.Session.SetString("UsuarioNombre", perfil.Nombre);
                 return RedirectToAction("EditarTutor");
-
-               
-
-               
+                             
             }
             catch (Exception ex)
             {
-                TempData[Error] = ex.Message;
+
+                // 🚨 Si el token expiró, el servicio te lanza TOKEN_EXPIRED
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                // ⚠️ Otros errores
+                TempData["Error"] = ex.Message;
                 return RedirectToAction("EditarTutor");
             }
         }
@@ -279,24 +343,40 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(2)]
         public async Task<IActionResult> RegistrarMaterias()
         {
-            var token = HttpContext.Session.GetString("Token");
-            var idTutor = HttpContext.Session.GetInt32("IdUsu");
-
-            if (string.IsNullOrEmpty(token) || idTutor == null)
+            try
             {
-                TempData[Error] = SessionExpiredMessage;
-                return RedirectToAction("IniciarSesion", "General");
+
+
+                var token = HttpContext.Session.GetString("Token");
+                var idTutor = HttpContext.Session.GetInt32("IdUsu");
+
+                if (string.IsNullOrEmpty(token) || idTutor == null)
+                {
+                    TempData[Error] = SessionExpiredMessage;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                var (ok, msg, materias) = await _tutorService.ObtenerMateriasPorTutorAsync(idTutor.Value, token);
+
+                if (!ok)
+                {
+                    TempData[Error] = msg;
+                    return RedirectToAction("PanelTutor", "Tutor");
+                }
+
+                return View(materias);
             }
-
-            var (ok, msg, materias) = await _tutorService.ObtenerMateriasPorTutorAsync(idTutor.Value, token);
-
-            if (!ok)
+            catch(Exception ex)
             {
-                TempData[Error] = msg;
-                return RedirectToAction("PanelTutor", "Tutor");
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                // ⚠️ Otros errores
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("RegistrarMaterias");
             }
-
-            return View(materias);
         }
 
 
@@ -305,53 +385,86 @@ namespace EduConnect_Front.Controllers
         [ValidarRol(2)]
         public async Task<IActionResult> GuardarMaterias(int[] MateriasSeleccionadas)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                // Si los datos no son válidos, volvemos a mostrar la vista con los errores
-                return View(MateriasSeleccionadas);
-            }
-            var token = HttpContext.Session.GetString("Token");
-            var idTutor = HttpContext.Session.GetInt32("IdUsu");
 
-            if (string.IsNullOrEmpty(token) || idTutor == null)
-            {
-                TempData[Error] = SessionExpiredMessage;
-                return RedirectToAction("IniciarSesion", "General");
-            }
+                if (!ModelState.IsValid)
+                {
+                    // Si los datos no son válidos, volvemos a mostrar la vista con los errores
+                    return View(MateriasSeleccionadas);
+                }
+                var token = HttpContext.Session.GetString("Token");
+                var idTutor = HttpContext.Session.GetInt32("IdUsu");
 
-            if (MateriasSeleccionadas == null || MateriasSeleccionadas.Length == 0)
+                if (string.IsNullOrEmpty(token) || idTutor == null)
+                {
+                    TempData[Error] = SessionExpiredMessage;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                if (MateriasSeleccionadas == null || MateriasSeleccionadas.Length == 0)
+                {
+                    TempData[Error] = "Debes seleccionar al menos una materia.";
+                    return RedirectToAction("RegistrarMaterias");
+                }
+
+                var (ok, msg) = await _tutorService.RegistrarMateriasAsync(idTutor.Value, MateriasSeleccionadas, token);
+
+                TempData[ok ? "Success" : "Error"] = msg;
+                return RedirectToAction("PanelTutor");
+
+            }
+            catch (Exception ex)
             {
-                TempData[Error] = "Debes seleccionar al menos una materia.";
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                // ⚠️ Otros errores
+                TempData["Error"] = ex.Message;
                 return RedirectToAction("RegistrarMaterias");
             }
 
-            var (ok, msg) = await _tutorService.RegistrarMateriasAsync(idTutor.Value, MateriasSeleccionadas, token);
-
-            TempData[ok ? "Success" : "Error"] = msg;
-            return RedirectToAction("PanelTutor");
         }
+
         [HttpGet]
         [ValidarRol(2)] // solo los tutores
         public async Task<IActionResult> ComentariosTutor()
         {
-            var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
-            var token = HttpContext.Session.GetString("Token");
-
-            if (idTutor == 0 || string.IsNullOrEmpty(token))
+            try
             {
-                TempData[Error] = "Sesión no válida.";
-                return RedirectToAction("IniciarSesion", "General");
+
+                var idTutor = HttpContext.Session.GetInt32("IdUsu") ?? 0;
+                var token = HttpContext.Session.GetString("Token");
+
+                if (idTutor == 0 || string.IsNullOrEmpty(token))
+                {
+                    TempData[Error] = "Sesión no válida.";
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+
+                var (ok, msg, data) = await _tutorService.ObtenerComentariosTutorAsync(idTutor, null, 1, token);
+
+                if (!ok)
+                {
+                    TempData[Error] = msg;
+                    return View(new List<ComentarioTutorDto>());
+                }
+
+                return View(data);
+            }
+            catch(Exception ex)
+            {
+                if (ex.Message == "TOKEN_EXPIRED")
+                {
+                    TempData[SessionExpiredMessage] = SesionExpirada;
+                    return RedirectToAction("IniciarSesion", "General");
+                }
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("ComentariosTutor");
             }
 
-            var (ok, msg, data) = await _tutorService.ObtenerComentariosTutorAsync(idTutor, null, 1, token);
-
-            if (!ok)
-            {
-                TempData[Error] = msg;
-                return View(new List<ComentarioTutorDto>());
-            }
-
-            return View(data);
         }
 
         [HttpPost]

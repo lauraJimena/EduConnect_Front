@@ -11,11 +11,15 @@
 
 </head>
 <body>
+    @{
+        var nombreUsuario = Context.Session.GetString("UsuarioNombre") ?? "Usuario";
+
+    }
     <header>
         <img src="~/img/logo.png" alt="Logo EduConnect" />
         <h2>Reporte de Tutores Activos e Inactivos</h2>
         <p>Generado el @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</p>
-
+        <p class="fecha">Por @nombreUsuario</p>
     </header>
 
     <table>
