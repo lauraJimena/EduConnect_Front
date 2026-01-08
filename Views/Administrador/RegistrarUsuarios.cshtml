@@ -80,15 +80,16 @@
             </div>
         </form>
 
-        @* Popup de error si la API respondió con fallo *@
-        @{
-            var error = ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage;
-        }
-        @await Html.PartialAsync("_Popup", new EduConnect_Front.Dtos.PopupDto {
-        Tipo = "error",
+        @if (TempData["ErrorRegistroAdm"] != null)
+        {
+            @await Html.PartialAsync("_Popup", new PopupDto
+            {
+                Tipo = "error",
                 Titulo = "No se pudo registrar",
-                Mensaje = error
+                Mensaje = TempData["ErrorRegistroAdm"] as string
                 })
+                }
+
     </section>
 </main>
 <script>
